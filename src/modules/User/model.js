@@ -105,6 +105,7 @@ const UserSchema=new mongoose.Schema({
         type:Boolean,
         default:false
       },
+      followers:[{type:mongoose.Schema.Types.ObjectId,ref:'user'}],
 
       otp: {
         type: Number,
