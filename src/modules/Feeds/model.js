@@ -36,7 +36,7 @@ const CommentSchema=new mongoose.Schema({
 },{timestamps:true});
 
 // Define The Uploads Schema
-const UploadSchema=new mongoose.Schema({
+const FeedSchema=new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,
@@ -74,3 +74,6 @@ const UploadSchema=new mongoose.Schema({
     },
     comments:[CommentSchema]
 },{timestamps:true});
+
+const FeedModel =mongoose.model('feeds',FeedSchema);
+module.exports = FeedModel;
