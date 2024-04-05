@@ -34,11 +34,6 @@ const registerHandler = asyncHandler(async(req, res) => {
 });
 
 
-const commitTest = asyncHandler(async(req,res)=>{
-  res.status(200).json({message:"tesst commit"})
-}) 
-
-
 
 
 
