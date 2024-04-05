@@ -86,13 +86,24 @@ const UserSchema=new mongoose.Schema({
         max:[23,'Host must be at least 23 characters'],
     
      },
+
       monthlyTarget:{
         type:String,
         max:[120,'Target must be at least 20 characters']
       },
+
       referenceBy:{
         type:String,
         max:[20,'Reference must be at least 20 characters']
+      },
+
+      agencyNid:{
+        type:[String]
+      },
+
+      isApproved:{
+        type:Boolean,
+        default:false
       },
 
       otp: {
@@ -110,7 +121,7 @@ const UserSchema=new mongoose.Schema({
       },
       role: {
         type: String,
-        // BU -> Basic User
+       // BU -> Basic User
        // HO -> Host
        // AG ->Agency Owner
        // MP -> Master Portal
