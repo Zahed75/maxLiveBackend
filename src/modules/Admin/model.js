@@ -10,7 +10,6 @@ const adminSchema = new mongoose.Schema({
     carousel: {
         type : String,
         required: false,
-        
     },
     carouselLink:{
         type : String,
