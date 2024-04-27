@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./model');
 const { NotFound, BadRequest } = require('../../utility/errors');
-
+const firebase = require('../../utility/firebaseConfig');
 
 
 
@@ -40,8 +40,8 @@ const resetPassword = async (email, newPassword) => {
 
 //getAllUser
 
-const getAllUsers=async(data)=>{
-    const user=await User.find();
+const getUserById=async(userId)=>{
+    const user=await firebase.getUserById(userId);
     return user;
 }
 
@@ -53,6 +53,6 @@ const getAllUsers=async(data)=>{
 
 module.exports = {
   resetPassword,
-  getAllUsers
+  getUserById
  
 };
