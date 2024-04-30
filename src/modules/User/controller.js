@@ -48,7 +48,7 @@ const getUserProfileById = asyncHandler(async (req, res) => {
 });
 
 const getAllUsersHandler = asyncHandler(async (req, res) => {
-  const users = await userService.getAllUsers();
+  const users = await userService.getAllUserService();
   res.status(200).json({ users });
 });
 
@@ -60,11 +60,42 @@ const saveUserHandler = asyncHandler(async (req, res) => {
   });
 });
 
+const updateUserInfoHandler = asyncHandler(async(req, res) => {
+
+  const updatedUser=await userService.updateUserInfoService(req.params.id,req.body);
+  res.status(200).json({
+      updatedUser
+  })
+});
+
+const signInHandler = asyncHandler(async(req, res)=>{
+  const { email } = req.body;
+
+  try {
+    await userService.generateAndSendOTPService(email);
+    res.status(200).json({ message: 'OTP sent to email for sign-in' });
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
+})
+const otpVerifyHandler = asyncHandler(async(req,res)=>{
+  const { email, otp } = req.body;
+  const verify=await userService.verifyOTPService(email,otp)
+  
+    res.json({
+       message: 'OTP verified successfully. User activated.',
+       verify
+      });
+});
 
 
 
-
-router.post("/registerUserHandler",registerUserHandler)
+router.post("/otpVerifyHandler",otpVerifyHandler)
+router.post("/signInHandler",signInHandler)
+router.post("/registerUserHandler",registerUserHandler);
+router.get("/getAllUser",getAllUsersHandler);
+router.put("/updateUserInfo/:id",updateUserInfoHandler)
 router.post("/resetPass", resetPasswordHandler);
 router.get("/usersById/:userId", getUserProfileById);
 router.get("/allUsers", getAllUsersHandler);

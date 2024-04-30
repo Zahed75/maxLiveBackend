@@ -21,6 +21,16 @@ const UserSchema = new mongoose.Schema(
         return this.role === "BU";
       },
     },
+    userName:{
+      type : String
+    },
+    birthdate:{
+      type : String
+    },
+    gender:{
+      type : String,
+      enum:['male','female','others']
+    },
 
     email: {
       type: String,
