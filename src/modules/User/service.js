@@ -9,8 +9,8 @@ const userRegisterService = async(userData)=>{
   const newUser = await User.create(userData);
   if (!newUser) {
       throw new BadRequest('Could Not Create User');
-  return newUser;
   }
+  return newUser;
 }
 
 
@@ -72,6 +72,6 @@ const getSocialUserById=async(userId)=>{
 module.exports = {
   resetPassword,
   getSocialUserById,
-  getAllUsers,
- saveUserService
+ saveUserService,
+ userRegisterService
 };
