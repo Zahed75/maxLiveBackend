@@ -5,6 +5,14 @@ const { NotFound, BadRequest } = require('../../utility/errors');
 const firebase = require('../../utility/firebaseConfig');
 
 
+const userRegisterService = async(userData)=>{
+  const newUser = await User.create(userData);
+  if (!newUser) {
+      throw new BadRequest('Could Not Create User');
+  return newUser;
+  }
+}
+
 
 
 
@@ -40,19 +48,30 @@ const resetPassword = async (email, newPassword) => {
 
 //getAllUser
 
-const getUserById=async(userId)=>{
+const getSocialUserById=async(userId)=>{
+    try{
     const user=await firebase.getUserById(userId);
     return user;
+    }
+    catch(error){
+        console.log(error)
+    }
 }
 
 
 
-
-
-
+  const saveUserService = async(userData)=>{
+    
+    const newUser = await User.create(userData);
+    if (!newUser) {
+        throw new BadRequest('Could Not Create User');
+    return newUser;
+  }
+}
 
 module.exports = {
   resetPassword,
-  getUserById
- 
+  getSocialUserById,
+  getAllUsers,
+ saveUserService
 };

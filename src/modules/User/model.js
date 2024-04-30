@@ -7,12 +7,16 @@ const UserSchema=new mongoose.Schema({
     firstName:{
     type:String,
      max:[30,'Please Input Your Name'],
-    required:[true,'Must Be required your name']
-    },
+    required:function () {
+      return this.role === 'BU';
+  }
+                                        },
     lastName:{
       type:String,
        max:[30,'Please Input Your Name'],
-      required:[true,'Must Be required your name']
+      required:function () {
+        return this.role === 'BU';
+    }
       },
   
     email: {
@@ -34,6 +38,9 @@ const UserSchema=new mongoose.Schema({
         type: String,
         unique: [true, 'your host must be unique'],
         max:[8,'Your host must be less than 8 characters'],
+        required: function () {
+          return this.role === 'HO';
+      }
     
       },
       agencyId:[
@@ -46,7 +53,9 @@ const UserSchema=new mongoose.Schema({
       hostType:{
         type:String,
         enum:['AU','VD'],
-        required:[true,'Type Must be selected']
+        required:function () {
+          return this.role === 'HO';
+      }
       },
     
       hostNid:{
@@ -55,7 +64,10 @@ const UserSchema=new mongoose.Schema({
 
       agencyName:{
         type:String,
-        max:[120,'Name Must be at least 120 characters']
+        max:[120,'Name Must be at least 120 characters'],
+        required:function () {
+          return this.role === 'AG';
+      }
       },
      country:{
         type:String,
@@ -68,13 +80,17 @@ const UserSchema=new mongoose.Schema({
      agencyEmail:{
       type:String,
       unique:true,
-      required: [true, 'email must be required'],
+      required: function () {
+        return this.role === 'AG';
+    }
      },
 
      agencyNumber:{
         type:String,
         max:[12,'Phone Number must be less then 13 characters'],
-        required:[true,'Must input Phone Number']
+        required:function () {
+          return this.role === 'AG';
+      }
      },
      previousAppName:{
       type:String,
@@ -143,8 +159,6 @@ const UserSchema=new mongoose.Schema({
       
 },{ timestamps: true }
 );
-
-
 
 // Password Hash Function using Bycryptjs
 

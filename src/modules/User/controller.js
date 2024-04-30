@@ -16,8 +16,6 @@ const { asyncHandler } = require('../../utility/common');
 const { HEAD_OFFICE,BRANCH_ADMIN } = require('../../config/constants');
 
 
-
-
 const resetPasswordHandler = asyncHandler(async(req,res)=>{
 
     const { email, newPassword } = req.body;
@@ -30,11 +28,7 @@ const resetPasswordHandler = asyncHandler(async(req,res)=>{
    
 })
 
-
-
-// getAllUsers
-
-const getUserProfileById = async (req, res) => {
+const getUserProfileById = asyncHandler(async (req, res) => {
     const userId = req.params.userId;
     try {
       const user = await userService.getUserById(userId);
@@ -42,15 +36,31 @@ const getUserProfileById = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  };
+  });
+
+  const getAllUsersHandler = asyncHandler(async (req, res) => {
+    const users = await userService.getAllUsers();
+    res.status(200).json({ users });
+  });
 
 
+  const 
 
+  const saveUserHandler = asyncHandler(async(req,res)=>{
 
+    const user = await userService.saveUserService(req.body);
+    res.status(200).json({
+        message: "User added successfully!",
+        user
+    })
+  
+  })
 
 
 
 router.post('/resetPass',resetPasswordHandler);
-router.get('/allUsers/:userId', getUserProfileById);
+router.get('/usersById/:userId', getUserProfileById);
+router.get('/allUsers', getAllUsersHandler);
+router.post('/saveUser',saveUserHandler);
 
 module.exports = router;

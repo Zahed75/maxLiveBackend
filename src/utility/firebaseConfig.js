@@ -5,13 +5,16 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-module.exports = admin;
-
-exports.getUserById = async (userId) => {
+const firebase = {
+  admin,
+  getUserById: async (userId) => {
     try {
       const userRecord = await admin.auth().getUser(userId);
       return userRecord.toJSON();
     } catch (error) {
       throw new Error('User not found');
     }
-  };
+  }
+};
+
+module.exports = firebase;
