@@ -22,10 +22,23 @@ const generateOTP = () => {
   
     return numStr;
   }
+
+ 
+const generateHostId = () => {
+  let hostId = '';
+  const idLength = 8;
+  for (let i = 0; i < idLength; i++) {
+    const digit = Math.floor(Math.random() * 10); 
+    hostId += digit;
+  }
+  return hostId;
+};
+
   
   module.exports = {
     generateOTP,
     asyncHandler,
     convertTo4Digit,
+    generateHostId
   };
   

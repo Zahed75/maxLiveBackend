@@ -14,6 +14,7 @@ const roleMiddleware = require("../../middlewares/roleMiddleware");
 const handleValidation = require("../../middlewares/schemaValidation");
 const { asyncHandler } = require("../../utility/common");
 const { HEAD_OFFICE, BRANCH_ADMIN } = require("../../config/constants");
+const { app } = require("firebase-admin");
 
 
 const registerUserHandler = asyncHandler(async(req,res)=>{
@@ -91,6 +92,20 @@ const otpVerifyHandler = asyncHandler(async(req,res)=>{
 
 
 
+const applyToBeHostHandler = asyncHandler(async(req,res)=>{
+
+  const agencyId = req.params.agencyId;
+  const hostType = req.body;
+  console.log(req.user)
+  const hostId = await userService.applyToBeHostService(agencyId,hostType,req.user);
+  if(!hostId){
+    res.status(401).json({message:"Unauthorized to be a host"})
+  }
+  res.status(201).json({message:"successful",hostId})
+  console.log(req.user);
+
+})
+
 router.post("/otpVerifyHandler",otpVerifyHandler)
 router.post("/signInHandler",signInHandler)
 router.post("/registerUserHandler",registerUserHandler);
@@ -100,6 +115,7 @@ router.post("/resetPass", resetPasswordHandler);
 router.get("/usersById/:userId", getUserProfileById);
 router.get("/allUsers", getAllUsersHandler);
 router.post("/saveUser", saveUserHandler);
+router.post("/applytoBeHost",applyToBeHostHandler);
 
 
 module.exports = router;
