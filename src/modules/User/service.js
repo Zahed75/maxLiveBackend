@@ -4,15 +4,7 @@ const User = require("./model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
-const nodemailer = require("nodemailer");
 
-const userRegisterService = async (userData) => {
-  const newUser = await User.create(userData);
-  if (!newUser) {
-    throw new BadRequest("Could Not Create User");
-  }
-  return newUser;
-};
 
 const resetPassword = async (email, newPassword) => {
   try {
@@ -52,13 +44,6 @@ const getSocialUserById = async (userId) => {
   }
 };
 
-const saveUserService = async (userData) => {
-  const newUser = await User.create(userData);
-  if (!newUser) {
-    throw new BadRequest("Could Not Create User");
-  }
-  return newUser;
-};
 
 const getAllUserService = async () => {
   const Users = await User.find();
@@ -79,82 +64,34 @@ const updateUserInfoService = async (userId, updatedInfo) => {
   return updatedResult;
 };
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "shahriartasin2000@gmail.com",
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
-function sendOTP(email, otp) {
-  const mailOptions = {
-    from: "shahriartasin2000@gmail.com",
-    to: email,
-    subject: "OTP for Sign-in",
-    text: `Your OTP for sign-in is: ${otp}`,
-  };
 
-  return transporter.sendMail(mailOptions);
-}
 
-const generateAndSendOTPService = async (email) => {
+const applyToBeHostService = async (agencyId, hostType, userId,role) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error("User not found");
-    }
 
-    const otp = generateOTP();
-    user.otp = otp;
-    await user.save();
-    await sendOTP(email, otp);
-  } catch (error) {
-    throw new Error("Error generating and sending OTP: " + error.message);
-  }
-};
-
-const verifyOTPService = async (email, otp) => {
-  try {
-    const user = await User.findOne({ email, otp });
-    if (!user) {
-      throw new BadRequest("Invalid OTP.");
-    }
-
-    // Update user
-    user.isActive = true;
-    user.isVerified = true;
-    user.otp = undefined; // Clear OTP after verification
-    await user.save();
-  } catch (error) {
-    throw new BadRequest("Failed to verify OTP.");
-  }
-};
-
-const applyToBeHostService = async (agencyId, hostType, user) => {
-  try {
     const hostId = generateHostId();
-    console.log("hostid :",hostId);
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found"); // Throw an error if user is not found
+    }
     user.agencyId = agencyId;
     user.hostType = hostType;
     user.hostId = hostId;
+    user.role = role;
     await user.save();
-    res
-      .status(200)
-      .json({ message: "Host application submitted successfully", hostId });
+    
+    return hostId;
   } catch (error) {
-    return error;
+    console.error("Error applying to be host:", error);
+    throw error;
   }
 };
 
 module.exports = {
   resetPassword,
   getSocialUserById,
-  saveUserService,
-  userRegisterService,
   getAllUserService,
   updateUserInfoService,
-  generateAndSendOTPService,
-  verifyOTPService,
   applyToBeHostService,
 };

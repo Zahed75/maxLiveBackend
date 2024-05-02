@@ -52,12 +52,11 @@ const UserSchema = new mongoose.Schema(
         return this.role === "HO";
       },
     },
-    agencyId: [
+    agencyId: 
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "agency",
+        type: String,
+        
       },
-    ],
 
     hostType: {
       type: String,
@@ -88,9 +87,6 @@ const UserSchema = new mongoose.Schema(
     },
     agencyEmail: {
       type: String,
-      unique: function () {
-        return this.role === "AG";
-      },
       required: function () {
         return this.role === "AG";
       },

@@ -15,34 +15,17 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const { asyncHandler } = require('../../utility/common');
 
 
-
-
-
-
-
-// Register a new user
-
-const registerHandler = asyncHandler(async(req, res) => {
-  const { email, phoneNumber, password, role } = req.body;
-  const user = await authService.UserRegister(email, phoneNumber, password, role);
-
-  res.status(200).json({
-      message: "Your account has been registered. Please check your email for the OTP.",
-      email: user.email,
-      user,
-  });
+const registerUserHandler = asyncHandler(async (req, res) => {
+  const userInfo = await authService.userRegisterService(req.body);
+  res.status(200).json({ message: "user created successfully", userInfo });
 });
-
-
-
-
 
 
 // Verify OTP
 
 const otpVerifyHandler = asyncHandler(async(req,res)=>{
   const { email, otp } = req.body;
-  const verify=await authService.verifyOTP(email,otp)
+  const verify=await authService.verifyOTPService(email,otp)
   
     res.json({
        message: 'OTP verified successfully. User activated.',
@@ -80,42 +63,25 @@ const expireOTP = async (req, res, next) => {
 
 
 
-//UserSignIn
+const signInHandler = asyncHandler(async(req, res)=>{
+  const { email } = req.body;
 
-const signInHandler=asyncHandler(async(req,res)=>{
-  const { email, password } = req.body;
-  const response = await authService.signIn(email, password);
-  res.status(200).json({
-    messsage:"User signed in Successfully",
-    response
-  });
+  try {
+    await authService.generateAndSendOTPService(email);
+    res.status(200).json({ message: 'OTP sent to email for sign-in' });
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
 })
 
 
-
-//SignInUser
-
-const userSignInHandler= async (req, res, next) => {
-  const { email, password } = req.body;
-  try {
-    const user = await authService.signinUser(email, password);
-    res.status(200).json({
-      message: 'User signed in successfully.',
-      user
-    });
-  } catch (error) {
-    res.status(401).json({
-      error: error.message
-    });
-  }
-};
-
-
-router.post('/adminRegister',registerHandler);
+router.post("/registerUserHandler", registerUserHandler);
+router.post("/signInHandler",signInHandler);
 router.post('/otpVerification',otpVerifyHandler);
-router.post('/otpResend',resendOTPHandler);
-router.post('/expireOTP',expireOTP);
-router.post('/signInAdmin',userSignInHandler)
+router.post('/otpResend',resendOTPHandler);//not tested in postman
+router.post('/expireOTP',expireOTP);//not tested in postman
+
 
 
 
