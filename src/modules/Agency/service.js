@@ -3,8 +3,8 @@ const { NotFound, BadRequest } = require("../../utility/errors");
 
 const registerAgencyService = async (agencyData) => {
     try {
-        const { agencyName, agencyHolderName, country, presentAddress, email, phone, role } = agencyData;
-        if (!agencyName || !agencyHolderName || !country || !presentAddress || !email || !phone || !role) {
+        const { agencyName, agencyHolderName, country, presentAddress, email, phone} = agencyData;
+        if (!agencyName || !agencyHolderName || !country || !presentAddress || !email || !phone) {
             return { status: 400, message: "All fields are required" };
         }
 

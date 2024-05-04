@@ -11,14 +11,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: [30, "Please Input Your Name"],
       required: function () {
-        return this.role === "BU";
+        return this.role === "BU"||"HO";
       },
     },
     lastName: {
       type: String,
       max: [30, "Please Input Your Name"],
       required: function () {
-        return this.role === "BU";
+        return this.role === "BU"||"HO";
       },
     },
     userName:{
@@ -92,13 +92,13 @@ const UserSchema = new mongoose.Schema(
       },
     },
 
-    agencyNumber: {
-      type: String,
-      max: [12, "Phone Number must be less then 13 characters"],
-      required: function () {
-        return this.role === "AG";
-      },
-    },
+    // agencyNumber: {
+    //   type: String,
+    //   max: [12, "Phone Number must be less then 13 characters"],
+    //   required: function () {
+    //     return this.role === "AG";
+    //   },
+    // },
     previousAppName: {
       type: String,
       max: [20, "App Name must be at least 20 characters"],
@@ -126,7 +126,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    hostStatus :{
+      type : String,
+      enum : ["None","Pending","Accepted"],
+      default : "None"
+    },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     otp: {
       type: Number,
@@ -180,11 +185,11 @@ UserSchema.methods = {
   },
 };
 
-//Validations
-UserSchema.path("agencyNumber").validate(function (value) {
-  const regex = /^\d{13}$/; // regular expression to match 11 digits
-  return regex.test(value);
-}, "Must be a valid phone number");
+// //Validations
+// UserSchema.path("agencyNumber").validate(function (value) {
+//   const regex = /^\d{13}$/; // regular expression to match 11 digits
+//   return regex.test(value);
+// }, "Must be a valid phone number");
 
 const UserModel = mongoose.model("user", UserSchema);
 

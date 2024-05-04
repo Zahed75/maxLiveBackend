@@ -4,11 +4,11 @@ const agencyService = require('../Agency/service');
 const { asyncHandler } = require("../../utility/common");
 
 
-const registerAgency = async (req, res) => {
+const registerAgency = asyncHandler(async (req, res) => {
     try {
       // Check if the request body contains all required fields
-      const { agencyName, agencyHolderName, country, presentAddress, email, phone,role } = req.body;
-      if (!agencyName || !agencyHolderName || !country || !presentAddress || !email || !phone|| !role) {
+      const { agencyName, agencyHolderName, country, presentAddress, email, phone } = req.body;
+      if (!agencyName || !agencyHolderName || !country || !presentAddress || !email || !phone) {
         return res.status(400).json({ message: "All fields are required" });
       }
   
@@ -19,7 +19,7 @@ const registerAgency = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
     }
-  };
+  });
   
   router.use('/registerAgency',registerAgency);
 

@@ -2,6 +2,10 @@ const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const agencySchema = new mongoose.Schema({
+  agencyId:{
+    type : String,
+    max :[30,"agencyId should be under 30 characters"]
+  },
   agencyName: {
     type: String,
     required: [true, "Agency name is required"],
@@ -27,6 +31,7 @@ const agencySchema = new mongoose.Schema({
 
     enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
     require: [true, "Role must be selected"],
+    default: "AG"
   },
   presentAddress: {
     type: String,

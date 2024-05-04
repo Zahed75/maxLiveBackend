@@ -54,26 +54,11 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
   });
 });
 
-const applyToBeHostHandler = asyncHandler(async (req, res) => {
-  const agencyId = req.body.agencyId;
-  const hostType = req.body.hostType;
-  const userId = req.params.userId;
-  const hostId = await userService.applyToBeHostService(
-    agencyId,
-    hostType,
-    userId
-  );
-  if (!hostId) {
-    res.status(401).json({ message: "Unauthorized to be a host" });
-  }
-  res.status(201).json({ message: "successful", hostId });
-});
-
 
 router.get("/getAllUser", getAllUsersHandler);
 router.put("/updateUserInfo/:id", updateUserInfoHandler);
 router.get("/usersById/:userId", getUserProfileById);
-router.post("/applytoBeHost/:userId", applyToBeHostHandler);
+
 router.post("/resetPass", resetPasswordHandler);//not tested in postman
 
 module.exports = router;
