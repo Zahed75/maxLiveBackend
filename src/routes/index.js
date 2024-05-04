@@ -10,11 +10,12 @@ const authVerifyMiddleware = require('../middlewares/authMiddleware');
 //routes
 const authRoute = require('../modules/Auth/controller');
 const userRoute=require('../modules/User/controller');
-
+const agencyRoute = require('../modules/Agency/controller');
 //EndPoint
 
 router.use('/auth', authRoute);
 router.use('/user',userRoute);
+router.use('/agency',agencyRoute);
 router.use(authVerifyMiddleware);
 
 module.exports = router;

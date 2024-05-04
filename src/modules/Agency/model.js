@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const agencySchema = new mongoose.Schema({
@@ -11,8 +12,21 @@ const agencySchema = new mongoose.Schema({
   },
   country: {
     type: String,
-    enum: ["BD", "IND", "PAK"], // Add all countries as enum values
-    required: [true, "Country is required"],
+    enum: ["BD", "NEP", "IND"], 
+
+  },
+  role: {
+    type: String,
+    // BU -> Basic User
+    // HO -> Host
+    // AG ->Agency Owner
+    // MP -> Master Portal
+    // AD -> Admin
+    //CN ->Coin Resller
+    //BR -> Bean Reseller
+
+    enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
+    require: [true, "Role must be selected"],
   },
   presentAddress: {
     type: String,
@@ -42,7 +56,15 @@ const agencySchema = new mongoose.Schema({
     type: String,
   },
   nidPhoto: {
-    type: [String]
+    type: [String],
+  },
+  isApproved: {
+    type: Boolean,
+    default: false,
+  },
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
   },
 });
 
