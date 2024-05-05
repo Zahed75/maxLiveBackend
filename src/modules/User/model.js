@@ -55,7 +55,6 @@ const UserSchema = new mongoose.Schema(
     agencyId: 
       {
         type: String,
-        
       },
 
     hostType: {
