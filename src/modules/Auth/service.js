@@ -25,11 +25,17 @@ const { decrypt } = require('dotenv');
 // Admin Register a new user
 
 const userRegisterService = async (userData) => {
-  const newUser = await User.create(userData);
-  if (!newUser) {
-    throw new BadRequest("Could Not Create User");
+  try {
+    const { email } = userData;
+    const otp = await generateAndSendOTPService(email);
+    const newUser = await User.create({ ...userData, otp });
+    if (!newUser) {
+      throw new BadRequest("Could Not Create User");
+    }
+    return newUser;
+  } catch (error) {
+    throw new Error("Error registering user: " + error.message);
   }
-  return newUser;
 };
 
 
@@ -114,17 +120,12 @@ function sendOTP(email, otp) {
 
   return transporter.sendMail(mailOptions);
 }
+
 const generateAndSendOTPService = async (email) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error("User not found");
-    }
-
     const otp = generateOTP();
-    user.otp = otp;
-    await user.save();
     await sendOTP(email, otp);
+    return otp;
   } catch (error) {
     throw new Error("Error generating and sending OTP: " + error.message);
   }

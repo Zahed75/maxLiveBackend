@@ -24,6 +24,7 @@ const registerUserHandler = asyncHandler(async (req, res) => {
 // Verify OTP
 
 const otpVerifyHandler = asyncHandler(async(req,res)=>{
+  
   const { email, otp } = req.body;
   const verify=await authService.verifyOTPService(email,otp)
   
@@ -63,21 +64,8 @@ const expireOTP = async (req, res, next) => {
 
 
 
-const signInHandler = asyncHandler(async(req, res)=>{
-  const { email } = req.body;
-
-  try {
-    await authService.generateAndSendOTPService(email);
-    res.status(200).json({ message: 'OTP sent to email for sign-in' });
-  } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({ message: 'Failed to send OTP' });
-  }
-})
-
 
 router.post("/registerUserHandler", registerUserHandler);
-router.post("/signInHandler",signInHandler);
 router.post('/otpVerification',otpVerifyHandler);
 router.post('/otpResend',resendOTPHandler);//not tested in postman
 router.post('/expireOTP',expireOTP);//not tested in postman

@@ -62,9 +62,8 @@ const hostSchema = new mongoose.Schema({
   agencyId: 
     {
       type: String,
-      
-    },
 
+    },
   hostType: {
     type: String,
     enum: ["AU", "VD"],
@@ -81,7 +80,7 @@ const hostSchema = new mongoose.Schema({
     type: String,
     max: [120, "Name Must be at least 120 characters"],
     required: function () {
-      return this.role === "AG";
+      return this.role === "HO";
     },
   },
   country: {
@@ -95,7 +94,7 @@ const hostSchema = new mongoose.Schema({
   agencyEmail: {
     type: String,
     required: function () {
-      return this.role === "AG";
+      return this.role === "HO";
     },
   },
 
