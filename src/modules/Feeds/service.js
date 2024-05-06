@@ -77,6 +77,24 @@ const addComment=async(postId, userId, comment)=>{
 }
 
 
+// addReply
+
+const addReply=async(postId, commentId, userId, reply)=>{
+    const posts = await feedModel.findById(postId);
+    if (!posts) {
+        throw new Error('Posts not found');
+    }
+
+    const comment = posts.comments.find(comment => comment._id == commentId);
+    if (!comment) {
+        throw new Error('Comment not found');
+    }
+
+    comment.replies.push({ userId, reply });
+    await posts.save();
+    return posts;
+    
+}
 
 
 
@@ -87,6 +105,7 @@ module.exports = {
     updatePostById,
     deletePostById,
     getAllPosts,
-    addComment
+    addComment,
+    addReply
 
 }
