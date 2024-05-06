@@ -63,13 +63,29 @@ const expireOTP = async (req, res, next) => {
 };
 
 
+const userSignInHandler= async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const user = await authService.signinUserService(email, password);
+    res.status(200).json({
+      message: 'User signed in successfully.',
+      user
+    });
+  } catch (error) {
+    res.status(401).json({
+      error: error.message
+    });
+  }
+};
+
+
 
 
 router.post("/registerUserHandler", registerUserHandler);
 router.post('/otpVerification',otpVerifyHandler);
 router.post('/otpResend',resendOTPHandler);//not tested in postman
 router.post('/expireOTP',expireOTP);//not tested in postman
-
+router.post('/signInUser',userSignInHandler)
 
 
 

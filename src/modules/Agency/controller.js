@@ -50,6 +50,6 @@ const getAllPendingHostHandler = asyncHandler(async (req, res) => {
 });
 
 router.post("/registerAgency", registerAgency);
-router.get("/getAllPendingHostHandler",roleMiddleware([AGENCY_OWNER,ADMIN,]),getAllPendingHostHandler);
+router.get("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
 
 module.exports = router;

@@ -55,26 +55,12 @@ const getPendingHostService = async (role) => {
     }
 
     const pendingHosts = await User.find({ hostStatus: "Pending" });
-
+    
     // Check if there are any pending hosts
     if (pendingHosts.length === 0) {
       return { message: "No pending hosts found" }; // Return a message if no pending hosts found
     }
     return pendingHosts;
-    //   await Promise.all(
-    //     pendingHosts.map(async (host) => {
-    //       const newHost = new Host({
-    //         userId: host._id,
-    //         firstName: host.firstName,
-    //         lastName: host.lastName,
-    //         email: host.email,
-    //         hostType: host.hostType,
-    //         // Add additional fields if needed
-    //       });
-    //       await newHost.save();
-    //       return newHost;
-    //     })
-    //   );
   } catch (error) {
     console.error("Error saving pending hosts:", error);
     throw new Error("Internal server error");
