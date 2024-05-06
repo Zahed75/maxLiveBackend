@@ -38,6 +38,8 @@ const UserSchema = new mongoose.Schema(
       required: [true, "email must be required"],
     },
 
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    
     password: {
       type: String,
       max: [6, "Your Password must be in 6 digits"],
@@ -65,7 +67,7 @@ const UserSchema = new mongoose.Schema(
       },
     },
 
-    hostNid: {
+    userNid: {
       type: [String],
     },
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const agencyService = require("../Agency/service");
 const { asyncHandler } = require("../../utility/common");
 const roleMiddleware = require('../../middlewares/roleMiddleware');
-
+const authMiddleware = require('../../middlewares/authMiddleware');
 const {
   AGENCY_OWNER,
   ADMIN,
@@ -50,6 +50,6 @@ const getAllPendingHostHandler = asyncHandler(async (req, res) => {
 });
 
 router.post("/registerAgency", registerAgency);
-router.post("/getAllPendingHostHandler",roleMiddleware([AGENCY_OWNER,ADMIN,]),getAllPendingHostHandler);
+router.get("/getAllPendingHostHandler",roleMiddleware([AGENCY_OWNER,ADMIN,]),getAllPendingHostHandler);
 
 module.exports = router;
