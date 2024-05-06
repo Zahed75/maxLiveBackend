@@ -24,5 +24,8 @@ const applyToBeHostHandler = asyncHandler(async (req, res) => {
 
   
 router.post("/applytoBeHost/:userId/:agencyId/:hostId", applyToBeHostHandler);
+
+
+
   
 module.exports = router;

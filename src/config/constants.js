@@ -4,6 +4,6 @@ module.exports = {
     BASIC_USER: 'BU',
     HOST: 'HO',
     AGENCY_OWNER: 'AG',
-    SUPER_ADMIN: 'SA',
+    ADMIN:'AD',
   };
   

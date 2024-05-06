@@ -109,10 +109,10 @@ const hostSchema = new mongoose.Schema({
     type: String,
     max: [20, "App Name must be at least 20 characters"],
   },
-  activeHost: {
-    type: String,
-    max: [23, "Host must be at least 23 characters"],
-  },
+  // activeHost: {
+  //   type: String,
+  //   max: [23, "Host must be at least 23 characters"],
+  // },
 
   monthlyTarget: {
     type: String,
@@ -124,9 +124,9 @@ const hostSchema = new mongoose.Schema({
     max: [20, "Reference must be at least 20 characters"],
   },
 
-  agencyNid: {
-    type: [String],
-  },
+  // agencyNid: {
+  //   type: [String],
+  // },
 
   isApproved: {
     type: Boolean,
