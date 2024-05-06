@@ -35,6 +35,8 @@ const createPostHandler = asyncHandler(async(req,res)=>{
 
 
 
+
+
 // updatePostByUserId
 
 const updatePostHandler=asyncHandler(async(req,res)=>{
@@ -47,12 +49,66 @@ const updatePostHandler=asyncHandler(async(req,res)=>{
 })
 
 
+// dletePostHandler
+
+const deletePostByIdHandler = asyncHandler(async(req,res)=>{
+
+    const  {id}=req.params;
+    const posts= await feedService.deletePostById(id,req.body);
+    res.status(200).json({
+        message:"Post deleted successfully",
+        posts
+    })
+
+})
+
+
+// getAllPostsController
+const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
+const getAllPostsHandler = asyncHandler(async(req,res)=>{
+    const allPosts = await feedService.getAllPosts();
+
+        if (allPosts.length === 0) {
+            return res.status(404).json({ message: "No posts found" });
+        }
+
+        const shuffledPosts = shuffleArray(allPosts);
+        const randomPosts = shuffledPosts.filter((post, index) => index % 2 === 0);
+        res.status(200).json({
+            message:"GetALLPost Fetched SuccessFully!",
+            randomPosts
+        })
+})
+
+
+
+//addComment Handler
+
+const addCommentHandler=asyncHandler(async(req,res)=>{
+    const { userId, comment } = req.body;
+    const postId = req.params.postId;
+
+    const posts = await feedService.addComment(postId, userId, comment);
+
+    res.status(201).json({ message: 'Comment added successfully', posts });
+})
+
+
 
 
 
 router.post('/addPost',createPostHandler);
 router.put('/:id',updatePostHandler);
-
+router.delete('/:id',deletePostByIdHandler);
+router.get('/allPosts',getAllPostsHandler)
+router.post('/addComments/:postId',addCommentHandler)
 module.exports=router;
 
 
