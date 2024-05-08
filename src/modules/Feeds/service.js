@@ -79,21 +79,24 @@ const addComment=async(postId, userId, comment)=>{
 
 // addReply
 
-const addReply=async(postId, commentId, userId, reply)=>{
-    const posts = await feedModel.findById(postId);
-    if (!posts) {
-        throw new Error('Posts not found');
-    }
+const addReply = async (postId, commentId, userId, reply) => {
+    try {
+        const post = await feedModel.findById(postId);
+        if (!post) {
+            throw new Error('Post not found');
+        }
 
-    const comment = posts.comments.find(comment => comment._id == commentId);
-    if (!comment) {
-        throw new Error('Comment not found');
-    }
+        const comment = post.comments.find(comment => comment._id == commentId);
+        if (!comment) {
+            throw new Error('Comment not found');
+        }
 
-    comment.replies.push({ userId, reply });
-    await posts.save();
-    return posts;
-    
+        comment.replies.push({ UserId: userId, reply: reply }); // Assign UserId field correctly
+        await post.save();
+        return post;
+    } catch (error) {
+        throw error;
+    }
 }
 
 

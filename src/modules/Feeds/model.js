@@ -3,18 +3,18 @@ const mongoose=require('mongoose');
 const User=require('../User/model');
 const { required } = require('joi');
 
-const ReplySchema=new mongoose.Schema({
-    UserId:{
-        type:mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref:'user'
+const ReplySchema = new mongoose.Schema({
+    UserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'user'
     },
-    reply:{
-        type:String,
-        required:true,
-        max:[500,'Reply Must be less than 500 characters']
+    reply: {
+        type: String,
+        required: true,
+        max: [500, 'Reply Must be less than 500 characters']
     }
-},{timestamps:true});
+}, { timestamps: true });
 
 // Commments schema
 

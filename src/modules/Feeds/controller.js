@@ -102,14 +102,18 @@ const addCommentHandler=asyncHandler(async(req,res)=>{
 
 
 
-const addReplyHandler=asyncHandler(async(req,res)=>{
+const addReplyHandler = asyncHandler(async(req, res) => {
     const { userId, reply } = req.body;
-            const { postId, commentId } = req.params;
+    const { postId, commentId } = req.params;
     
-            const posts = await feedService.addReply(postId, commentId, userId, reply);
-    
-            res.status(201).json({ message: 'Reply added successfully', posts });
+    try {
+        const posts = await feedService.addReply(postId, commentId, userId, reply);
+        res.status(201).json({ message: 'Reply added successfully', posts });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 })
+
 
 
 
@@ -122,6 +126,8 @@ router.delete('/:id',deletePostByIdHandler);
 router.get('/allPosts',getAllPostsHandler)
 router.post('/addComments/:postId',addCommentHandler);
 router.post('/addReply/:postId/:commentId',addReplyHandler);
+
+
 module.exports=router;
 
 
