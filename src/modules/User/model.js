@@ -1,64 +1,48 @@
 const bcrypt = require("bcryptjs");
-const { required, string } = require("joi");
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    firebaseUid: {
-      type: String,
-    },
+    firebaseUid: String,
     firstName: {
       type: String,
-      max: [30, "Please Input Your Name"],
+      max: [30, "Please input your name"],
       required: function () {
-        return this.role === "BU"||"HO";
+        return this.role === "BU" || this.role === "HO";
       },
     },
     lastName: {
       type: String,
-      max: [30, "Please Input Your Name"],
+      max: [30, "Please input your name"],
       required: function () {
-        return this.role === "BU"||"HO";
+        return this.role === "BU" || this.role === "HO";
       },
     },
-    userName:{
-      type : String
+    userName: String,
+    birthdate: String,
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'others']
     },
-    birthdate:{
-      type : String
-    },
-    gender:{
-      type : String,
-      enum:['male','female','others']
-    },
-
     email: {
       type: String,
-      unique: [true, "your email must be unique/used already"],
-      required: [true, "email must be required"],
+      unique: true,
+      required: true,
     },
-
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    
     password: {
       type: String,
-      max: [6, "Your Password must be in 6 digits"],
+      max: [6, "Your password must be at least 6 characters"],
     },
-    profilePicture: {
-      type: String,
-    },
+    profilePicture: String,
     hostId: {
       type: String,
-      max: [8, "Your host must be less than 8 characters"],
+      max: [8, "Your host ID must be less than 8 characters"],
       required: function () {
         return this.role === "HO";
       },
     },
-    agencyId: 
-      {
-        type: String,
-      },
-
+    agencyId: String,
     hostType: {
       type: String,
       enum: ["AU", "VD"],
@@ -66,25 +50,21 @@ const UserSchema = new mongoose.Schema(
         return this.role === "HO";
       },
     },
-
-    userNid: {
-      type: [String],
-    },
-
+    userNid: [String],
     agencyName: {
       type: String,
-      max: [120, "Name Must be at least 120 characters"],
+      max: [120, "Agency name must be at most 120 characters"],
       required: function () {
         return this.role === "AG";
       },
     },
     country: {
       type: String,
-      max: [20, "Country must be at least 20 characters"],
+      max: [20, "Country must be at most 20 characters"],
     },
     presentAddress: {
       type: String,
-      max: [120, "Address must be at least 120 characters"],
+      max: [120, "Address must be at most 120 characters"],
     },
     agencyEmail: {
       type: String,
@@ -92,75 +72,44 @@ const UserSchema = new mongoose.Schema(
         return this.role === "AG";
       },
     },
-
-    // agencyNumber: {
-    //   type: String,
-    //   max: [12, "Phone Number must be less then 13 characters"],
-    //   required: function () {
-    //     return this.role === "AG";
-    //   },
-    // },
     previousAppName: {
       type: String,
-      max: [20, "App Name must be at least 20 characters"],
+      max: [20, "App name must be at most 20 characters"],
     },
     activeHost: {
       type: String,
-      max: [23, "Host must be at least 23 characters"],
+      max: [23, "Host must be at most 23 characters"],
     },
-
     monthlyTarget: {
       type: String,
-      max: [120, "Target must be at least 20 characters"],
+      max: [120, "Target must be at most 120 characters"],
     },
-
     referenceBy: {
       type: String,
-      max: [20, "Reference must be at least 20 characters"],
+      max: [20, "Reference must be at most 20 characters"],
     },
-
-    agencyNid: {
-      type: [String],
-    },
-
+    agencyNid: [String],
     isApproved: {
       type: Boolean,
       default: false,
     },
-    hostStatus :{
-      type : String,
-      enum : ["None","Pending","Accepted"],
-      default : "None"
-    },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-
-    otp: {
-      type: Number,
-    },
-    emailChangeOTP: {
-      type: Number,
-    },
-    changedEmail: {
+    hostStatus: {
       type: String,
+      enum: ["None", "Pending", "Accepted"],
+      default: "None",
     },
+    otp: Number,
+    emailChangeOTP: Number,
+    changedEmail: String,
     isActive: {
       type: Boolean,
       default: false,
     },
     role: {
       type: String,
-      // BU -> Basic User
-      // HO -> Host
-      // AG ->Agency Owner
-      // MP -> Master Portal
-      // AD -> Admin
-      //CN ->Coin Resller
-      //BR -> Bean Reseller
-
       enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
-      require: [true, "Role must be selected"],
+      required: true,
     },
-
     isVerified: {
       type: Boolean,
       default: false,
@@ -169,8 +118,6 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Password Hash Function using Bycryptjs
 
 UserSchema.pre("save", async function hashPassword(next) {
   if (this.isModified("password")) {
@@ -186,12 +133,6 @@ UserSchema.methods = {
   },
 };
 
-// //Validations
-// UserSchema.path("agencyNumber").validate(function (value) {
-//   const regex = /^\d{13}$/; // regular expression to match 11 digits
-//   return regex.test(value);
-// }, "Must be a valid phone number");
-
-const UserModel = mongoose.model("user", UserSchema);
+const UserModel = mongoose.model("User", UserSchema);
 
 module.exports = UserModel;

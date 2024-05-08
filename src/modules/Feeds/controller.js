@@ -21,7 +21,7 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const {asyncHandler}=require('../../utility/common');
 const feedModel=require('../Feeds/model');
 const UserModel = require('../User/model');
-
+const mongoose = require('mongoose');
 
 // CreatePostHandler
 
@@ -151,6 +151,40 @@ const getTotalLikesHandler=async(req, res)=>{
 
 
 
+// addFollowers
+
+const followUserHandler = async (req, res) => {
+    try {
+      const { followerId, followingId } = req.body;
+  
+      const result = await feedService.followUser(followerId, followingId);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message }); // Use specific error messages
+    }
+  };
+
+
+
+// GetTotal Followers
+const getTotalFollowers = async (req, res) => {
+    try {
+        const { userId } = req.params; // Extract userId from request parameters
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ error: 'Invalid userId format' });
+        }
+
+        const totalFollowers = await feedService.getTotalFollowers(userId);
+
+        res.status(200).json(totalFollowers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 
 
 
@@ -164,6 +198,10 @@ router.post('/addComments/:postId',addCommentHandler);
 router.post('/addReply/:postId/:commentId',addReplyHandler);
 router.post('/likePost/:postId', likePostHandler);
 router.get('/likesTotal/:postId', getTotalLikesHandler);
+router.post('/follow', followUserHandler);
+router.get('/followers/:userId', getTotalFollowers);
+
+
 
 module.exports=router;
 

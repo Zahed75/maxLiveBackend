@@ -144,6 +144,85 @@ const getTotalLikes=async(postId)=>{
 }
 
 
+// followUser
+
+const followUser = async (followerId, followingId) => {
+    try {
+      // Update User model
+      const follower = await User.findByIdAndUpdate(followerId, {
+        $addToSet: { following: followingId },
+      }, { new: true }); // Ensures updated document is returned
+  
+      if (!follower) {
+        throw new Error('Follower not found');
+      }
+  
+      await follower.save(); // Explicitly save follower document
+  
+      const following = await User.findByIdAndUpdate(followingId, {
+        $addToSet: { followers: followerId },
+      }, { new: true });
+  
+      if (!following) {
+        throw new Error('Following user not found');
+      }
+  
+      await following.save(); // Explicitly save following document
+  
+      // Update Post model (for following user's posts)
+      const followingPosts = await feedModel.updateMany({ userId: followingId }, {
+        $addToSet: { followers: followerId }
+      });
+      if (followingPosts.nModified === 0) {
+        console.warn('No posts found for following user');
+      }
+  
+      // Update Post model (for follower user's posts)
+      const followerPosts = await feedModel.updateMany({ userId: followerId }, {
+        $addToSet: { following: followingId }
+      });
+      if (followerPosts.nModified === 0) {
+        console.warn('No posts found for follower user');
+      }
+  
+      return { message: 'User followed successfully' };
+    } catch (error) {
+      console.error(error);
+      if (error.name === 'MongoError') { // Check for specific database errors
+        throw new Error('Failed to update user data');
+      } else {
+        throw new Error('Failed to create following relationship');
+      }
+    }
+  };
+
+
+
+// getTotalFollowers byUserId
+
+const getTotalFollowers = async (userId) => {
+    try {
+        // Query user data
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+          throw new Error('User not found');
+        }
+    
+        // Query feed data associated with the user
+        const feeds = await feedModel.find({ userId });
+    
+        return { user, feeds };
+      } catch (error) {
+        console.error('Error fetching user and feeds:', error.message);
+        throw error; // Re-throw the error for higher level handling
+      }
+};
+
+
+
+
+
+
 
 
 
@@ -157,5 +236,7 @@ module.exports = {
     addReply,
     likePost,
     getTotalLikes,
+    followUser,
+    getTotalFollowers,
 
 }
