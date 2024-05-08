@@ -101,6 +101,51 @@ const addReply = async (postId, commentId, userId, reply) => {
 
 
 
+// add Like Post
+const likePost = async (postId, userId) => {
+    try {
+        const posts = await feedModel.findById(postId);
+        if (!posts) {
+            throw new Error('Upload not found');
+        }
+
+        if (posts.likes.includes(userId)) {
+            throw new Error('You have already liked this post');
+        }
+
+        posts.likes.push(userId);
+        await posts.save();
+
+        // Returning updated likes array
+        return posts.likes;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+
+
+
+//getTotal Like of a POST
+
+const getTotalLikes=async(postId)=>{
+    {
+        try {
+            const posts = await feedModel.findById(postId);
+            if (!posts) {
+                throw new Error('Posts not found');
+            }
+    
+            return posts.likes.length;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+}
+
+
+
+
 
 
 module.exports = {
@@ -109,6 +154,8 @@ module.exports = {
     deletePostById,
     getAllPosts,
     addComment,
-    addReply
+    addReply,
+    likePost,
+    getTotalLikes,
 
 }

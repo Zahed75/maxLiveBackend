@@ -49,7 +49,7 @@ const updatePostHandler=asyncHandler(async(req,res)=>{
 })
 
 
-// dletePostHandler
+// deletePostHandler
 
 const deletePostByIdHandler = asyncHandler(async(req,res)=>{
 
@@ -102,6 +102,7 @@ const addCommentHandler=asyncHandler(async(req,res)=>{
 
 
 
+// addReply Handler
 const addReplyHandler = asyncHandler(async(req, res) => {
     const { userId, reply } = req.body;
     const { postId, commentId } = req.params;
@@ -115,6 +116,41 @@ const addReplyHandler = asyncHandler(async(req, res) => {
 })
 
 
+// likes Handler
+const likePostHandler = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const postId = req.params.postId;
+
+        const updatedLikes = await feedService.likePost(postId, userId);
+
+        res.status(200).json({ message: 'Post liked successfully', likes: updatedLikes });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+
+//getTotal LikesHandler
+
+const getTotalLikesHandler=async(req, res)=>{
+    {
+        try {
+            const postId = req.params.postId;
+    
+            const likesCount = await feedService.getTotalLikes(postId);
+    
+            res.status(200).json({ likes: likesCount });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+}
+
+
+
+
 
 
 
@@ -126,7 +162,8 @@ router.delete('/:id',deletePostByIdHandler);
 router.get('/allPosts',getAllPostsHandler)
 router.post('/addComments/:postId',addCommentHandler);
 router.post('/addReply/:postId/:commentId',addReplyHandler);
-
+router.post('/likePost/:postId', likePostHandler);
+router.get('/likesTotal/:postId', getTotalLikesHandler);
 
 module.exports=router;
 
