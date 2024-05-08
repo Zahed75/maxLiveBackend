@@ -188,6 +188,36 @@ const getTotalFollowers = async (req, res) => {
 
 
 
+//Following Users
+
+const getTotalFollowing=async(req, res)=>{
+    {
+        try {
+            const userId = req.params.userId;
+            const totalFollowing = await feedService.getTotalFollowing(userId);
+            res.status(200).json({ totalFollowing });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+}
+
+
+
+const getTotalPostsByUserIdHandler = async (req, res) => {
+    try {
+        const { userId } = req.params; // Assuming userId is passed as a URL parameter
+        const totalPosts = await feedService.getTotalPostsByUserId(userId);
+        res.json({ totalPosts });
+    } catch (error) {
+        console.error('Error getting total posts by user ID:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
+
 
 
 router.post('/addPost',createPostHandler);
@@ -200,7 +230,8 @@ router.post('/likePost/:postId', likePostHandler);
 router.get('/likesTotal/:postId', getTotalLikesHandler);
 router.post('/follow', followUserHandler);
 router.get('/followers/:userId', getTotalFollowers);
-
+router.get('/following/:userId', getTotalFollowing);
+router.get('/:userId/totalPost',getTotalPostsByUserIdHandler);
 
 
 module.exports=router;

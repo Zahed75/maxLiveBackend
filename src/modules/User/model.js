@@ -30,6 +30,8 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
     password: {
       type: String,
       max: [6, "Your password must be at least 6 characters"],

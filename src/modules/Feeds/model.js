@@ -44,10 +44,15 @@ const FeedSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // Update following to refer to the followers field in the User model
   following: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User' 
+}],
   caption: {
     type: String,
     max: [1000, 'Caption must be less than 1000 characters']

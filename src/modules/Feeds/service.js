@@ -198,6 +198,9 @@ const followUser = async (followerId, followingId) => {
 
 
 
+
+
+
 // getTotalFollowers byUserId
 
 const getTotalFollowers = async (userId) => {
@@ -221,6 +224,37 @@ const getTotalFollowers = async (userId) => {
 
 
 
+//getTotal Following 
+
+const getTotalFollowing = async (userId) => {
+    try {
+        const user = await User.findById(userId).populate('following');
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return user.following.length;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+
+// getTotalPostCound
+
+const getTotalPostsByUserId=async(userId)=>{
+    try {
+        const totalPosts = await feedModel.countDocuments({ userId });
+        return totalPosts;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+
 
 
 
@@ -238,5 +272,6 @@ module.exports = {
     getTotalLikes,
     followUser,
     getTotalFollowers,
-
+    getTotalFollowing,
+    getTotalPostsByUserId
 }
