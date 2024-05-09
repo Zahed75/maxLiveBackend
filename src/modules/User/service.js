@@ -4,11 +4,13 @@ const User = require("./model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
+const admin = require('firebase-admin');
 
 
 const resetPassword = async (email, newPassword) => {
   try {
     // Hash the new password
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Construct the update object to set the new hashed password
@@ -29,7 +31,7 @@ const resetPassword = async (email, newPassword) => {
 
     return user;
   } catch (error) {
-    throw new Error("Failed to reset password.");
+    throw new Error("Failed to reset password.",error);
   }
 };
 
@@ -43,7 +45,18 @@ const getSocialUserById = async (userId) => {
     console.log(error);
   }
 };
-
+const getUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+};
 
 const getAllUserService = async () => {
   const Users = await User.find();
@@ -88,10 +101,40 @@ const applyToBeHostService = async (agencyId, hostType, userId,role) => {
   }
 };
 
+const updateUser = async (userId, additionalInfo) => {
+  ///need to work on this !!!!
+  try {
+    // Use Firebase Admin SDK to update the user
+    const result = await admin.auth().updateUser(userId, additionalInfo);
+    return result; // It's better to return the result for success cases as well
+  } catch (error) {
+    console.error("Error updating user in Firebase:", error);
+    throw new Error("Error updating user in Firebase");
+  }
+};
+
+
+const deleteUserById = async (userId) => {
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
+
+
 module.exports = {
   resetPassword,
   getSocialUserById,
   getAllUserService,
   updateUserInfoService,
   applyToBeHostService,
+  updateUser,
+  getUserById,
+  deleteUserById
 };

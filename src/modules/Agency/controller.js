@@ -10,31 +10,21 @@ const {
 }=require('../../config/constants');
 
 
-const registerAgency = asyncHandler(async (req, res) => {
+const registerAgencyHandler = asyncHandler(async (req, res) => {
   try {
-    // Check if the request body contains all required fields
-    const {
-      agencyName,
-      agencyHolderName,
-      country,
-      presentAddress,
-      email,
-      phone,
-    } = req.body;
-    if (
-      !agencyName ||
-      !agencyHolderName ||
-      !country ||
-      !presentAddress ||
-      !email ||
-      !phone
-    ) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    
+    const userId = req.params._id; // Assuming userId is available in the request
+    const agencyData = { ...req.body, userId };
+
+    // Generate agencyId in the backend
+    const agencyId = generateAgencyId(); // Implement generateAgencyId function
+
+    // Add agencyId to the agencyData
+    agencyData.agencyId = agencyId;
 
     // Call the service function to register the agency
-    const result = await agencyService.registerAgencyService(req.body);
-    res.status(201).json(result);
+    const result = await agencyService.registerAgencyService(agencyData);
+    res.status(result.status).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -49,7 +39,32 @@ const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   res.status(200).json(pendingResult); // Return the approval result
 });
 
-router.post("/registerAgency", registerAgency);
-router.get("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
+const approveHostHandler = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const role = req.body.role;
 
+  try {
+    const host = await agencyService.approveHostService(userId, role);
+    if (!host) {
+      return res.status(404).json({ message: 'Host not found' });
+    }
+
+    res.status(200).json({ message: 'Host approved successfully', host });
+  } catch (error) {
+    console.error('Error approving host:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+const generateAgencyId = () => {
+  const timestamp = new Date().getTime();
+  const randomNumber = Math.floor(Math.random() * 1000000);
+  const agencyId = `AGY${timestamp}${randomNumber}`;
+  return agencyId;
+};
+
+router.post("/registerAgency/:_id", registerAgencyHandler);
+router.get("/getAllPendingHostHandler",authMiddleware,
+roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
+router.post("/approveHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),approveHostHandler)
 module.exports = router;

@@ -25,6 +25,7 @@ const applyToBeHostService = async (userId, agencyId, hostType,hostId) => {
       user.hostStatus = "Pending";
       user.hostType = hostType;
       user.hostId = hostId;
+      user.agencyId=agencyId;
       await user.save();
   
       return user;

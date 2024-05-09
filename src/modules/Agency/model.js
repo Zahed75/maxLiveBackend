@@ -1,10 +1,16 @@
-const { required } = require("joi");
+const { required, ref } = require("joi");
 const mongoose = require("mongoose");
 
 const agencySchema = new mongoose.Schema({
+  userId:{
+    type : mongoose.Schema.Types.ObjectId,
+    ref:'user',
+    required: [true, "User id is required"]
+  },
   agencyId:{
     type : String,
-    max :[30,"agencyId should be under 30 characters"]
+    max :[30,"agencyId should be under 30 characters"],
+    required: [true, "Agency id is required"]
   },
   agencyName: {
     type: String,
@@ -42,7 +48,7 @@ const agencySchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, "Email is required"],
+    required: [true, "Email is required"],   
   },
   phone: {
     type: String,
@@ -62,6 +68,19 @@ const agencySchema = new mongoose.Schema({
   },
   nidPhoto: {
     type: [String],
+  },
+  agencyStatus:{
+    type:String,
+    enum:["active","inactive","pending","rejected"],
+    default:"pending"
+  },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
   },
   isApproved: {
     type: Boolean,
