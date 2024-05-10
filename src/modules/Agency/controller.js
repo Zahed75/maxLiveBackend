@@ -18,7 +18,7 @@ const registerAgencyHandler = asyncHandler(async (req, res) => {
     const userId = req.params._id; // Assuming userId is available in the request
 
     // Call the service function to handle agency registration
-    const result = await agencyService.registerAgency(userId, req.body, req.files);
+    const result = await agencyService.registerAgencyService(userId, req.body, req.files);
 
     // Send response based on the result
     res.status(result.status).json(result);
@@ -45,7 +45,7 @@ const approveHostHandler = asyncHandler(async (req, res) => {
   try {
     const host = await agencyService.approveHostService(userId, role);
     if (!host) {
-      return res.status(404).json({ message: 'Host not found' });
+      res.status(404).json({ message: 'Host not found' });
     }
 
     res.status(200).json({ message: 'Host approved successfully', host });

@@ -67,9 +67,19 @@ const agencySchema = new mongoose.Schema({
   referenceBy: {
     type: String,
   },
-  nidPhoto: {
-    type: [String],
-  },
+  nidPhotos: [
+    {
+      type: {
+        type: String,
+        enum: ["front", "back"], // Enum for photo type: front or back
+        required: true
+      },
+      url: {
+        type: String,
+        required: true
+      }
+    }
+  ],
   agencyStatus:{
     type:String,
     enum:["active","inactive","pending","rejected"],

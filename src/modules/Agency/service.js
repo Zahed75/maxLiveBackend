@@ -5,6 +5,7 @@ const { NotFound, BadRequest } = require("../../utility/errors");
 
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
+    console.log(files)
     const existingAgency = await agencyModel.findOne({ userId });
     if (existingAgency) {
       return { status: 501, message: 'User already has an agency' };
@@ -18,9 +19,17 @@ const registerAgencyService = async (userId, agencyData, files) => {
     agencyData.userId = userId; // Add userId to the agencyData
 
     // Add URLs of uploaded NID photos to agencyData
+    // if (files && files['nidPhotoFront'] && files['nidPhotoBack']) {
+    //   agencyData.nidPhotoFront = files['nidPhotoFront'][0].buffer.toString('base64'); // Assuming multer stores file buffers
+    //   agencyData.nidPhotoBack = files['nidPhotoBack'][0].buffer.toString('base64'); // Assuming multer stores file buffers
+    // } else {
+    //   return { status: 400, message: 'NID photos are required' };
+    // }
     if (files && files['nidPhotoFront'] && files['nidPhotoBack']) {
-      agencyData.nidPhotoFront = files['nidPhotoFront'][0].buffer.toString('base64'); // Assuming multer stores file buffers
-      agencyData.nidPhotoBack = files['nidPhotoBack'][0].buffer.toString('base64'); // Assuming multer stores file buffers
+      agencyData.nidPhotos = [
+        { type: 'front', url: files['nidPhotoFront'][0].buffer.toString('base64') },
+        { type: 'back', url: files['nidPhotoBack'][0].buffer.toString('base64') }
+      ];
     } else {
       return { status: 400, message: 'NID photos are required' };
     }
