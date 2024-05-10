@@ -3,20 +3,43 @@ const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 
-const registerAgencyService = async (agencyData) => {
+const registerAgencyService = async (userId, agencyData, files) => {
   try {
+    const existingAgency = await agencyModel.findOne({ userId });
+    if (existingAgency) {
+      return { status: 501, message: 'User already has an agency' };
+    }
+
+    // Generate agencyId in the backend
+    const agencyId = generateAgencyId(); // Implement generateAgencyId function
+
+    // Add agencyId to the agencyData
+    agencyData.agencyId = agencyId;
+    agencyData.userId = userId; // Add userId to the agencyData
+
+    // Add URLs of uploaded NID photos to agencyData
+    if (files && files['nidPhotoFront'] && files['nidPhotoBack']) {
+      agencyData.nidPhotoFront = files['nidPhotoFront'][0].buffer.toString('base64'); // Assuming multer stores file buffers
+      agencyData.nidPhotoBack = files['nidPhotoBack'][0].buffer.toString('base64'); // Assuming multer stores file buffers
+    } else {
+      return { status: 400, message: 'NID photos are required' };
+    }
+
+    // Create a new agency instance
     const newAgency = new agencyModel(agencyData);
     await newAgency.save();
 
-    return {
-      status: 201,
-      message: "Agency registered successfully",
-      agency: newAgency,
-    };
+    return { status: 201, message: 'Agency registered successfully', agency: newAgency };
   } catch (error) {
-    console.error("Error registering agency:", error);
-    return { status: 500, message: "Internal server error" };
+    console.error('Error registering agency:', error);
+    return { status: 500, message: 'Internal server error' };
   }
+};
+const generateAgencyId = () => {
+  const timestamp = new Date().getTime();
+  const randomNumber = Math.floor(Math.random() * 1000000);
+  const agencyId = `AGY${timestamp}${randomNumber}`;
+  return agencyId;
 };
 
 

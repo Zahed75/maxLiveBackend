@@ -1,5 +1,8 @@
 const express = require("express");
+const agencyModel = require("./model");
+const multer = require('multer');
 const router = express.Router();
+const upload = multer();
 const agencyService = require("../Agency/service");
 const { asyncHandler } = require("../../utility/common");
 const roleMiddleware = require('../../middlewares/roleMiddleware');
@@ -12,24 +15,20 @@ const {
 
 const registerAgencyHandler = asyncHandler(async (req, res) => {
   try {
-    
     const userId = req.params._id; // Assuming userId is available in the request
-    const agencyData = { ...req.body, userId };
 
-    // Generate agencyId in the backend
-    const agencyId = generateAgencyId(); // Implement generateAgencyId function
+    // Call the service function to handle agency registration
+    const result = await agencyService.registerAgency(userId, req.body, req.files);
 
-    // Add agencyId to the agencyData
-    agencyData.agencyId = agencyId;
-
-    // Call the service function to register the agency
-    const result = await agencyService.registerAgencyService(agencyData);
+    // Send response based on the result
     res.status(result.status).json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+module.exports = router;
 const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   const userRole = req.body.role;
   const pendingResult = await agencyService.getPendingHostService(userRole);
@@ -56,14 +55,9 @@ const approveHostHandler = asyncHandler(async (req, res) => {
   }
 });
 
-const generateAgencyId = () => {
-  const timestamp = new Date().getTime();
-  const randomNumber = Math.floor(Math.random() * 1000000);
-  const agencyId = `AGY${timestamp}${randomNumber}`;
-  return agencyId;
-};
 
-router.post("/registerAgency/:_id", registerAgencyHandler);
+
+router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
 roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
 router.post("/approveHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),approveHostHandler)

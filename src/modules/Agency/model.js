@@ -5,7 +5,8 @@ const agencySchema = new mongoose.Schema({
   userId:{
     type : mongoose.Schema.Types.ObjectId,
     ref:'user',
-    required: [true, "User id is required"]
+    required: [true, "User id is required"],
+    unique: true,
   },
   agencyId:{
     type : String,

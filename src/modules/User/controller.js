@@ -30,9 +30,9 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
 });
 
 const getUserProfileBySocialId = asyncHandler(async (req, res) => {
-  const userId = req.params.userId;
+  const firebaseUid = req.params.firebaseUId;
   try {
-    const user = await userService.getSocialUserById(userId);
+    const user = await userService.getSocialUserById(firebaseUid);
     res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -109,7 +109,7 @@ const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
 })
 
 router.get("/getAllUser", getAllUsersHandler);
-router.get("/firebaseUsersById/:userId", getUserProfileBySocialId);
+router.get("/firebaseUsersById/:firebaseUId", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
 router.put("/updateUserInfo/:id", updateUserInfoHandler);
 
