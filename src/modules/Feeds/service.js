@@ -60,21 +60,19 @@ const getAllPosts = async () => {
 
 
 
-
+ 
 // addComments Service
 
-const addComment=async(postId, userId, comment)=>{
-   
-        const post = await feedModel.findById(postId);
-        if (!post) {
-            throw new Error('Posts not found');
-        }
-        post.comments.push({ UserId: userId, comment: comment });
-        await post.save();
-
-        return post;
-   
+const addComment = async (postId, userId, comment) => {
+    const post = await feedModel.findById(postId);
+    if (!post) {
+        throw new Error('Post not found');
+    }
+    post.comments.push({ userId: userId, comment: comment });
+    await post.save();
+    return post;
 }
+
 
 
 // addReply
@@ -91,7 +89,7 @@ const addReply = async (postId, commentId, userId, reply) => {
             throw new Error('Comment not found');
         }
 
-        comment.replies.push({ UserId: userId, reply: reply }); // Assign UserId field correctly
+        comment.replies.push({ userId: userId, reply: reply }); // Corrected field name to userId
         await post.save();
         return post;
     } catch (error) {

@@ -104,8 +104,9 @@ const addCommentHandler=asyncHandler(async(req,res)=>{
 
 // addReply Handler
 const addReplyHandler = asyncHandler(async(req, res) => {
-    const { userId, reply } = req.body;
     const { postId, commentId } = req.params;
+    const { userId, reply } = req.body;
+   
     
     try {
         const posts = await feedService.addReply(postId, commentId, userId, reply);
@@ -231,6 +232,7 @@ const sharePostHandler = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 
