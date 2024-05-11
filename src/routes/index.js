@@ -22,6 +22,6 @@ router.use('/user',userRoute);
 router.use('/agency',agencyRoute);
 router.use('/host',hostRoute);
 router.use('/feed',feedRoute);
-router.use(authVerifyMiddleware);
+// router.use(authVerifyMiddleware);
 
 module.exports = router;

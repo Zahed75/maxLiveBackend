@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
@@ -36,7 +37,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: [6, "Your password must be at least 6 characters"],
     },
-    profilePicture: String,
+    profilePicture: {
+      type: String,
+      required:true
+      
+    },
     hostId: {
       type: String,
       max: [8, "Your host ID must be less than 8 characters"],
@@ -52,7 +57,14 @@ const UserSchema = new mongoose.Schema(
         return this.role === "HO";
       },
     },
-    userNid: [String],
+    nidFront: {
+      type: String,
+      required:true
+    },
+    nidBack: {
+      type: String,
+      required:true
+    },
     agencyName: {
       type: String,
       max: [120, "Agency name must be at most 120 characters"],

@@ -19,25 +19,29 @@ const { decrypt } = require('dotenv');
 
 
 
-
-
-
-// Admin Register a new user
-
-const userRegisterService = async (userData) => {
+const registerUserService = async (userData) => {
   try {
-    const { email } = userData;
+    const { email, profilePicture, nidFront, nidBack } = userData;
+
+    // Generate OTP and send
     const otp = await generateAndSendOTPService(email);
+
+    // Create a new user with profile picture and NID photos
     const newUser = await User.create({ ...userData, otp });
+
     if (!newUser) {
       throw new BadRequest("Could Not Create User");
     }
-    return newUser;
+
+    // Update the newly created user with NID photo URLs
+    await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture, nidFront, nidBack } });
+
+    return { status: 201, message: 'User registered successfully', user: newUser };
   } catch (error) {
-    throw new Error("Error registering user: " + error.message);
+    console.error('Error registering user:', error);
+    return { status: 500, message: 'Internal server error' };
   }
 };
-
 
 
 
@@ -54,7 +58,9 @@ const verifyOTPService = async (email, otp) => {
     user.otp = undefined; // Clear OTP after verification
     await user.save();
   } catch (error) {
+    console.log(error)
     throw new BadRequest("Failed to verify OTP.");
+    
   }
 };
 
@@ -123,6 +129,7 @@ function sendOTP(email, otp) {
 
 const generateAndSendOTPService = async (email) => {
   try {
+    // console.log(email)
     const otp = generateOTP();
     await sendOTP(email, otp);
     return otp;
@@ -179,7 +186,7 @@ const signinUserService = async (email,password) => {
 
 
 module.exports = {
-  userRegisterService,
+  registerUserService,
   verifyOTPService,
   resendOTP,
   expireOTP,
