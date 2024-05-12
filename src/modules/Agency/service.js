@@ -2,13 +2,13 @@ const agencyModel = require("./model");
 const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
+const { asyncHandler } = require("../../utility/common");
 
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
-
     const existingAgency = await agencyModel.findOne({ userId });
     if (existingAgency) {
-      return { status: 501, message: 'User already has an agency' };
+      return { status: 501, message: "User already has an agency" };
     }
 
     // Generate agencyId in the backend
@@ -18,23 +18,33 @@ const registerAgencyService = async (userId, agencyData, files) => {
     agencyData.agencyId = agencyId;
     agencyData.userId = userId; // Add userId to the agencyData
 
-    if (files && files['nidPhotoFront'] && files['nidPhotoBack']) {
+    if (files && files["nidPhotoFront"] && files["nidPhotoBack"]) {
       agencyData.nidPhotos = [
-        { type: 'front', url: files['nidPhotoFront'][0].buffer.toString('base64') },
-        { type: 'back', url: files['nidPhotoBack'][0].buffer.toString('base64') }
+        {
+          type: "front",
+          url: files["nidPhotoFront"][0].buffer.toString("base64"),
+        },
+        {
+          type: "back",
+          url: files["nidPhotoBack"][0].buffer.toString("base64"),
+        },
       ];
     } else {
-      return { status: 400, message: 'NID photos are required' };
+      return { status: 400, message: "NID photos are required" };
     }
 
     // Create a new agency instance
     const newAgency = new agencyModel(agencyData);
     await newAgency.save();
 
-    return { status: 201, message: 'Agency registered successfully', agency: newAgency };
+    return {
+      status: 201,
+      message: "Agency registered successfully",
+      agency: newAgency,
+    };
   } catch (error) {
-    console.error('Error registering agency:', error);
-    return { status: 500, message: 'Internal server error' };
+    console.error("Error registering agency:", error);
+    return { status: 500, message: "Internal server error" };
   }
 };
 const generateAgencyId = () => {
@@ -44,16 +54,15 @@ const generateAgencyId = () => {
   return agencyId;
 };
 
-
 const getPendingHostService = async (role) => {
   try {
     // Assuming req.user.role contains the role of the user making the request
     if (!["AG", "AD"].includes(role)) {
-      return { message: "role must be a authorized role" }; 
+      return { message: "role must be a authorized role" };
     }
 
     const pendingHosts = await User.find({ hostStatus: "Pending" });
-    
+
     // Check if there are any pending hosts
     if (pendingHosts.length === 0) {
       return { message: "No pending hosts found" }; // Return a message if no pending hosts found
@@ -67,30 +76,31 @@ const getPendingHostService = async (role) => {
 
 const approveHostService = async (userId, role) => {
   if (!["AG", "AD"].includes(role)) {
-    return {message:"your role must be Agency owner or Admin"}; // Return null to indicate unauthorized access
+    throw new Error("Your role must be Agency owner or Admin");
   }
 
-  // Find user from the userid
   const user = await User.findById(userId);
   if (!user) {
-    return {message:"couldnt find user"};  // Return null to indicate user not found
+    throw new Error("Couldn't find user");
   }
 
-  // Check if the user even applied for host or not
-  if (!user.hostId || user.hostStatus !== "pending" || !user.isActive || !user.isVerified) {
-    return {message:"User is not eligible for approval"}; ; // Return null to indicate user not eligible for approval
+  if (
+    !user.hostId ||
+    user.hostStatus !== "pending" ||
+    !user.isActive ||
+    !user.isVerified
+  ) {
+    throw new Error("User is not eligible for approval");
   }
 
-  // Check if the agencyID is in agency model
-  const agency = await agencyModel.findById(user.agencyId);
+  const agency = await agencyModel.findOne({ agencyId: user.agencyId });
   if (!agency) {
-    return {message:"Couldnt find agencyID"};  // Return null to indicate agency not found
+    throw new Error("Couldn't find agencyID");
   }
 
   // Approval of host begins with host status changing, also hostactivity to true
   user.hostStatus = "active";
 
-  // Populating the host model from usermodel with that user info
   const host = new Host({
     userId: user._id,
     firebaseUid: user.firebaseUid,
@@ -103,26 +113,72 @@ const approveHostService = async (userId, role) => {
     hostId: user.hostId,
     agencyId: user.agencyId,
     hostType: user.hostType,
+    hostStatus: "active",
     nidFront: user.nidFront,
     nidBack: user.nidBack,
-    agencyName: user.agencyName,
+    agencyName: agency.agencyName,
     country: user.country,
     presentAddress: user.presentAddress,
-    agencyEmail: user.agencyEmail,
+    agencyEmail: agency.email,
     isActive: user.isActive,
     isApproved: true,
-    role: user.role,
+    role: "HO",
     isVerified: user.isVerified,
     refreshToken: user.refreshToken,
   });
 
+  // Save the host document
   await host.save();
 
+  // Return the host object
   return host;
 };
+
+
+const signinAgencyService = async (email,password) => {
+  try {
+    // Find user by email
+    const agency = await agencyModel.findOne({ email });
+
+    // Check if user exists
+    if (!agency) {
+      throw new BadRequest("Invalid email or password.");
+    }
+
+    // Validate password using bcrypt.compare
+    const isMatch = await bcrypt.compare(password, agency.password);
+
+    // Check password match
+    if (!isMatch) {
+      throw new BadRequest("Invalid email or password.");
+    }
+ // Generate JWT token with user data payload
+ const accessToken = jwt.sign({ agency }, 'SecretKey12345', { expiresIn: '3d' });
+    // User is authenticated, return sanitized user data (excluding sensitive fields)
+    const sanitizedUser = {
+      accessToken,
+      email: agency.email,
+      phoneNumber: agency.phoneNumber,
+      role: agency.role,
+      isActive: true,//need to recehck
+      isVerified: true,
+      
+      
+    };
+
+    return sanitizedUser;
+  } catch (error) {
+    console.error(error);
+    throw error; 
+  }
+};
+
+
+
 
 module.exports = {
   registerAgencyService,
   getPendingHostService,
-  approveHostService
+  approveHostService,
+  signinAgencyService
 };

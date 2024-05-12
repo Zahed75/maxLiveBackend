@@ -28,7 +28,7 @@ const registerAgencyHandler = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = router;
+
 const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   const userRole = req.body.role;
   const pendingResult = await agencyService.getPendingHostService(userRole);
@@ -38,23 +38,15 @@ const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   res.status(200).json(pendingResult); // Return the approval result
 });
 
-const approveHostHandler = asyncHandler(async (req, res) => {
-  const userId = req.params.userId;
-  const role = req.body.role;
-
+const approveHostHandler = async (req, res) => {
   try {
-    const host = await agencyService.approveHostService(userId, role);
-    if (host) {
-      res.status(200).json({ message: 'Host approved successfully', host });
-    }
-    res.status(404).json({ message: 'Host not found' });
-   
+    const updatedHost = await agencyService.approveHostService(req.params.userId, req.body.role);
+    res.status(200).json(updatedHost);
   } catch (error) {
-    console.error('Error approving host:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error approving host:", error.message);
+    res.status(500).json({ message: "Error approving host", error: error.message });
   }
-});
-
+};
 
 
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);

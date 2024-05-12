@@ -106,17 +106,6 @@ const applyToBeHostService = async (agencyId, hostType, userId,role) => {
   }
 };
 
-const updateUser = async (userId, additionalInfo) => {
-  ///need to work on this !!!!
-  try {
-    // Use Firebase Admin SDK to update the user
-    const result = await admin.auth().updateUser(userId, additionalInfo);
-    return result; // It's better to return the result for success cases as well
-  } catch (error) {
-    console.error("Error updating user in Firebase:", error);
-    throw new Error("Error updating user in Firebase");
-  }
-};
 
 
 const deleteUserById = async (userId) => {
@@ -139,7 +128,6 @@ module.exports = {
   getAllUserService,
   updateUserInfoService,
   applyToBeHostService,
-  updateUser,
   getUserById,
   deleteUserById
 };

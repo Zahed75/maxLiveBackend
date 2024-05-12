@@ -66,10 +66,6 @@ const hostSchema = new mongoose.Schema(
       },
     },
 
-    hostNid: {
-      type: [String],
-    },
-
     agencyName: {
       type: String,
       max: [120, "Name Must be at least 120 characters"],
@@ -98,6 +94,17 @@ const hostSchema = new mongoose.Schema(
       default : "inactive"
       
     },
+    nidFront: {
+      type: String,
+      required: function () {
+        return this.role === "HO";
+      },
+    },
+    nidBack: {
+      type: String,
+      required: function () {
+        return this.role === "HO";
+      }},
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     otp: {

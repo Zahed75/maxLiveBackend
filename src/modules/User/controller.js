@@ -64,39 +64,6 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
   });
 });
 
-// const updateSocialUser = asyncHandler(async (req, res) => {
-//   //need to work on this
-//   try {
-//     const userId = req.params.userId; // Assuming userId is passed in the request parameters
-//     const user = await userService.getSocialUserById(userId); // Fetch the user from the service
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Additional information to update the user
-//     const additionalInfo = {
-//       // Add the additional fields you want to update
-//       // For example:
-
-//       role: req.body.role,
-//       hostStatus: req.body.hostStatus,
-//       agencyId: req.params.agencyId,
-//       hostId: req.params.hostId,
-
-//       // Add more fields as needed
-//     };
-
-//     // Update the user in Firebase
-//     await userService.updateUser(userId, additionalInfo);
-//     const updatedUser = await userService.getSocialUserById(userId);
-//     res
-//       .status(200)
-//       .json({ message: "User updated successfully", result: updatedUser });
-//   } catch (error) {
-//     console.error("Error updating user:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
 
 
 const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
@@ -114,7 +81,6 @@ router.get('/getUserById/:userId',getUserById)
 router.put("/updateUserInfo/:id", updateUserInfoHandler);
 
 router.post("/resetPass", resetPasswordHandler); //not tested in postman
-// router.put("/updateSocialUser/:userId/:agencyId/:hostId", updateSocialUser);
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
 
 module.exports = router;
