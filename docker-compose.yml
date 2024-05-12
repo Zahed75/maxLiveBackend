@@ -13,7 +13,7 @@ services:
       - ./:/app
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017/maxProd?authSource=admin
+      MONGODB_URI: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017/basilaProd?authSource=admin
     depends_on:
       - mongo
   mongo:
@@ -36,11 +36,11 @@ services:
     ports:
       - "8081:8081"
     networks:
-      - max-network
+      - basila-network
     environment:
       ME_CONFIG_BASICAUTH_USERNAME: maxdbadmin
-      ME_CONFIG_BASICAUTH_PASSWORD: E7Dw~e5NKh4Ly's
-      ME_CONFIG_MONGODB_ADMINUSERNAME: maxdbadmin
+      ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
+      ME_CONFIG_MONGODB_ADMINUSERNAME: sysco
       ME_CONFIG_MONGODB_ADMINPASSWORD: E7Dw~e5NKh4Ly's
       ME_CONFIG_MONGODB_URL: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017
     depends_on:
