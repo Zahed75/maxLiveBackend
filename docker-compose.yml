@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   backend:
     build:
@@ -16,6 +17,7 @@ services:
       MONGODB_URI: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017/basilaProd?authSource=admin
     depends_on:
       - mongo
+
   mongo:
     container_name: max-db
     image: mongo
@@ -30,13 +32,14 @@ services:
       MONGO_INITDB_ROOT_USERNAME: maxadmin
       MONGO_INITDB_ROOT_PASSWORD: E7Dw~e5NKh4Ly's
       MONGO_INITDB_DATABASE: maxProd
+
   mongo-express:
     image: mongo-express
     restart: always
     ports:
       - "8081:8081"
     networks:
-      - basila-network
+      - max-network
     environment:
       ME_CONFIG_BASICAUTH_USERNAME: maxdbadmin
       ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
@@ -45,7 +48,9 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017
     depends_on:
       - mongo
+
 networks:
   max-network:
+
 volumes:
   mongoData:
