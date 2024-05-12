@@ -6,9 +6,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    container_name: basila-server
+    container_name: maxLive-server
     networks:
-      - basila-network
+      - maxLive-network
     volumes:
       - ./:/app
     environment:
@@ -17,7 +17,7 @@ services:
     depends_on:
       - mongo
   mongo:
-    container_name: basilia-db
+    container_name: maxLive-db
     image: mongo
     ports:
       - "27177:27017"
@@ -27,9 +27,9 @@ services:
       - mongoData:/data/db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: basilaadmin
+      MONGO_INITDB_ROOT_USERNAME: maxadmin
       MONGO_INITDB_ROOT_PASSWORD: E7Dw~e5NKh4Ly's
-      MONGO_INITDB_DATABASE: basilaProd
+      MONGO_INITDB_DATABASE: maxLiveProd
   mongo-express:
     image: mongo-express
     restart: always
@@ -42,7 +42,7 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
       ME_CONFIG_MONGODB_ADMINUSERNAME: sysco
       ME_CONFIG_MONGODB_ADMINPASSWORD: E7Dw~e5NKh4Ly's
-      ME_CONFIG_MONGODB_URL: mongodb://basilaadmin:E7Dw~e5NKh4Ly's@mongo:27017
+      ME_CONFIG_MONGODB_URL: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017
     depends_on:
       - mongo
 networks:
