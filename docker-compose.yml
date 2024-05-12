@@ -53,4 +53,4 @@ networks:
   max-network:
 
 volumes:
-  mongoData:
+  mongoData
