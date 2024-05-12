@@ -7,7 +7,8 @@ const {generateHostId}= require('../../utility/common');
 
 
 
-const applyToBeHostService = async (userId, agencyId, hostType,hostId) => {
+const applyToBeHostService = async (userId, agencyId, hostType,hostId,
+  nidFrontPath,nidBackPath) => {
     try {
       // Find the user in the User model
       const user = await User.findById(userId);
@@ -22,10 +23,16 @@ const applyToBeHostService = async (userId, agencyId, hostType,hostId) => {
       }
   
       // Update the user's host status to "Pending"
-      user.hostStatus = "Pending";
+      user.hostStatus = "pending";
       user.hostType = hostType;
       user.hostId = hostId;
       user.agencyId=agencyId;
+      user.isActive= user.isActive;
+      user.isVerified = user.isVerified;
+      user.isApproved=user.isApproved; 
+      user.profilePicture=user.profilePicture;
+      user.nidFront=nidFrontPath;
+      user.nidBack=nidBackPath;
       await user.save();
   
       return user;

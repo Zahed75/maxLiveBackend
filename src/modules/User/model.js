@@ -39,7 +39,6 @@ const UserSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      required:true
       
     },
     hostId: {
@@ -59,11 +58,15 @@ const UserSchema = new mongoose.Schema(
     },
     nidFront: {
       type: String,
-      required:true
+      required: function () {
+        return this.role === "HO";
+      },
     },
     nidBack: {
       type: String,
-      required:true
+      required: function () {
+        return this.role === "HO";
+      },
     },
     agencyName: {
       type: String,
@@ -102,15 +105,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: [20, "Reference must be at most 20 characters"],
     },
-    agencyNid: [String],
     isApproved: {
       type: Boolean,
       default: false,
     },
     hostStatus: {
       type: String,
-      enum: ["None", "Pending", "Accepted"],
-      default: "None",
+      enum: ["active","inactive","pending","rejected"],
+      default: "inactive",
     },
     otp: Number,
     emailChangeOTP: Number,

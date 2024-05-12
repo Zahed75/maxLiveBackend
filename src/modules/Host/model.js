@@ -94,8 +94,9 @@ const hostSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ["None", "Pending", "Accepted"],
-      default: "None",
+      enum: ["active","inactive","pending","rejected"],
+      default : "inactive"
+      
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
@@ -111,9 +112,6 @@ const hostSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: false,
-    },
-    hostActivity: {
-      type: Boolean,
     },
     isApproved: {
       type: Boolean,

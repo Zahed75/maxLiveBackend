@@ -16,12 +16,13 @@ const{SendEmailUtility}=require('../../utility/email');
 const createToken = require('../../utility/createToken');
 const bcrypt = require('bcryptjs');
 const { decrypt } = require('dotenv');
+const { IosApp } = require('firebase-admin/project-management');
 
 
 
 const registerUserService = async (userData) => {
   try {
-    const { email, profilePicture, nidFront, nidBack } = userData;
+    const { email, profilePicture } = userData;
 
     // Generate OTP and send
     const otp = await generateAndSendOTPService(email);
@@ -34,7 +35,7 @@ const registerUserService = async (userData) => {
     }
 
     // Update the newly created user with NID photo URLs
-    await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture, nidFront, nidBack } });
+    await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture } });
 
     return { status: 201, message: 'User registered successfully', user: newUser };
   } catch (error) {
@@ -168,6 +169,7 @@ const signinUserService = async (email,password) => {
       role: user.role,
       isActive: user.isActive,
       isVerified: user.isVerified,
+      
       
     };
 

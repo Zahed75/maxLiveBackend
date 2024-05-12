@@ -44,11 +44,11 @@ const approveHostHandler = asyncHandler(async (req, res) => {
 
   try {
     const host = await agencyService.approveHostService(userId, role);
-    if (!host) {
-      res.status(404).json({ message: 'Host not found' });
+    if (host) {
+      res.status(200).json({ message: 'Host approved successfully', host });
     }
-
-    res.status(200).json({ message: 'Host approved successfully', host });
+    res.status(404).json({ message: 'Host not found' });
+   
   } catch (error) {
     console.error('Error approving host:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -60,5 +60,5 @@ const approveHostHandler = asyncHandler(async (req, res) => {
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
 roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
-router.post("/approveHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),approveHostHandler)
+router.post("/approveHostHandler/:userId",approveHostHandler)//authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN])
 module.exports = router;

@@ -20,19 +20,15 @@ const { asyncHandler } = require("../../utility/common");
 
 const registerUserHandler = asyncHandler(async (req, res) => {
   try {
-    console.log(req.body, req.files);
+
 
     // Extract file paths from request object
     const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
-    const nidFrontPath = req.files['nidFront'] ? req.files['nidFront'][0].path : '';
-    const nidBackPath = req.files['nidBack'] ? req.files['nidBack'][0].path : '';
 
     // Create user object with extracted file paths
     const userData = {
       ...req.body,
       profilePicture: profilePicturePath,
-      nidFront: nidFrontPath,
-      nidBack: nidBackPath
     };
 
     // Call the service function to handle user registration
@@ -98,9 +94,7 @@ const userSignInHandler = async (req, res, next) => {
 };
 
 router.post('/register', multerMiddleware.upload.fields([
-  { name: 'profilePicture', maxCount: 1 },
-  { name: 'nidFront', maxCount: 1 },
-  { name: 'nidBack', maxCount: 1 }
+  { name: 'profilePicture', maxCount: 1 }
 ]), registerUserHandler);
 router.post("/otpVerification", otpVerifyHandler);
 router.post("/otpResend", resendOTPHandler); //not tested in postman

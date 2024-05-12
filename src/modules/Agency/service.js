@@ -77,8 +77,8 @@ const approveHostService = async (userId, role) => {
   }
 
   // Check if the user even applied for host or not
-  if (!user.hostId || user.hostStatus !== "Pending" || !user.isActive || !user.isVerified) {
-    return {message:"Already a host"}; ; // Return null to indicate user not eligible for approval
+  if (!user.hostId || user.hostStatus !== "pending" || !user.isActive || !user.isVerified) {
+    return {message:"User is not eligible for approval"}; ; // Return null to indicate user not eligible for approval
   }
 
   // Check if the agencyID is in agency model
@@ -88,8 +88,7 @@ const approveHostService = async (userId, role) => {
   }
 
   // Approval of host begins with host status changing, also hostactivity to true
-  user.hostStatus = "Accepted";
-  user.hostActivity = true;
+  user.hostStatus = "active";
 
   // Populating the host model from usermodel with that user info
   const host = new Host({
@@ -104,13 +103,13 @@ const approveHostService = async (userId, role) => {
     hostId: user.hostId,
     agencyId: user.agencyId,
     hostType: user.hostType,
-    hostNid: user.hostNid,
+    nidFront: user.nidFront,
+    nidBack: user.nidBack,
     agencyName: user.agencyName,
     country: user.country,
     presentAddress: user.presentAddress,
     agencyEmail: user.agencyEmail,
     isActive: user.isActive,
-    hostActivity: user.hostActivity,
     isApproved: true,
     role: user.role,
     isVerified: user.isVerified,
