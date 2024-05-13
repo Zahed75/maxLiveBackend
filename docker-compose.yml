@@ -1,30 +1,28 @@
 version: '3.9'
-
 services:
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "5050:5050"
     container_name: max-server
     networks:
-      - maxLive-network
+      - max-network
     volumes:
       - ./:/app
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017/basilaProd?authSource=admin
+      MONGODB_URI: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017/maxProd?authSource=admin
     depends_on:
       - mongo
-
   mongo:
     container_name: max-db
     image: mongo
     ports:
       - "27177:27017"
     networks:
-      - maxLive-network
+      - max-network
     volumes:
       - mongoData:/data/db
     restart: always
@@ -32,14 +30,13 @@ services:
       MONGO_INITDB_ROOT_USERNAME: maxadmin
       MONGO_INITDB_ROOT_PASSWORD: E7Dw~e5NKh4Ly's
       MONGO_INITDB_DATABASE: maxProd
-
   mongo-express:
     image: mongo-express
     restart: always
     ports:
-      - "8081:8081"
+      - "8084:8084"
     networks:
-      - maxLive-network
+      - max-network
     environment:
       ME_CONFIG_BASICAUTH_USERNAME: maxdbadmin
       ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
@@ -48,9 +45,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017
     depends_on:
       - mongo
-
 networks:
-  maxLive-network:
-
+  max-network:
 volumes:
   mongoData:
