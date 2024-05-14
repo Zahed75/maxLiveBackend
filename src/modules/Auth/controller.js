@@ -6,6 +6,8 @@ const multerMiddleware = require('../../middlewares/multerMiddlware');
 const { validate } = require("../../middlewares/schemaValidation"); // Corrected import
 
 const {
+  BASIC_USER, AGENCY_OWNER, MASTER_PORTAL,SUPER_ADMIN
+}=require('../../config/constants');
   HEAD_OFFICE,
   BRANCH_ADMIN,
   CUSTOMER,
@@ -16,6 +18,8 @@ const { adminValidate } = require("./request");
 const roleMiddleware = require("../../middlewares/roleMiddleware");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
+
+
 
 
 const registerUserHandler = asyncHandler(async (req, res) => {
