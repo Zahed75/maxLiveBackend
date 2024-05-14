@@ -63,26 +63,67 @@ const getUserById = async (userId) => {
   }
 };
 
-const getAllUserService = async () => {
-  const Users = await User.find();
-  if (!Users) {
-    throw new BadRequest("Could Not find Users");
+const getAllUserService = async (reQuerry, res) => {
+  try {
+    const { page = 1, limit = 10 } =  reQuerry;// Default values for page and limit
+
+
+    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+      throw new BadRequest('Invalid page or limit parameters. Both must be positive integers.');
+    }
+
+    const skip = (page - 1) * limit; // Calculate offset for pagination
+
+  
+    const [users, totalUsersCount] = await Promise.all([
+      User.find() // Select specific fields if desired
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments() 
+    ]);
+
+    if (!users.length) {
+      return res.status(204).json({ message: 'No users found' }); 
+    }
+
+    const totalPages = Math.ceil(totalUsersCount / limit); // Calculate total pages
+
+    return ({
+      users,
+      pagination: {
+        page,
+        limit,
+        totalPages,
+        totalCount: totalUsersCount,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
   }
-  return Users;
 };
 
-const updateUserInfoService = async (userId, updatedInfo) => {
-  const updatedResult = await User.findByIdAndUpdate(userId, updatedInfo, {
-    new: true,
-  });
-  if (!updatedResult) {
-    throw new Error("User info to update not found");
+const updateUserInfoService = async (userId, updatedInfo, profilePicturePath) => {
+  try {
+    // Handle profile picture upload (if applicable):
+    if (profilePicturePath) {
+      // Update `updatedInfo` object to include profile picture path
+      updatedInfo.profilePicture = profilePicturePath;
+    }
+
+    const updatedResult = await User.findByIdAndUpdate(userId, updatedInfo, {
+      new: true,
+    });
+
+    if (!updatedResult) {
+      throw new Error("User info to update not found");
+    }
+
+    return updatedResult;
+  } catch (error) {
+    throw error; // Re-throw error for proper handling in controller
   }
-
-  return updatedResult;
 };
-
-
 
 
 const applyToBeHostService = async (agencyId, hostType, userId,role) => {

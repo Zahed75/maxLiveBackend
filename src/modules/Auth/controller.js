@@ -16,7 +16,6 @@ const roleMiddleware = require("../../middlewares/roleMiddleware");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
 
-console.log("test push")
 
 
 const registerUserHandler = asyncHandler(async (req, res) => {

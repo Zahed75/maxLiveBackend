@@ -18,6 +18,8 @@ const { app } = require("firebase-admin");
 const Agency = require("../Agency/model");
 const { mongo, default: mongoose } = require("mongoose");
 const { DateModule } = require("@faker-js/faker");
+const multerMiddleware = require('../../middlewares/multerMiddlware');
+
 
 const resetPasswordHandler = asyncHandler(async (req, res) => {
   const { email, newPassword } = req.body;
@@ -50,14 +52,16 @@ const getUserById = asyncHandler(async(req,res)=>{
 })
 
 const getAllUsersHandler = asyncHandler(async (req, res) => {
-  const users = await userService.getAllUserService();
+  const users = await userService.getAllUserService(req.query);
   res.status(200).json({ users });
 });
 
 const updateUserInfoHandler = asyncHandler(async (req, res) => {
+  const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
   const updatedUser = await userService.updateUserInfoService(
     req.params.id,
-    req.body
+    req.body,
+    profilePicturePath
   );
   res.status(200).json({
     updatedUser,
@@ -78,7 +82,9 @@ const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUId", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
-router.put("/updateUserInfo/:id", updateUserInfoHandler);
+router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
+  { name: 'profilePicture', maxCount: 1 }
+]),updateUserInfoHandler);
 
 router.post("/resetPass", resetPasswordHandler); //not tested in postman
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
