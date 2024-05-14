@@ -121,8 +121,8 @@ const approveHostService = async (userId, role) => {
     presentAddress: user.presentAddress,
     agencyEmail: agency.email,
     isActive: user.isActive,
-    isApproved: true,
-    role: "HO",
+    isApproved: true,//true after approval
+    role: "HO",//role is getting changed from BU to Ho after approval
     isVerified: user.isVerified,
     refreshToken: user.refreshToken,
   });
@@ -172,7 +172,6 @@ const signinAgencyService = async (email,password) => {
     throw error; 
   }
 };
-
 
 
 
