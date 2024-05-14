@@ -8,10 +8,7 @@ const { validate } = require("../../middlewares/schemaValidation"); // Corrected
 const {
   BASIC_USER, AGENCY_OWNER, MASTER_PORTAL,SUPER_ADMIN
 }=require('../../config/constants');
-  HEAD_OFFICE,
-  BRANCH_ADMIN,
-  CUSTOMER,
-} = require("../../config/constants");
+
 
 const authService = require("./service");
 const { adminValidate } = require("./request");

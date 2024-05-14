@@ -29,7 +29,7 @@ const registerUserService = async (userData) => {
 
     // Create a new user with profile picture and NID photos
     const newUser = await User.create({ ...userData, otp });
-
+    
     if (!newUser) {
       throw new BadRequest("Could Not Create User");
     }
