@@ -3,9 +3,7 @@ const router = express.Router();
 const { validate } = require('../../middlewares/schemaValidation'); // Corrected import
 
 const {
-    HEAD_OFFICE,
-    BRANCH_ADMIN,
-    CUSTOMER
+  BASIC_USER, AGENCY_OWNER, MASTER_PORTAL,SUPER_ADMIN
 }=require('../../config/constants');
 
 const authService = require('./service');
@@ -15,10 +13,14 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const { asyncHandler } = require('../../utility/common');
 
 
+
+
 const registerUserHandler = asyncHandler(async (req, res) => {
   const userInfo = await authService.userRegisterService(req.body);
   res.status(200).json({ message: "user created successfully", userInfo });
 });
+
+
 
 
 // Verify OTP
@@ -82,6 +84,7 @@ const userSignInHandler= async (req, res, next) => {
 
 
 router.post("/registerUserHandler", registerUserHandler);
+router.use(authMiddleware);
 router.post('/otpVerification',otpVerifyHandler);
 router.post('/otpResend',resendOTPHandler);//not tested in postman
 router.post('/expireOTP',expireOTP);//not tested in postman

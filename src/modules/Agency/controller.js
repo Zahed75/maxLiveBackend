@@ -49,6 +49,8 @@ const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   res.status(200).json(pendingResult); // Return the approval result
 });
 
+
+
 router.post("/registerAgency", registerAgency);
 router.get("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
 

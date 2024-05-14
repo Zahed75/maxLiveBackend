@@ -7,5 +7,5 @@ RUN npm ci
 # Copy app source code
 COPY . .
 #Expose port and start application
-EXPOSE 5050
-CMD [ "npm", "run", "dev" ]
+EXPOSE 5000
+CMD [ "node" , "index.js" ]
