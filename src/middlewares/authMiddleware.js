@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
     jwt.verify(Token, "SecretKey12345", function (err, decoded) {
         if (err) {
             console.log(err)
-           res.status(401).json({ status: "UnAuthorizeddd" });
+           res.status(401).json({ status: "UnAuthorizedddsh" });
         } else {
             console.log("Decoded Token:", decoded); // Log decoded data for debugging
 

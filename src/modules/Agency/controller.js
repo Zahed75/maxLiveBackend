@@ -48,9 +48,25 @@ const approveHostHandler = async (req, res) => {
   }
 };
 
+const signinAgencyController = asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const sanitizedUser = await agencyService.signinAgencyService(email, password);
+    
+    // Respond with sanitized user data
+    res.status(200).json({message:"sign in success",user :sanitizedUser});
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
 roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)//authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN])
+router.post("/agencySignin",signinAgencyController);
 module.exports = router;

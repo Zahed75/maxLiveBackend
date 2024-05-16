@@ -3,6 +3,8 @@ const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const { asyncHandler } = require("../../utility/common");
+const bcrypt = require('bcryptjs');
+const jwt= require('jsonwebtoken');
 
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
@@ -134,8 +136,9 @@ const approveHostService = async (userId, role) => {
   return host;
 };
 
+// signinAgencyService.js
 
-const signinAgencyService = async (email,password) => {
+const signinAgencyService = async (email, password) => {
   try {
     // Find user by email
     const agency = await agencyModel.findOne({ email });
@@ -152,18 +155,17 @@ const signinAgencyService = async (email,password) => {
     if (!isMatch) {
       throw new BadRequest("Invalid email or password.");
     }
- // Generate JWT token with user data payload
- const accessToken = jwt.sign({ agency }, 'SecretKey12345', { expiresIn: '3d' });
+
+    // Generate JWT token with user data payload
+    const accessToken = jwt.sign({ agency }, 'SecretKey12345', { expiresIn: '3d' });
+    await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
     // User is authenticated, return sanitized user data (excluding sensitive fields)
     const sanitizedUser = {
       accessToken,
       email: agency.email,
       phoneNumber: agency.phoneNumber,
       role: agency.role,
-      isActive: true,//need to recehck
       isVerified: true,
-      
-      
     };
 
     return sanitizedUser;
@@ -172,6 +174,8 @@ const signinAgencyService = async (email,password) => {
     throw error; 
   }
 };
+
+
 
 
 

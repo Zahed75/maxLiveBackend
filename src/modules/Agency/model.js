@@ -51,6 +51,9 @@ const agencySchema = new mongoose.Schema({
     type: String,
     required: [true, "Email is required"],   
   },
+  password:{
+    type:String,
+  },
   phone: {
     type: String,
     required: [true, "Phone number is required"],
@@ -82,7 +85,7 @@ const agencySchema = new mongoose.Schema({
   ],
   agencyStatus:{
     type:String,
-    enum:["active","inactive","pending","rejected"],
+    enum:["active","inactive","pending","banned"],
     default:"pending"
   },
   isActive:{
@@ -92,6 +95,9 @@ const agencySchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false,
+  },
+  maxPower:{
+    type:Boolean,
   },
   isApproved: {
     type: Boolean,

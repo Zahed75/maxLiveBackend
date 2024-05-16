@@ -119,7 +119,7 @@ const transporter = nodemailer.createTransport({
 
 function sendOTP(email, otp) {
   const mailOptions = {
-    from: "shahriartasin2000@gmail.com",
+    from: "shahriartasin2000@gmail.com",//need to change
     to: email,
     subject: "OTP for Sign-in",
     text: `Your OTP for sign-in is: ${otp}`,
