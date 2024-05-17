@@ -137,15 +137,25 @@ const approveHostService = async (userId, role) => {
 };
 
 // signinAgencyService.js
-
 const signinAgencyService = async (email, password) => {
   try {
+    // Log email
+    console.log(`Email: ${email}`);
+    
     // Find user by email
     const agency = await agencyModel.findOne({ email });
+    
+    // Log agency found
+    console.log(`Agency found: ${agency}`);
 
     // Check if user exists
     if (!agency) {
       throw new BadRequest("Invalid email or password.");
+    }
+
+    // Check if the agency is banned
+    if (agency.agencyStatus === 'banned') {
+      throw new BadRequest("This agency is banned and cannot sign in.");
     }
 
     // Validate password using bcrypt.compare
@@ -158,7 +168,10 @@ const signinAgencyService = async (email, password) => {
 
     // Generate JWT token with user data payload
     const accessToken = jwt.sign({ agency }, 'SecretKey12345', { expiresIn: '3d' });
+    
+    // Update isVerified field in the agency document
     await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
+
     // User is authenticated, return sanitized user data (excluding sensitive fields)
     const sanitizedUser = {
       accessToken,
