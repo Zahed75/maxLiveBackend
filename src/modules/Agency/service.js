@@ -139,15 +139,9 @@ const approveHostService = async (userId, role) => {
 // signinAgencyService.js
 const signinAgencyService = async (email, password) => {
   try {
-    // Log email
-    console.log(`Email: ${email}`);
-    
     // Find user by email
     const agency = await agencyModel.findOne({ email });
     
-    // Log agency found
-    console.log(`Agency found: ${agency}`);
-
     // Check if user exists
     if (!agency) {
       throw new BadRequest("Invalid email or password.");
