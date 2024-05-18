@@ -35,7 +35,9 @@ const getUserProfileBySocialId = asyncHandler(async (req, res) => {
   const firebaseUid = req.params.firebaseUId;
   try {
     const user = await userService.getSocialUserById(firebaseUid);
-    res.status(200).json({ user });
+    if (!user){
+    res.status(400)
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
