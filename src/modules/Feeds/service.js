@@ -3,6 +3,13 @@ const multer = require('multer');
 const { BadRequest, NotFound } = require('../../utility/errors');
 const User=require('../User/model');
 const mongoose = require('mongoose');
+const fs = require('fs-extra');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const fsExtra = require('fs-extra');
+// Function to save image data to file system and return the image URL
+require('dotenv').config(); // Import dotenv to access environment variables
+const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment variable
 
 
 
@@ -16,13 +23,6 @@ const mongoose = require('mongoose');
 
 
 
-const fs = require('fs-extra');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const fsExtra = require('fs-extra');
-// Function to save image data to file system and return the image URL
-require('dotenv').config(); // Import dotenv to access environment variables
-const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment variable
 
 const saveImage = async (base64Image) => {
     if (!base64Image) {

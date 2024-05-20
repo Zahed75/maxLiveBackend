@@ -1,20 +1,19 @@
 const mongoose = require("mongoose");
 
-const levelSchema = new mongoose.Schema({
+const beanSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  currentLevel: {
+  amount: {
     type: Number,
     required: true,
-    default: 1,
   },
-  beansSent: {
-    type: Number,
+  transactionType: {
+    type: String,
+    enum: ["purchase", "send", "convert"],
     required: true,
-    default: 0,
   },
   createdAt: {
     type: Date,
@@ -22,6 +21,6 @@ const levelSchema = new mongoose.Schema({
   },
 });
 
-const Level = mongoose.model("Level", levelSchema);
+const Bean = mongoose.model("Bean", beanSchema);
 
-module.exports = Level;
+module.exports = Bean;

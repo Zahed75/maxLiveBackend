@@ -1,27 +1,25 @@
 const mongoose = require("mongoose");
 
-const levelSchema = new mongoose.Schema({
+const vipSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  currentLevel: {
+  vipLevel: {
     type: Number,
     required: true,
-    default: 1,
   },
-  beansSent: {
-    type: Number,
+  perks: {
+    type: [String],
     required: true,
-    default: 0,
   },
-  createdAt: {
+  activatedAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-const Level = mongoose.model("Level", levelSchema);
+const VIP = mongoose.model("VIP", vipSchema);
 
-module.exports = Level;
+module.exports = VIP;
