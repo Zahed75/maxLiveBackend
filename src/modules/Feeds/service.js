@@ -25,7 +25,7 @@ const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment v
 
 
 // Define the directory where images will be saved
-const UPLOADS_DIR = path.join(__dirname, 'Feeds/uploads'); // Adjusted path to remove redundant 'Feeds' directory
+const UPLOADS_DIR = path.join(__dirname, 'uploads'); // Adjusted path to remove redundant 'Feeds' directory
 
 const saveImage = async (base64Image) => {
     if (!base64Image) {
