@@ -24,6 +24,9 @@ const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment v
 
 
 
+// Define the directory where images will be saved
+const UPLOADS_DIR = path.join(__dirname, 'Feeds', 'uploads');
+
 const saveImage = async (base64Image) => {
     if (!base64Image) {
         throw new Error('Base64 image data is required');
@@ -37,10 +40,10 @@ const saveImage = async (base64Image) => {
     const imageBuffer = Buffer.from(matches[2], 'base64');
     const imageType = matches[1].split('/')[1]; // e.g., 'jpeg', 'png'
     const imageName = `${uuidv4()}.${imageType}`;
-    const imagePath = path.join(__dirname, 'uploads', imageName);
+    const imagePath = path.join(UPLOADS_DIR, imageName);
 
     // Ensure the uploads directory exists
-    await fsExtra.ensureDir(path.dirname(imagePath));
+    await fsExtra.ensureDir(UPLOADS_DIR);
 
     // Save the image to the file system
     await fs.promises.writeFile(imagePath, imageBuffer);
@@ -56,18 +59,17 @@ const createPostService = async ({ userId, base64Image, caption }) => {
     // Replace this with your own user retrieval logic
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+        throw new Error('User not found');
     }
-  
+
     // Save the image and get the image URL
     const imageUrl = await saveImage(base64Image);
-  
+
     // Create the post
     const newPost = await feedModel.create({ userId, fileUrl: imageUrl, caption });
-  
+
     return newPost;
 };
-
 
 
 
