@@ -4,8 +4,7 @@ const User = require("./model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
-const admin = require('firebase-admin');
-
+const admin = require("firebase-admin");
 
 const resetPassword = async (email, newPassword) => {
   try {
@@ -31,7 +30,7 @@ const resetPassword = async (email, newPassword) => {
 
     return user;
   } catch (error) {
-    throw new Error("Failed to reset password.",error);
+    throw new Error("Failed to reset password.", error);
   }
 };
 
@@ -39,56 +38,55 @@ const resetPassword = async (email, newPassword) => {
 
 const getSocialUserById = async (firebaseUid) => {
   try {
-    const user = await User.findOne({ firebaseUid:firebaseUid });
-    if (!user) {
-      return { message: "Could not find social user" };
+    const user = await User.findOne({ firebaseUid: firebaseUid });
+    if (user) {
+      return user;
     }
-    return user;
+    return { message: "Could not find social user" };
   } catch (error) {
     console.log(error);
   }
 };
 
-
 const getUserById = async (userId) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
     return user;
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error("Error fetching user:", error);
     throw error;
   }
 };
 
 const getAllUserService = async (reQuerry, res) => {
   try {
-    const { page = 1, limit = 10 } =  reQuerry;// Default values for page and limit
-
+    const { page = 1, limit = 10 } = reQuerry; // Default values for page and limit
 
     if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      throw new BadRequest('Invalid page or limit parameters. Both must be positive integers.');
+      throw new BadRequest(
+        "Invalid page or limit parameters. Both must be positive integers."
+      );
     }
 
     const skip = (page - 1) * limit; // Calculate offset for pagination
 
-  
     const [users, totalUsersCount] = await Promise.all([
       User.find() // Select specific fields if desired
         .skip(skip)
         .limit(limit),
-      User.countDocuments() 
+      User.countDocuments(),
     ]);
 
     if (!users.length) {
-      return res.status(204).json({ message: 'No users found' }); 
+      return res.status(204).json({ message: "No users found" });
     }
 
     const totalPages = Math.ceil(totalUsersCount / limit); // Calculate total pages
 
-    return ({
+    return {
       users,
       pagination: {
         page,
@@ -96,14 +94,18 @@ const getAllUserService = async (reQuerry, res) => {
         totalPages,
         totalCount: totalUsersCount,
       },
-    });
+    };
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error("Error fetching user:", error);
     throw error;
   }
 };
 
-const updateUserInfoService = async (userId, updatedInfo, profilePicturePath) => {
+const updateUserInfoService = async (
+  userId,
+  updatedInfo,
+  profilePicturePath
+) => {
   try {
     // Handle profile picture upload (if applicable):
     if (profilePicturePath) {
@@ -125,10 +127,8 @@ const updateUserInfoService = async (userId, updatedInfo, profilePicturePath) =>
   }
 };
 
-
-const applyToBeHostService = async (agencyId, hostType, userId,role) => {
+const applyToBeHostService = async (agencyId, hostType, userId, role) => {
   try {
-
     const hostId = generateHostId();
     const user = await User.findById(userId);
     if (!user) {
@@ -139,7 +139,7 @@ const applyToBeHostService = async (agencyId, hostType, userId,role) => {
     user.hostId = hostId;
     user.role = role;
     await user.save();
-    
+
     return hostId;
   } catch (error) {
     console.error("Error applying to be host:", error);
@@ -147,21 +147,18 @@ const applyToBeHostService = async (agencyId, hostType, userId,role) => {
   }
 };
 
-
-
 const deleteUserById = async (userId) => {
   try {
     const user = await User.findByIdAndDelete(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
     return user;
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error("Error deleting user:", error);
     throw error;
   }
 };
-
 
 module.exports = {
   resetPassword,
@@ -170,5 +167,5 @@ module.exports = {
   updateUserInfoService,
   applyToBeHostService,
   getUserById,
-  deleteUserById
+  deleteUserById,
 };
