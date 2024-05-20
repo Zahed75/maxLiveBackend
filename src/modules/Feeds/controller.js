@@ -26,12 +26,14 @@ const mongoose = require('mongoose');
 // CreatePostHandler
 
 const createPostHandler = asyncHandler(async (req, res) => {
-    const posts = await feedService.createPostService(req.body);
+    const { userId, base64Image, caption } = req.body;
+    const newPost = await feedService.createPostService({ userId, base64Image, caption });
     res.status(200).json({
       message: "Post created successfully",
-      posts
+      post: newPost
     });
   });
+  
 
 
 

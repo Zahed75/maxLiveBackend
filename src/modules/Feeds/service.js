@@ -19,41 +19,54 @@ const mongoose = require('mongoose');
 const fs = require('fs-extra');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-
+const fsExtra = require('fs-extra');
+// Function to save image data to file system and return the image URL
+require('dotenv').config(); // Import dotenv to access environment variables
+const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment variable
 
 const saveImage = async (base64Image) => {
-  // Decode base64 image
-  const matches = base64Image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-  if (!matches || matches.length !== 3) {
-    throw new Error('Invalid base64 image string');
-  }
+    if (!base64Image) {
+        throw new Error('Base64 image data is required');
+    }
 
-  const imageBuffer = Buffer.from(matches[2], 'base64');
-  const imageType = matches[1].split('/')[1]; // e.g., 'jpeg', 'png'
-  const imageName = `${uuidv4()}.${imageType}`;
-  const imagePath = path.join(__dirname, 'uploads', imageName);
+    const matches = base64Image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+        throw new Error('Invalid base64 image string');
+    }
 
-  // Ensure the uploads directory exists
-  await fs.ensureDir(path.dirname(imagePath));
+    const imageBuffer = Buffer.from(matches[2], 'base64');
+    const imageType = matches[1].split('/')[1]; // e.g., 'jpeg', 'png'
+    const imageName = `${uuidv4()}.${imageType}`;
+    const imagePath = path.join(__dirname, 'uploads', imageName);
 
-  // Save the image to the file system
-  await fs.writeFile(imagePath, imageBuffer);
+    // Ensure the uploads directory exists
+    await fsExtra.ensureDir(path.dirname(imagePath));
 
-  // Generate the image URL (adjust the base URL according to your server setup)
-  const imageUrl = `http://localhost:8080/uploads/${imageName}`;
-  return imageUrl;
+    // Save the image to the file system
+    await fs.promises.writeFile(imagePath, imageBuffer);
+
+    // Generate the image URL using the base URL from .env
+    const imageUrl = `${BASE_URL}/uploads/${imageName}`;
+    return imageUrl;
 };
 
-const createPostService = async (posts) => {
-  if (posts.base64Image) {
-    posts.fileUrl = await saveImage(posts.base64Image);
-    delete posts.base64Image; // Remove the base64Image field from the post object
-  }
+// Function to create a new post
+const createPostService = async ({ userId, base64Image, caption }) => {
+    // Check if user exists
+    // Replace this with your own user retrieval logic
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
   
-  const newPost = await feedModel.create(posts);
-  return newPost;
+    // Save the image and get the image URL
+    const imageUrl = await saveImage(base64Image);
+  
+    // Create the post
+    const newPost = await feedModel.create({ userId, fileUrl: imageUrl, caption });
+  
+    return newPost;
 };
-
 
 
 
