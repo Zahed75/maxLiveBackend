@@ -23,54 +23,28 @@ const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment v
 
 
 
-
-// Define the directory where images will be saved
-const UPLOADS_DIR = path.join(__dirname, 'uploads'); // Adjusted path to remove redundant 'Feeds' directory
-
-const saveImage = async (base64Image) => {
-    if (!base64Image) {
-        throw new Error('Base64 image data is required');
+const createPostService = async (userId, data, file) => {
+    if (!file) {
+      throw new Error('Post image is required');
     }
-
-    const matches = base64Image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
-        throw new Error('Invalid base64 image string');
-    }
-
-    const imageBuffer = Buffer.from(matches[2], 'base64');
-    const imageType = matches[1].split('/')[1]; // e.g., 'jpeg', 'png'
-    const imageName = `${uuidv4()}.${imageType}`;
-    const imagePath = path.join(UPLOADS_DIR, imageName);
-
-    // Ensure the uploads directory exists
-    await fsExtra.ensureDir(UPLOADS_DIR);
-
-    // Save the image to the file system
-    await fs.promises.writeFile(imagePath, imageBuffer);
-
-    // Generate the image URL using the base URL from .env
-    const imageUrl = `${BASE_URL}/uploads/${imageName}`;
-    return imageUrl;
-};
-
-
-// Function to create a new post
-const createPostService = async ({ userId, base64Image, caption }) => {
-    // Check if user exists
-    // Replace this with your own user retrieval logic
-    const user = await User.findById(userId);
-    if (!user) {
-        throw new Error('User not found');
-    }
-
-    // Save the image and get the image URL
-    const imageUrl = await saveImage(base64Image);
-
-    // Create the post
-    const newPost = await feedModel.create({ userId, fileUrl: imageUrl, caption });
-
+  
+    const imageUrl = `${process.env.BASE_API_URL}/uploads/feeds/${file.filename}`;
+  
+    const newPost = await feedModel.create({
+      userId,
+      postImage: file.filename,
+      fileUrl: imageUrl,
+      caption: data.caption,
+    });
+  
+    await User.findByIdAndUpdate(
+      { _id: userId },
+      { $push: { post: newPost } }
+    );
+  
     return newPost;
-};
+  };
+  
 
 
 

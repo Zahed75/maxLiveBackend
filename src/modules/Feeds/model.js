@@ -34,7 +34,7 @@ const FeedSchema = new mongoose.Schema({
     required: true,
     ref: "User"
   },
-  files: String,
+  postImage: String,
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

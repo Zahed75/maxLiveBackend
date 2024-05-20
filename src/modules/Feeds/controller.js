@@ -22,15 +22,19 @@ const {asyncHandler}=require('../../utility/common');
 const feedModel=require('../Feeds/model');
 const UserModel = require('../User/model');
 const mongoose = require('mongoose');
-
+const {feedUpload} = require('../../utility/multer');
 // CreatePostHandler
 
+
+
 const createPostHandler = asyncHandler(async (req, res) => {
-    const { userId, base64Image, caption } = req.body;
-    const newPost = await feedService.createPostService({ userId, base64Image, caption });
+    const { userId, caption } = req.body;
+  const file = req.file;
+
+  const newPost = await feedService.createPostService(userId, { caption }, file);
     res.status(200).json({
       message: "Post created successfully",
-      post: newPost
+      newPost
     });
   });
   
@@ -249,7 +253,15 @@ const sharePostHandler = async (req, res) => {
 
 
 
-router.post('/addPost',createPostHandler);
+// router.post('/addPost',feedUpload.fields([
+// { name:'postImage',
+//     maxCount:1},
+
+// ]),
+// createPostHandler
+// );
+
+router.post('/addPost',feedUpload.single('postImage'),createPostHandler);
 router.put('/:id',updatePostHandler);
 router.delete('/:id',deletePostByIdHandler);
 router.get('/allPosts',getAllPostsHandler)
@@ -264,5 +276,7 @@ router.get('/:userId/totalPost',getTotalPostsByUserIdHandler);
 router.post('/share/:postId', sharePostHandler);
 
 module.exports=router;
+
+
 
 

@@ -1,26 +1,18 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-const brandStorage = multer.diskStorage({
+const feedStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads/brands'));
+    cb(null, path.join(__dirname, '../uploads/feeds'));
   },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      req.body.brandName.replace(/Img|\+/g, '') +
-        path.extname(file.originalname)
-    );
-  },
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
-
-
-const brandUpload = multer({ storage: brandStorage });
-
+const feedUpload = multer({ storage: feedStorage });
 
 module.exports = {
-  brandUpload,
-
+  feedUpload,
 };
