@@ -25,13 +25,13 @@ const mongoose = require('mongoose');
 
 // CreatePostHandler
 
-const createPostHandler = asyncHandler(async(req,res)=>{
+const createPostHandler = asyncHandler(async (req, res) => {
     const posts = await feedService.createPostService(req.body);
     res.status(200).json({
-        message:"Post created successfully",
-        posts
-    })
-})
+      message: "Post created successfully",
+      posts
+    });
+  });
 
 
 
@@ -64,28 +64,35 @@ const deletePostByIdHandler = asyncHandler(async(req,res)=>{
 
 
 // getAllPostsController
+
 const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
-};
-
-const getAllPostsHandler = asyncHandler(async(req,res)=>{
+  };
+  
+  const getAllPostsHandler = asyncHandler(async (req, res) => {
     const allPosts = await feedService.getAllPosts();
+  
+    if (!allPosts || allPosts.message) {
+      return res.status(404).json({ message: "No posts found" });
+    }
+  
+    const shuffledPosts = shuffleArray(allPosts);
+    const randomPosts = shuffledPosts; // Return all shuffled posts
+  
+    res.status(200).json({
+      message: "GetALLPost Fetched Successfully!",
+      randomPosts,
+    });
+  });
 
-        if (allPosts.length === 0) {
-            return res.status(404).json({ message: "No posts found" });
-        }
 
-        const shuffledPosts = shuffleArray(allPosts);
-        const randomPosts = shuffledPosts.filter((post, index) => index % 2 === 0);
-        res.status(200).json({
-            message:"GetALLPost Fetched SuccessFully!",
-            randomPosts
-        })
-})
+  
+
+
 
 
 

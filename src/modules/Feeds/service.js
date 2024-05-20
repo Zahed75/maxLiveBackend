@@ -9,10 +9,50 @@ const mongoose = require('mongoose');
 
 // create a post
 
-const createPostService= async(posts)=>{
-    const newPost=await feedModel.create(posts);
-    return newPost;
-}
+// const createPostService= async(posts)=>{
+//     const newPost=await feedModel.create(posts);
+//     return newPost;
+// }
+
+
+
+const fs = require('fs-extra');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
+
+const saveImage = async (base64Image) => {
+  // Decode base64 image
+  const matches = base64Image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) {
+    throw new Error('Invalid base64 image string');
+  }
+
+  const imageBuffer = Buffer.from(matches[2], 'base64');
+  const imageType = matches[1].split('/')[1]; // e.g., 'jpeg', 'png'
+  const imageName = `${uuidv4()}.${imageType}`;
+  const imagePath = path.join(__dirname, 'uploads', imageName);
+
+  // Ensure the uploads directory exists
+  await fs.ensureDir(path.dirname(imagePath));
+
+  // Save the image to the file system
+  await fs.writeFile(imagePath, imageBuffer);
+
+  // Generate the image URL (adjust the base URL according to your server setup)
+  const imageUrl = `http://localhost:8080/uploads/${imageName}`;
+  return imageUrl;
+};
+
+const createPostService = async (posts) => {
+  if (posts.base64Image) {
+    posts.fileUrl = await saveImage(posts.base64Image);
+    delete posts.base64Image; // Remove the base64Image field from the post object
+  }
+  
+  const newPost = await feedModel.create(posts);
+  return newPost;
+};
 
 
 
@@ -47,15 +87,16 @@ const deletePostById=async(id)=>{
 
 
 
-//getAllpost Service
+
 
 // Get all Post all users
 const getAllPosts = async () => {
-    
-        const allPosts = await feedModel.find();
-        return allPosts;
-    
-};
+    const allPosts = await feedModel.find().populate({
+        path: 'userId',
+        select: 'firstName,profilePicture'
+      });
+    return allPosts;
+  };
 
 
 
