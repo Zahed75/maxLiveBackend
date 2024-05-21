@@ -1,21 +1,56 @@
-version: '3'
+version: '3.9'
 services:
   backend:
     build:
-      context: .
+      context: '.'
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
-    depends_on:
-      - mongo
+      - 5050:5050
+    container_name: anydemo-backend
+    networks:
+      - anydemo-network
+    volumes:
+      - ./:/app
+    restart: on-failure
     environment:
       NODE_ENV: production
-      MONGODB_URI: "mongodb://syscoadmin:E7Dw~e5NKh4Ly%27s@mongo:27017/maxProd?authSource=admin"
-      AUTH_SECRET_KEY: SecretKey123456789
-      EMAIL_PASS: myaa trfs ymcq msja
-      BASE_API_URL: https://max.syscomatic.com/api/v1
+      MONGODB_URI: mongodb://anydemo:AsqQkL8%3CH6L_rS@mongo:27017
+     
 
+    depends_on:
+      - mongo
   mongo:
-    image: mongo:latest
+    container_name: anydemo-db
+    image: mongo
     ports:
-      - "27017:27017"
+      - 27177:27017
+    networks:
+      - anydemo-network
+    volumes:
+      - anydemoDBdata:/data/db
+    restart: always
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: anydemo
+      MONGO_INITDB_ROOT_PASSWORD: AsqQkL8<H6L_rS
+      MONGO_INITDB_DATABASE: AnyDemoPROD
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    networks:
+      - anydemo-network
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: anydemoDBAdmin
+      ME_CONFIG_BASICAUTH_PASSWORD: b}wu.gk3k?(~MNsL
+      ME_CONFIG_MONGODB_ADMINUSERNAME: anydemo
+      ME_CONFIG_MONGODB_ADMINPASSWORD: AsqQkL8<H6L_rS
+      ME_CONFIG_MONGODB_URL: mongodb://anydemo:AsqQkL8<H6L_rS@mongo:27017/AnyDemoPROD?authSource=admin
+    depends_on:
+      - mongo
+networks:
+  anydemo-network:
+volumes:
+  anydemoDBdata:
