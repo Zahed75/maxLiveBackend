@@ -20,18 +20,12 @@ const { asyncHandler } = require("../../utility/common");
 
 const registerUserHandler = asyncHandler(async (req, res) => {
   try {
-
-
-    // Extract file paths from request object
     const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
 
-    // Create user object with extracted file paths
     const userData = {
       ...req.body,
       profilePicture: profilePicturePath,
     };
-
-    // Call the service function to handle user registration
     const result = await authService.registerUserService(userData);
 
     // Send response based on the result
@@ -41,6 +35,40 @@ const registerUserHandler = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
+
+// MasterPortalRegister 
+
+
+
+
+
+const registerMasterPortalHandler =asyncHandler(async(req,res)=>{
+
+
+    const {  email, password } = req.body;
+
+    // Validate input
+    if (!email || !password ) {
+      return res.status(400).json({ message: 'Required fields are missing' });
+    }
+
+    // Register user
+    const user = await authService.registerMasterPortalUser({
+      email,
+      password,
+   
+    });
+
+    return res.status(201).json({ message: 'User registered successfully', user });
+ 
+
+})
+
+
+
 
 
 // Verify OTP
@@ -93,12 +121,17 @@ const userSignInHandler = async (req, res, next) => {
   }
 };
 
+
+
 router.post('/register', multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
 ]), registerUserHandler);
+
 router.post("/otpVerification", otpVerifyHandler);
-router.post("/otpResend", resendOTPHandler); //not tested in postman
-router.post("/expireOTP", expireOTP); //not tested in postman
+router.post("/otpResend", resendOTPHandler); 
+router.post("/expireOTP", expireOTP); 
 router.post("/signInUser", userSignInHandler);
+
+router.post('/registerMaster',registerMasterPortalHandler)
 
 module.exports = router;

@@ -76,7 +76,7 @@ app.use(handleError);
 
 // Undefined Route Implement
 app.use('*', (req, res) => {
-  res.status(404).json({ status: 'fail', data: 'Just for the 2nd test' });
+  res.status(404).json({ status: 'fail', data: 'Server is Okay,its Undefined Route' });
 });
 
 module.exports = app;

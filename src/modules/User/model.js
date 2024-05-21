@@ -131,7 +131,7 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     
-    // ...existing fields...
+    // ...Skins/Frame/Level/Coins/Beans...
     beans: {
       type: Number,
       default: 0,

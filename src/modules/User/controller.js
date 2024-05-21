@@ -82,12 +82,21 @@ const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
   res.status(200).json({message:"User deleted successfully",result:user});
 })
 
+
+
+
+
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUId", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
+
+
 router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
 ]),updateUserInfoHandler);
+
+
+
 
 router.post("/resetPass", resetPasswordHandler); //not tested in postman
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);

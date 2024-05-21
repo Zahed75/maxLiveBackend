@@ -17,6 +17,7 @@ const createToken = require('../../utility/createToken');
 const bcrypt = require('bcryptjs');
 const { decrypt } = require('dotenv');
 const { IosApp } = require('firebase-admin/project-management');
+const { captureRejectionSymbol } = require('nodemailer/lib/xoauth2');
 
 
 
@@ -43,6 +44,36 @@ const registerUserService = async (userData) => {
     return { status: 500, message: 'Internal server error' };
   }
 };
+
+
+
+// registerMasterPortal
+
+const registerMasterPortalUser = async (userData) =>{
+  // Check if email already exists
+  const existingUser = await User.findOne({ email: userData.email });
+  if (existingUser) {
+    throw new Error('Email already in use');
+  }
+
+  // Create the user with the provided data
+  const user = new User({
+    ...userData,
+    role: 'MP',
+    isVerified: true,
+    isActive:true
+  });
+
+  // Save the user to the database
+  await user.save();
+
+  return user;
+}
+
+
+
+
+
 
 
 
@@ -193,7 +224,8 @@ module.exports = {
   resendOTP,
   expireOTP,
   generateAndSendOTPService,
-  signinUserService
+  signinUserService,
+  registerMasterPortalUser
 };
 
 

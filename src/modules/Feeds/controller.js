@@ -253,13 +253,7 @@ const sharePostHandler = async (req, res) => {
 
 
 
-// router.post('/addPost',feedUpload.fields([
-// { name:'postImage',
-//     maxCount:1},
 
-// ]),
-// createPostHandler
-// );
 
 router.post('/addPost',feedUpload.single('postImage'),createPostHandler);
 router.put('/:id',updatePostHandler);
