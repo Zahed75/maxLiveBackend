@@ -1,18 +1,18 @@
 version: '3'
 
 networks:
-  maxLive-production-network:
+  maxlive-production-network:
     driver: bridge
 
 services:
-  maxLive_production_backend:
-    container_name: maxLive_production_backend
+  maxlive-production-backend:
+    container_name: maxlive_production_backend
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
     networks:
-      - maxLive-production-network
+      - maxlive-production-network
     env_file:
       - .env
     volumes:
@@ -20,30 +20,30 @@ services:
     ports:
       - "127.0.0.1:5050:5000"  # Changed port to 5050
     depends_on:
-      - maxLive_production_mongo
+      - maxlive-production-mongo
 
-  maxLive_production_mongo:
-    container_name: maxLive_production_mongo
+  maxlive-production-mongo:
+    container_name: maxlive_production_mongo
     restart: always
     image: mongo
     ports:
       - "17002:27017"
     networks:
-      - maxLive-production-network
+      - maxlive-production-network
     volumes:
       - /home/maxLive_persistent/mongodb:/data/db
     env_file:
       - .env
 
-  maxLive_production_mongo_express:
-    container_name: maxLive_production_mongo_express
+  maxlive-production-mongo-express:
+    container_name: maxlive_production_mongo_express
     image: mongo-express
     restart: always
     ports:
-      - "127.0.0.1:17005:9090"
+      - "127.0.0.1:17003:8081"
     networks:
-      - maxLive-production-network
+      - maxlive-production-network
     env_file:
       - .env
     depends_on:
-      - maxLive_production_mongo
+      - maxlive-production-mongo
