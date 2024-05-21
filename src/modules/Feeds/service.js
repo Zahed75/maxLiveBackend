@@ -23,28 +23,53 @@ const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment v
 
 
 
-const createPostService = async (userId, data, file) => {
-    if (!file) {
-      throw new Error('Post image is required');
+// const createPostService = async (userId, data, file) => {
+//     if (!file) {
+//       throw new Error('Post image is required');
+//     }
+  
+//     const imageUrl = `${process.env.BASE_API_URL}/uploads/feeds/${file.filename}`;
+  
+//     const newPost = await feedModel.create({
+//       userId,
+//       postImage: file.filename,
+//       fileUrl: imageUrl,
+//       caption: data.caption,
+//     });
+  
+//     await User.findByIdAndUpdate(
+//       { _id: userId },
+//       { $push: { post: newPost } }
+//     );
+  
+//     return newPost;
+//   };
+  
+
+
+
+const createPostService = async (userId, data, files) => {
+  if (!files['postImage'] || !files['postImage'][0]) {
+    throw new BadRequest('PostImage is required');
+  }
+
+  const newPost = await feedModel.create({
+    ...data,
+    post: files['postImage'][0].filename,
+    userId,  // Ensure userId is included here
+  });
+
+  await User.findByIdAndUpdate(
+    { _id: userId },
+    {
+      $push: {
+        post: newPost,
+      },
     }
-  
-    const imageUrl = `${process.env.BASE_API_URL}/uploads/feeds/${file.filename}`;
-  
-    const newPost = await feedModel.create({
-      userId,
-      postImage: file.filename,
-      fileUrl: imageUrl,
-      caption: data.caption,
-    });
-  
-    await User.findByIdAndUpdate(
-      { _id: userId },
-      { $push: { post: newPost } }
-    );
-  
-    return newPost;
-  };
-  
+  );
+
+  return newPost;
+};
 
 
 

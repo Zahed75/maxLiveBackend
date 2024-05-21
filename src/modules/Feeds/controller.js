@@ -28,10 +28,11 @@ const {feedUpload} = require('../../utility/multer');
 
 
 const createPostHandler = asyncHandler(async (req, res) => {
-    const { userId, caption } = req.body;
-  const file = req.file;
-
-  const newPost = await feedService.createPostService(userId, { caption }, file);
+    const { userId, caption,postImage } = req.body;
+    const files = req.files;
+  
+    const newPost = await feedService.createPostService(userId,{ caption }, files);
+  
     res.status(200).json({
       message: "Post created successfully",
       newPost
@@ -255,7 +256,16 @@ const sharePostHandler = async (req, res) => {
 
 
 
-router.post('/addPost',feedUpload.single('postImage'),createPostHandler);
+router.post('/addPost',feedUpload.fields([
+    {
+      name: 'postImage',
+      maxCount: 1,
+    },
+   
+  ]),createPostHandler);
+
+
+
 router.put('/:id',updatePostHandler);
 router.delete('/:id',deletePostByIdHandler);
 router.get('/allPosts',getAllPostsHandler)
