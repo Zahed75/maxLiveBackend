@@ -1,38 +1,49 @@
-version: '3.1'  # Docker secrets require at least version 3.1
-services:
-  app:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - .:/usr/src/app
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI_FILE=/run/secrets/mongo_uri
-    secrets:
-      - mongo_uri
-    depends_on:
-      - mongo
-    networks:
-      - internal
-
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    command: --bind_ip_all
-    networks:
-      - internal
-
-secrets:
-  mongo_uri:
-    external: true
-
-volumes:
-  mongo-data:
+version: '3'
 
 networks:
-  internal:
+  maxLive-production-network:
     driver: bridge
+
+services:
+  maxLive_production_backend:
+    container_name: maxLive_production_backend
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - maxLive-production-network
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "127.0.0.1:5050:5000"  # Changed port to 5050
+    depends_on:
+      - maxLive_production_mongo
+
+  maxLive_production_mongo:
+    container_name: maxLive_production_mongo
+    restart: always
+    image: mongo
+    ports:
+      - "17002:27017"
+    networks:
+      - maxLive-production-network
+    volumes:
+      - /home/maxLive_persistent/mongodb:/data/db
+    env_file:
+      - .env
+
+  maxLive_production_mongo_express:
+    container_name: maxLive_production_mongo_express
+    image: mongo-express
+    restart: always
+    ports:
+      - "127.0.0.1:17005:9090"
+    networks:
+      - maxLive-production-network
+    env_file:
+      - .env
+    depends_on:
+      - maxLive_production_mongo
