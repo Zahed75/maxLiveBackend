@@ -1,49 +1,51 @@
-version: '3'
-
-networks:
-  maxlive-production-network:
-    driver: bridge
-
+version: '3.9'
 services:
-  maxlive-production-backend:
-    container_name: maxlive_production_backend
-    restart: always
+  backend:
     build:
-      context: .
+      context: '.'
       dockerfile: Dockerfile
-    networks:
-      - maxlive-production-network
-    env_file:
-      - .env
-    volumes:
-      - .:/app
     ports:
-      - "127.0.0.1:5050:5000"  # Changed port to 5050
+      - 5050:5050
+    container_name: max-server
+    networks:
+      - max-network
+    volumes:
+      - ./:/app
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017/maxProd?authSource=admin
     depends_on:
-      - maxlive-production-mongo
-
-  maxlive-production-mongo:
-    container_name: maxlive_production_mongo
-    restart: always
+      - mongo
+  mongo:
+    container_name: max-db
     image: mongo
     ports:
-      - "17005:27017"
+      - 27177:27017
     networks:
-      - maxlive-production-network
+      - max-network
     volumes:
-      - /home/maxLive_persistent/mongodb:/data/db
-    env_file:
-      - .env
-
-  maxlive-production-mongo-express:
-    container_name: maxlive_production_mongo_express
+      - mongoData:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: syscoadmin
+      MONGO_INITDB_ROOT_PASSWORD: E7Dw~e5NKh4Ly's
+      MONGO_INITDB_DATABASE: maxProd
+  mongo-express:
     image: mongo-express
     restart: always
     ports:
-      - "127.0.0.1:17007:8081"
+      - 8082:8082
     networks:
-      - maxlive-production-network
-    env_file:
-      - .env
+      - max-network
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: syscodbadmin
+      ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
+      ME_CONFIG_MONGODB_ADMINUSERNAME: sysco
+      ME_CONFIG_MONGODB_ADMINPASSWORD: E7Dw~e5NKh4Ly's
+      ME_CONFIG_MONGODB_URL: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017
     depends_on:
-      - maxlive-production-mongo
+      - mongo
+networks:
+  max-network:
+volumes:
+  mongoData:
