@@ -10,10 +10,11 @@ services:
       - mongo
     environment:
       NODE_ENV: production
-      MONGODB_URI: "mongodb://syscoadmin:E7Dw~e5NKh4Ly's@103.191.51.223:27017/maxProd?authSource=admin"
+      MONGODB_URI: "mongodb://syscoadmin:E7Dw~e5NKh4Ly%27s@mongo:27017/maxProd?authSource=admin"
       AUTH_SECRET_KEY: SecretKey123456789
       EMAIL_PASS: myaa trfs ymcq msja
       BASE_API_URL: https://max.syscomatic.com/api/v1
+    command: ["./wait-for-it.sh", "mongo:27017", "--", "node", "index.js"]
 
   mongo:
     image: mongo:latest
