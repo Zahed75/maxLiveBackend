@@ -1,58 +1,21 @@
-version: '3.9'
+version: '3'
 services:
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 5051:5050
-    container_name: max-server
-    networks:
-      - max-network
-    volumes:
-      - ./:/app
+      - "5050:5050"
+    depends_on:
+      - mongo
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://maxadmin:E7Dw~e5NKh4Ly's@mongo:27017/maxProd?authSource=admin
+      MONGODB_URI: "mongodb://syscoadmin:E7Dw~e5NKh4Ly's@103.191.51.223:27017/maxProd?authSource=admin"
       AUTH_SECRET_KEY: SecretKey123456789
-      EMAIL_PASS: myaatrfsymcqmsja
+      EMAIL_PASS: myaa trfs ymcq msja
       BASE_API_URL: https://max.syscomatic.com/api/v1
-    depends_on:
-      - mongo
 
   mongo:
-    container_name: max-db
-    image: mongo
+    image: mongo:latest
     ports:
-      - 27177:27017
-    networks:
-      - max-network
-    volumes:
-      - mongoData:/data/db
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: syscoadmin
-      MONGO_INITDB_ROOT_PASSWORD: E7Dw~e5NKh4Ly's
-      MONGO_INITDB_DATABASE: maxProd
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8082:8081
-    networks:
-      - max-network
-    environment:
-      ME_CONFIG_BASICAUTH_USERNAME: syscodbadmin
-      ME_CONFIG_BASICAUTH_PASSWORD: VNY*\:u@n{x7<?2
-      ME_CONFIG_MONGODB_ADMINUSERNAME: syscoadmin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: E7Dw~e5NKh4Ly's
-      ME_CONFIG_MONGODB_URL: mongodb://syscoadmin:E7Dw~e5NKh4Ly's@mongo:27017
-    depends_on:
-      - mongo
-
-networks:
-  max-network:
-
-volumes:
-  mongoData:
+      - "27017:27017"
