@@ -123,6 +123,13 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
+      // BU -> BASIC USER
+      // HO -> HOST
+      //AG-AGENCY 
+      //MP -> MASTER PORTAL
+      // AD -> ADMIN
+      //CN - COIN 
+      // BR -BEAN RESELLER
       enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
       required: true,
     },

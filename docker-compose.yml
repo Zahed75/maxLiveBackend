@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'  # Docker secrets require at least version 3.1
 services:
   app:
     build: .
@@ -8,13 +8,31 @@ services:
       - .:/usr/src/app
     environment:
       - NODE_ENV=production
+      - MONGODB_URI_FILE=/run/secrets/mongo_uri
+    secrets:
+      - mongo_uri
     depends_on:
       - mongo
+    networks:
+      - internal
+
   mongo:
     image: mongo
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    command: --bind_ip_all
+    networks:
+      - internal
+
+secrets:
+  mongo_uri:
+    external: true
+
 volumes:
   mongo-data:
+
+networks:
+  internal:
+    driver: bridge
