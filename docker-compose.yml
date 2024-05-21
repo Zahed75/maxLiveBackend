@@ -14,7 +14,6 @@ services:
       AUTH_SECRET_KEY: SecretKey123456789
       EMAIL_PASS: myaa trfs ymcq msja
       BASE_API_URL: https://max.syscomatic.com/api/v1
-    command: ["./wait-for-it.sh", "mongo:27017", "--", "node", "index.js"]
 
   mongo:
     image: mongo:latest
