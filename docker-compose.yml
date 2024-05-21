@@ -27,7 +27,7 @@ services:
     restart: always
     image: mongo
     ports:
-      - "17002:27017"
+      - "17005:27017"
     networks:
       - maxlive-production-network
     volumes:
