@@ -123,6 +123,8 @@ const userSignInHandler = async (req, res, next) => {
 
 
 
+
+
 router.post('/register', multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
 ]), registerUserHandler);
