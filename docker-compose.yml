@@ -6,51 +6,49 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5050:5050
-    container_name: anydemo-backend
+    container_name: max-backend
     networks:
-      - anydemo-network
+      - max-network
     volumes:
       - ./:/app
     restart: on-failure
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://anydemo:AsqQkL8%3CH6L_rS@mongo:27017
-     
-
+      MONGODB_URI: mongodb://max:AsqQkL8%3CH6L_rS@mongo:27017 
     depends_on:
       - mongo
   mongo:
-    container_name: anydemo-db
+    container_name: max-db
     image: mongo
     ports:
       - 27177:27017
     networks:
-      - anydemo-network
+      - max-network
     volumes:
-      - anydemoDBdata:/data/db
+      - maxDBdata:/data/db
     restart: always
 
     environment:
-      MONGO_INITDB_ROOT_USERNAME: anydemo
+      MONGO_INITDB_ROOT_USERNAME: max
       MONGO_INITDB_ROOT_PASSWORD: AsqQkL8<H6L_rS
-      MONGO_INITDB_DATABASE: AnyDemoPROD
+      MONGO_INITDB_DATABASE: maxPROD
 
   mongo-express:
     image: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - 7070:7070
     networks:
-      - anydemo-network
+      - max-network
     environment:
-      ME_CONFIG_BASICAUTH_USERNAME: anydemoDBAdmin
+      ME_CONFIG_BASICAUTH_USERNAME: maxDBAdmin
       ME_CONFIG_BASICAUTH_PASSWORD: b}wu.gk3k?(~MNsL
-      ME_CONFIG_MONGODB_ADMINUSERNAME: anydemo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: max
       ME_CONFIG_MONGODB_ADMINPASSWORD: AsqQkL8<H6L_rS
-      ME_CONFIG_MONGODB_URL: mongodb://anydemo:AsqQkL8<H6L_rS@mongo:27017/AnyDemoPROD?authSource=admin
+      ME_CONFIG_MONGODB_URL: mongodb://max:AsqQkL8<H6L_rS@mongo:27017/maxPROD?authSource=admin
     depends_on:
       - mongo
 networks:
-  anydemo-network:
+  max-network:
 volumes:
-  anydemoDBdata:
+  maxDBdata:
