@@ -40,7 +40,7 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - "127.0.0.1:17003:8081"
+      - "127.0.0.1:17007:8081"
     networks:
       - maxlive-production-network
     env_file:
