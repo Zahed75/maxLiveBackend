@@ -14,7 +14,7 @@ services:
     restart: on-failure
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://maxlive:AsqQkL8%3CH6L_rS@103.191.51.223:27017
+      MONGODB_URI: mongodb://maxlive:AsqQkL8%3CH6L_rS@mongo:27017
       # AUTH
       AUTH_SECRET_KEY: 12345678
 
