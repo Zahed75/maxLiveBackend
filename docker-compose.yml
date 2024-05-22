@@ -5,7 +5,7 @@ services:
       context: '.'
       dockerfile: Dockerfile
     ports:
-      - 5050:5050
+      - 7070:7070
     container_name: maxlive-backend
     networks:
       - maxlive-network
