@@ -110,14 +110,39 @@ const shuffleArray = (array) => {
 
 //addComment Handler
 
-const addCommentHandler=asyncHandler(async(req,res)=>{
+// const addCommentHandler=asyncHandler(async(req,res)=>{
+//     const { userId, comment } = req.body;
+//     const postId = req.params.postId;
+
+//     const posts = await feedService.addComment(postId, userId, comment);
+
+//     res.status(201).json({ message: 'Comment added successfully', posts });
+// })
+
+
+const addCommentHandler = asyncHandler(async (req, res) => {
     const { userId, comment } = req.body;
     const postId = req.params.postId;
 
-    const posts = await feedService.addComment(postId, userId, comment);
+    const post = await feedService.addComment(postId, userId, comment);
 
-    res.status(201).json({ message: 'Comment added successfully', posts });
+    // Fetch user information separately and map it to the comments
+    const populatedComments = await Promise.all(post.comments.map(async (comment) => {
+        const user = await User.findById(comment.userId);
+        return {
+            userId: {
+                _id: user._id,
+                firstName: user.firstName
+            },
+            comment: comment.comment,
+            createdAt: comment.createdAt
+        };
+    }));
+
+    res.status(201).json({ message: 'Comment added successfully', comments: populatedComments });
 })
+
+
 
 
 
