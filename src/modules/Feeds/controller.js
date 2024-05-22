@@ -23,22 +23,27 @@ const feedModel=require('../Feeds/model');
 const UserModel = require('../User/model');
 const mongoose = require('mongoose');
 const {feedUpload} = require('../../utility/multer');
+
+
+
 // CreatePostHandler
+const createPostHandler = async (req, res) => {
+    const userId = req.body.userId;
+    if (!userId) {
+      return res.status(400).json({ message: 'UserId is required.' });
+    }
+    try {
+      const baseUrl = process.env.BASE_API_URL;
+      const post = await feedService.createPostService(userId, req.body, req.files, baseUrl);
+      res.status(200).json({ message: 'Post Successfully Created!', post: post.toObject() }); // Convert to object to include virtuals like imageUrl
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
+  
 
 
-
-const createPostHandler = asyncHandler(async (req, res) => {
-    const { userId, caption,postImage } = req.body;
-    const files = req.files;
-  
-    const newPost = await feedService.createPostService(userId,{ caption }, files);
-  
-    res.status(200).json({
-      message: "Post created successfully",
-      newPost
-    });
-  });
-  
 
 
 
@@ -256,15 +261,8 @@ const sharePostHandler = async (req, res) => {
 
 
 
-router.post('/addPost',feedUpload.fields([
-    {
-      name: 'postImage',
-      maxCount: 1,
-    },
-   
-  ]),createPostHandler);
 
-
+router.post('/addPost', feedUpload.fields([{ name: 'postImage', maxCount: 1 }]), createPostHandler);
 
 router.put('/:id',updatePostHandler);
 router.delete('/:id',deletePostByIdHandler);

@@ -11,65 +11,52 @@ const fsExtra = require('fs-extra');
 require('dotenv').config(); // Import dotenv to access environment variables
 const BASE_URL = process.env.BASE_API_URL; // Access base URL from environment variable
 
+const cloudinary = require('cloudinary').v2;
 
+
+cloudinary.config({ 
+    cloud_name: 'dflydvz8j', 
+    api_key: '996218735613959', 
+    api_secret: 'L72cWEDQX4zELv7Un2aBPyvlZjo' 
+  });
 
 
 // create a post
 
-// const createPostService= async(posts)=>{
-//     const newPost=await feedModel.create(posts);
-//     return newPost;
-// }
 
-
-
-// const createPostService = async (userId, data, file) => {
-//     if (!file) {
-//       throw new Error('Post image is required');
-//     }
-  
-//     const imageUrl = `${process.env.BASE_API_URL}/uploads/feeds/${file.filename}`;
-  
-//     const newPost = await feedModel.create({
-//       userId,
-//       postImage: file.filename,
-//       fileUrl: imageUrl,
-//       caption: data.caption,
-//     });
-  
-//     await User.findByIdAndUpdate(
-//       { _id: userId },
-//       { $push: { post: newPost } }
-//     );
-  
-//     return newPost;
-//   };
-  
-
-
-
-const createPostService = async (userId, data, files) => {
+const createPostService = async (userId, data, files, baseUrl) => {
   if (!files['postImage'] || !files['postImage'][0]) {
-    throw new BadRequest('PostImage is required');
+    throw new Error('Post image is required.');
   }
+
+  // Upload image to Cloudinary
+  const image = files['postImage'][0];
+  const cloudinaryResponse = await cloudinary.uploader.upload(image.path);
 
   const newPost = await feedModel.create({
     ...data,
-    post: files['postImage'][0].filename,
-    userId,  // Ensure userId is included here
+    postImage: cloudinaryResponse.secure_url, // Use Cloudinary URL
+    userId,
+    imageUrl: cloudinaryResponse.secure_url, // Use Cloudinary URL
   });
 
   await User.findByIdAndUpdate(
     { _id: userId },
     {
       $push: {
-        post: newPost,
+        posts: newPost._id,
       },
     }
   );
 
   return newPost;
 };
+
+
+
+  
+  
+  
 
 
 

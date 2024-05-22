@@ -187,6 +187,10 @@ const UserSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Skin',
     }],
+    posts: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Feed'
+    }],
     refreshToken: [String],
   },
   
