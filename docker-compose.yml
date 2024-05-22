@@ -1,18 +1,12 @@
-version: '3.8'
-
 services:
   backend:
     build: .
     ports:
-      - "5050:5050"  # Adjust port if needed
+      - "5050:5050"
     depends_on:
       - mongodb
     environment:
-      - NODE_ENV=${NODE_ENV:-production}  # Set default environment
-      - INCLUDE_ENV_VARS=true  # Optional: Include environment variables from .env file (if used)
-      # Replace with your actual MongoDB connection string after securing it
-
-      - MONGODB_URI=mongodb://maxadmin:E7Dw~e5NKh4Ly's@103.191.51.223:27017/maxLiveDB?authSource=admin
+      MONGODB_URI: mongodb://103.191.51.223:27017/maxLiveDB
     volumes:
       - .:/app
       - /app/node_modules
@@ -20,7 +14,7 @@ services:
   mongodb:
     image: mongo:latest
     ports:
-      - "27017:27017"  # Only expose if necessary (consider private network)
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
