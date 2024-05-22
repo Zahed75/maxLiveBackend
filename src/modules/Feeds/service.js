@@ -92,29 +92,64 @@ const deletePostById=async(id)=>{
 
 
 // Get all Post all users
+
 const getAllPosts = async () => {
-    const allPosts = await feedModel.find().populate({
-        path: 'userId',
-        select: 'firstName,profilePicture'
-      });
-    return allPosts;
-  };
+  try {
+    const posts = await feedModel.aggregate([
+      { $sample: { size: 10 } }, // Randomly select 10 posts
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          postImage: 1,
+          imageUrl: 1,
+          likes: 1,
+          shares: 1,
+          following: 1,
+          followers: 1,
+          caption: 1,
+          comments: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          __v: 1,
+          user: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+            profilePicture: 1,
+            followers: 1,
+            following: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            __v: 1
+          }
+        }
+      }
+    ]);
 
+    // Log the posts after the lookup
+    console.log('Posts after lookup:', posts);
 
+    return posts;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw new Error('Error fetching posts');
+  }
+};
 
 
  
-// addComments Service
 
-// const addComment = async (postId, userId, comment) => {
-//     const post = await feedModel.findById(postId);
-//     if (!post) {
-//         throw new Error('Post not found');
-//     }
-//     post.comments.push({ userId: userId, comment: comment });
-//     await post.save();
-//     return post;
-// }
 
 
 const addComment = async (postId, userId, comment) => {

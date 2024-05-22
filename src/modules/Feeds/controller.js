@@ -75,49 +75,71 @@ const deletePostByIdHandler = asyncHandler(async(req,res)=>{
 })
 
 
+
+
 // getAllPostsController
 
-const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+// const shuffleArray = (array) => {
+//     for (let i = array.length - 1; i > 0; i--) {
+//       const j = Math.floor(Math.random() * (i + 1));
+//       [array[i], array[j]] = [array[j], array[i]];
+//     }
+//     return array;
+//   };
+  
+//   const getAllPostsHandler = asyncHandler(async (req, res) => {
+//     const allPosts = await feedModel.find()
+//       .populate({
+//         path: 'userId',
+//         select: 'firstName lastName' // Include user information
+//       })
+//       .lean(); // Use lean for better performance
+  
+//     if (!allPosts.length) { // Check if any posts are found
+//       return res.status(200).json({
+//         message: "No posts found",
+//         randomPosts: []
+//       });
+//     }
+  
+//     const shuffledPosts = shuffleArray(allPosts);
+//     const randomPosts = shuffledPosts.map((post) => {
+//       return {
+//         ...post, // Include all existing post properties
+//         user: post.userId ? { // Check if userId exists
+//           firstName: post.userId.firstName || null,  // Handle missing firstName
+//           lastName: post.userId.lastName || null, // Handle missing lastName
+//         } : null // Return null for user object if userId is null
+//       }
+//     });
+  
+//     res.status(200).json({
+//       message: "GetALLPost Fetched Successfully!",
+//       randomPosts,
+//     });
+//   });
+  
+
+const getAllPostsHandler = asyncHandler(async (req, res) => {
+    try {
+      const posts = await feedService.getAllPosts();
+      if (!posts || posts.length === 0) {
+        return res.status(404).json({ message: 'No posts found' });
+      }
+      res.status(200).json({ message: 'Get all posts successfully', posts });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ message: 'Error fetching posts' });
     }
-    return array;
-  };
-  
-  const getAllPostsHandler = asyncHandler(async (req, res) => {
-    const allPosts = await feedService.getAllPosts();
-  
-    if (!allPosts || allPosts.message) {
-      return res.status(404).json({ message: "No posts found" });
-    }
-  
-    const shuffledPosts = shuffleArray(allPosts);
-    const randomPosts = shuffledPosts; // Return all shuffled posts
-  
-    res.status(200).json({
-      message: "GetALLPost Fetched Successfully!",
-      randomPosts,
-    });
   });
 
-
   
 
 
 
 
 
-//addComment Handler
 
-// const addCommentHandler=asyncHandler(async(req,res)=>{
-//     const { userId, comment } = req.body;
-//     const postId = req.params.postId;
-
-//     const posts = await feedService.addComment(postId, userId, comment);
-
-//     res.status(201).json({ message: 'Comment added successfully', posts });
-// })
 
 
 const addCommentHandler = asyncHandler(async (req, res) => {
@@ -141,6 +163,7 @@ const addCommentHandler = asyncHandler(async (req, res) => {
 
     res.status(201).json({ message: 'Comment added successfully', comments: populatedComments });
 })
+
 
 
 
