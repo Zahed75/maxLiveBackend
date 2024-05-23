@@ -29,16 +29,14 @@ const resetPassword = async (email, newPassword) => {
 //getAllUser
 
 const getSocialUserById = async (firebaseUid) => {
-  try {
+ 
     const user = await User.findOne({ firebaseUid: firebaseUid });
-    if (user) {
-      return user;
-    }
-    return { message: "Could not find social user" };
-  } catch (error) {
-    console.log(error);
-  }
+    
+    return user;
 };
+
+
+
 
 
 const getUserById = async (userId) => {

@@ -19,6 +19,7 @@ const Agency = require("../Agency/model");
 const { mongo, default: mongoose } = require("mongoose");
 const { DateModule } = require("@faker-js/faker");
 const multerMiddleware = require('../../middlewares/multerMiddlware');
+const { BadRequest } = require("../../utility/errors");
 
 
 const resetPasswordHandler = asyncHandler(async (req, res) => {
@@ -31,16 +32,32 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
   });
 });
 
+
+
+// const getUserProfileBySocialId = asyncHandler(async (req, res) => {
+//   const firebaseUid = req.params.firebaseUId;
+  
+//     const user = await userService.getSocialUserById(firebaseUid);
+//     res.status(200).json({
+//       message:"Successfully Fetched all users!",
+//       user
+//     })
+  
+// });
+
 const getUserProfileBySocialId = asyncHandler(async (req, res) => {
-  const firebaseUid = req.params.firebaseUId;
-  
-    const user = await userService.getSocialUserById(firebaseUid);
-    res.status(200).json({
-      message:"Successfully Fetched all users!",
-      user
-    })
-  
+  const {firebaseUid} = req.params
+ 
+  const user = await userService.getSocialUserById(firebaseUid,req.body);
+  if(!user){
+    throw new BadRequest('User Not Found');
+  } 
+  res.status(200).json({
+    message: "Successfully fetched the user!",
+    user
+  });
 });
+
 
 
 
