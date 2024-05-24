@@ -44,19 +44,29 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
 //     })
   
 // });
-
 const getUserProfileBySocialId = asyncHandler(async (req, res) => {
-  const {firebaseUid} = req.params
- 
-  const user = await userService.getSocialUserById(firebaseUid,req.body);
-  if(!user){
-    throw new BadRequest('User Not Found');
-  } 
-  res.status(200).json({
-    message: "Successfully fetched the user!",
-    user
-  });
+  const { firebaseUid } = req.params;
+
+  try {
+    const user = await userService.getSocialUserById(firebaseUid);
+    if (!user) {
+      return res.status(404).json({
+        message: 'User Not Found',
+      });
+    }
+    res.status(200).json({
+      message: 'Successfully fetched the user!',
+      user,
+    });
+  } catch (error) {
+    console.error('Error fetching user by Firebase UID:', error);
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
 });
+
 
 
 
@@ -104,7 +114,7 @@ const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
 
 
 router.get("/getAllUser", getAllUsersHandler);
-router.get("/firebaseUsersById/:firebaseUId", getUserProfileBySocialId);
+router.get("/firebaseUsersById/:firebaseUid", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
 
 
