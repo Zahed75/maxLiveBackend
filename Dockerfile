@@ -1,20 +1,25 @@
-# Use the official Node.js image as a base image
-FROM node:16
+#Dockerfile
 
-# Set the working directory
+# Use this image as the platform to build the app
+FROM node:18-alpine AS external-website
+
+# A small line inside the image to show who made it
+LABEL Developers="Zahed Hasan"
+
+# The WORKDIR instruction sets the working directory for everything that will happen next
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-
-# Install the dependencies
-RUN npm install
-
-# Copy the rest of the application code to the working directory
+# Copy all local files into the image
 COPY . .
 
-# Expose the port your app runs on
-EXPOSE 5050
+# Clean install all node modules
+RUN npm ci
 
-# Command to run the application
-CMD ["npm", "start"]
+# Build SvelteKit app
+RUN npm run build
+
+# The USER instruction sets the user name to use as the default user for the remainder of the current stage
+USER node:node
+
+# This is the command that will be run inside the image when you tell Docker to start the container
+CMD ["node","build/index.js"]

@@ -1,57 +1,24 @@
-version: '3.9'
+# docker-compose.yml
+
+version: "3"
+
 services:
-  backend:
+  external:
+    container_name: external
+    # The name of the image that will be created when building this container
+    image: external-website
     build:
-      context: '.'
+      context: .
       dockerfile: Dockerfile
-    ports:
-      - 7070:7070
-    container_name: maxlive-backend
-    networks:
-      - maxlive-network
-    volumes:
-      - ./:/app
-    restart: on-failure
+    user: "node"
     environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://maxlive:AsqQkL8%3CH6L_rS@mongo:27017
-      # AUTH
-      AUTH_SECRET_KEY: 12345678
-
-    depends_on:
-      - mongo
-  mongo:
-    container_name: maxlive-db
-    image: mongo
+      # Internal server error messages will not send stacktrace to the browser in production
+      - NODE_ENV=production
+      # Sets the timezone of the containers OS
+      - TZ=Pacific/Auckland
+    # Points to a file with the sensitive environment variables
+    env_file:
+      - .env
+    restart: unless-stopped
     ports:
-      - 27177:27017
-    networks:
-      - maxlive-network
-    volumes:
-      - maxliveDBdata:/data/db
-    restart: always
-
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: maxlive
-      MONGO_INITDB_ROOT_PASSWORD: AsqQkL8<H6L_rS
-      MONGO_INITDB_DATABASE: maxlivePROD
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8082:8082
-    networks:
-      - maxlive-network
-    environment:
-      ME_CONFIG_BASICAUTH_USERNAME: maxliveDBAdmin
-      ME_CONFIG_BASICAUTH_PASSWORD: b}wu.gk3k?(~MNsL
-      ME_CONFIG_MONGODB_ADMINUSERNAME: maxlive
-      ME_CONFIG_MONGODB_ADMINPASSWORD: AsqQkL8<H6L_rS
-      ME_CONFIG_MONGODB_URL: mongodb://maxlive:AsqQkL8<H6L_rS@mongo:27017/maxlivePROD?authSource=admin
-    depends_on:
-      - mongo
-networks:
-  maxlive-network:
-volumes:
-  maxliveDBdata:
+      - 3000:5050
