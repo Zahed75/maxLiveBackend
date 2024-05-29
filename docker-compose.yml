@@ -1,24 +1,51 @@
-# docker-compose.yml
+version: '3'
 
-version: "3"
+networks:
+  maxlive-production-network:
+    driver: bridge
 
 services:
-  external:
-    container_name: external
-    # The name of the image that will be created when building this container
-    image: external-website
+  maxlive_production_backend:
+    container_name: maxlive_production_backend
+    restart: always
     build:
       context: .
-      dockerfile: Dockerfile
-    user: "node"
-    environment:
-      # Internal server error messages will not send stacktrace to the browser in production
-      - NODE_ENV=production
-      # Sets the timezone of the containers OS
-      - TZ=Pacific/Auckland
-    # Points to a file with the sensitive environment variables
+      dockerfile: Dockerfile # Path to your Dockerfile for MaxLive backend
+    networks:
+      - maxlive-production-network
+    env_file:
+      - .env # Environment variables for MaxLive backend
+    volumes:
+      - .:/app
+    ports:
+      - '127.0.0.1:18001:8080' 
+    depends_on:
+      - maxlive_production_mongo
+
+  maxlive_production_mongo:
+    container_name: maxlive_production_mongo
+    restart: always
+    image: mongo
+    ports:
+      - '18002:27017' # Different port from TradeMatrix
+    networks:
+      - maxlive-production-network
+    volumes:
+      - /home/maxlive_persistent/mongodb:/data/db
     env_file:
       - .env
-    restart: unless-stopped
+
+  maxlive_production_mongo_express:
+    container_name: maxlive_production_mongo_express
+    image: mongo-express
+    restart: always
     ports:
-      - 3000:5050
+      - '127.0.0.1:18003:8081' # Different port from TradeMatrix
+    networks:
+      - maxlive-production-network
+    env_file:
+      - .env
+    depends_on:
+      - maxlive_production_mongo
+volumes:
+  cache:
