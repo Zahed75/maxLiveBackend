@@ -18,7 +18,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - '127.0.0.1:18001:8080' 
+      - '127.0.0.1:18001:8080'
     depends_on:
       - maxlive_production_mongo
 
@@ -47,5 +47,6 @@ services:
       - .env
     depends_on:
       - maxlive_production_mongo
+
 volumes:
   cache:
