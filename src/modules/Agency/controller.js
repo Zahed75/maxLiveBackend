@@ -76,24 +76,33 @@ const updateAgencyHandler=asyncHandler(async(req,res)=>{
 });
 
 
-const getAllHostsByAgency = async (req, res) => {
-  try {
-    const { agencyId } = req.query;
+const getAllHostsByAgency = asyncHandler(async(req,res)=>{
+  const { agencyId } = req.query;
 
-    if (!agencyId) {
-      return res.status(400).json({ message: 'Agency ID is required' });
-    }
-
-    const hosts = await agencyService.getAllHostsByAgency(agencyId);
-
-    res.status(200).json(hosts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!agencyId) {
+    return res.status(400).json({ message: 'Agency ID is required' });
   }
-};
+
+  const hosts = await agencyService.getAllHostsByAgency(agencyId);
+
+  res.status(200).json({
+    message: 'Hosts fetched successfully',
+    hosts
+  })
+})
 
 
 
+
+
+const getHostbyIdHandler = asyncHandler(async(req,res)=>{
+  const {id} = req.params;
+  const host = await agencyService.detailsHostByUserId(id);
+  res.status(200).json({
+    message:"Host Details Fetched Successfully!",
+    host
+  })
+})
 
 
 
@@ -104,7 +113,6 @@ router.post("/approveHostHandler/:userId",approveHostHandler)//authMiddleware,ro
 router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
 router.get('/hosts',getAllHostsByAgency)
-
-
+router.get('/:id',getHostbyIdHandler)
 
 module.exports = router;

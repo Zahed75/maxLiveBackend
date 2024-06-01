@@ -201,7 +201,7 @@ const updateAgencyById = async(id,value)=>{
 // GetALL host By Agency ID
 
 const getAllHostsByAgency = async (agencyId) => {
-  try {
+  
     // Fetch hosts associated with the agencyId
     const hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
 
@@ -210,10 +210,19 @@ const getAllHostsByAgency = async (agencyId) => {
     }
 
     return hosts;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  
 };
+
+
+const detailsHostByUserId= async(id)=>{
+  const hostInfo= await Host.findById({_id:id});
+  if(!hostInfo){
+    throw new NotFound("Host not found in this ID");
+
+  }
+  return hostInfo;
+
+}
 
 
 
@@ -224,5 +233,6 @@ module.exports = {
   approveHostService,
   signinAgencyService,
   updateAgencyById,
-  getAllHostsByAgency 
+  getAllHostsByAgency,
+  detailsHostByUserId
 };
