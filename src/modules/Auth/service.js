@@ -87,6 +87,7 @@ const verifyOTPService = async (email, otp) => {
     // Update user
     user.isActive = true;
     user.isVerified = true;
+    user.isApproved = true;
     user.otp = undefined; // Clear OTP after verification
     await user.save();
   } catch (error) {
@@ -143,14 +144,14 @@ const expireOTP = async (data) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "shahriartasin2000@gmail.com",
+    user: "tim.ben1248@gmail.com",
     pass: process.env.EMAIL_PASS,
   },
 });
 
 function sendOTP(email, otp) {
   const mailOptions = {
-    from: "shahriartasin2000@gmail.com",//need to change
+    from: "tim.ben1248@gmail.com",//need to change
     to: email,
     subject: "OTP for Sign-in",
     text: `Your OTP for sign-in is: ${otp}`,
@@ -200,7 +201,7 @@ const signinUserService = async (email,password) => {
       role: user.role,
       isActive: user.isActive,
       isVerified: user.isVerified,
-      
+     
       
     };
 

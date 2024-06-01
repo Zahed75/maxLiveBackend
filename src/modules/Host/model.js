@@ -105,7 +105,9 @@ const hostSchema = new mongoose.Schema(
       required: function () {
         return this.role === "HO";
       }},
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followers: [{ 
+      type: mongoose.Schema.Types.ObjectId, ref: "User"
+     }],
 
     otp: {
       type: Number,

@@ -1,4 +1,4 @@
-const agencyModel = require("./model");
+const agencyModel = require("../Agency/model");
 const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
@@ -183,6 +183,38 @@ const signinAgencyService = async (email, password) => {
 };
 
 
+// updateAgency
+
+const updateAgencyById = async(id,value)=>{
+  const agencyList= await agencyModel.findByIdAndUpdate({_id:id},value,{
+    new:true,
+  });
+
+  if(!agencyList){
+    throw new NotFound("Agency not found in this ID");
+  }
+  return agencyList;
+}
+
+
+
+// GetALL host By Agency ID
+
+const getAllHostsByAgency = async (agencyId) => {
+  try {
+    // Fetch hosts associated with the agencyId
+    const hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
+
+    if (!hosts.length) {
+      throw new Error('No hosts found for this agency');
+    }
+
+    return hosts;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 
 
 
@@ -190,5 +222,7 @@ module.exports = {
   registerAgencyService,
   getPendingHostService,
   approveHostService,
-  signinAgencyService
+  signinAgencyService,
+  updateAgencyById,
+  getAllHostsByAgency 
 };

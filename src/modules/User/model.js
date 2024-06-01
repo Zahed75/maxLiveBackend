@@ -20,6 +20,7 @@ const UserSchema = new mongoose.Schema(
       },
     },
     userName: String,
+
     birthdate: String,
     gender: {
       type: String,
@@ -105,22 +106,29 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: [20, "Reference must be at most 20 characters"],
     },
+
     isApproved: {
       type: Boolean,
-      default: false,
+      default: false
     },
+
     hostStatus: {
       type: String,
       enum: ["active","inactive","pending","rejected"],
       default: "inactive",
     },
+    
     otp: Number,
+
     emailChangeOTP: Number,
+
     changedEmail: String,
+
     isActive: {
       type: Boolean,
       default: false,
     },
+
     role: {
       type: String,
       // BU -> BASIC USER
@@ -133,11 +141,13 @@ const UserSchema = new mongoose.Schema(
       enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
       required: true,
     },
+
     isVerified: {
       type: Boolean,
       default: false,
     },
     
+
     // ...Skins/Frame/Level/Coins/Beans...
     beans: {
       type: Number,

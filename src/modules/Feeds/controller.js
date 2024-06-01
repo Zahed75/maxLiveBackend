@@ -77,47 +77,7 @@ const deletePostByIdHandler = asyncHandler(async(req,res)=>{
 
 
 
-// getAllPostsController
 
-// const shuffleArray = (array) => {
-//     for (let i = array.length - 1; i > 0; i--) {
-//       const j = Math.floor(Math.random() * (i + 1));
-//       [array[i], array[j]] = [array[j], array[i]];
-//     }
-//     return array;
-//   };
-  
-//   const getAllPostsHandler = asyncHandler(async (req, res) => {
-//     const allPosts = await feedModel.find()
-//       .populate({
-//         path: 'userId',
-//         select: 'firstName lastName' // Include user information
-//       })
-//       .lean(); // Use lean for better performance
-  
-//     if (!allPosts.length) { // Check if any posts are found
-//       return res.status(200).json({
-//         message: "No posts found",
-//         randomPosts: []
-//       });
-//     }
-  
-//     const shuffledPosts = shuffleArray(allPosts);
-//     const randomPosts = shuffledPosts.map((post) => {
-//       return {
-//         ...post, // Include all existing post properties
-//         user: post.userId ? { // Check if userId exists
-//           firstName: post.userId.firstName || null,  // Handle missing firstName
-//           lastName: post.userId.lastName || null, // Handle missing lastName
-//         } : null // Return null for user object if userId is null
-//       }
-//     });
-  
-//     res.status(200).json({
-//       message: "GetALLPost Fetched Successfully!",
-//       randomPosts,
-//     });
-//   });
   
 
 const getAllPostsHandler = asyncHandler(async (req, res) => {

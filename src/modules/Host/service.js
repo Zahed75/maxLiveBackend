@@ -43,4 +43,8 @@ const applyToBeHostService = async (
   }
 };
 
-module.exports = { applyToBeHostService };
+
+
+module.exports = {
+   applyToBeHostService
+   };
