@@ -6,6 +6,8 @@ const { asyncHandler } = require("../../utility/common");
 const bcrypt = require('bcryptjs');
 const jwt= require('jsonwebtoken');
 
+
+
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
     const existingAgency = await agencyModel.findOne({ userId });
@@ -55,6 +57,10 @@ const generateAgencyId = () => {
   const agencyId = `AGY${timestamp}${randomNumber}`;
   return agencyId;
 };
+
+
+
+
 
 const getPendingHostService = async (role) => {
   try {
@@ -131,6 +137,7 @@ const approveHostService = async (userId, role) => {
 
   // Save the host document
   await host.save();
+  await user.save();
 
   // Return the host object
   return host;
@@ -198,6 +205,8 @@ const updateAgencyById = async(id,value)=>{
 
 
 
+
+
 // GetALL host By Agency ID
 
 const getAllHostsByAgency = async (agencyId) => {
@@ -214,7 +223,7 @@ const getAllHostsByAgency = async (agencyId) => {
 };
 
 
-const detailsHostByUserId= async(id)=>{
+const detailsHostByUserId = async(id)=>{
   const hostInfo= await Host.findById({_id:id});
   if(!hostInfo){
     throw new NotFound("Host not found in this ID");
@@ -227,6 +236,57 @@ const detailsHostByUserId= async(id)=>{
 
 
 
+
+
+
+const passwordResetService = async (adminId, userId, newPassword)=>{
+  // Fetch the admin and user from the database
+  const admin = await User.findById(adminId);
+  const user = await User.findById(userId);
+
+  if (!admin || !user) {
+    throw new Error("Admin or user not found");
+  }
+
+  // Check if the admin has the correct role
+  if (admin.role !== "MP" && admin.role !== "AD") {
+    throw new Error("You do not have permission to reset passwords");
+  }
+
+  // Check if the user is an HO or BU
+  if (user.role !== "HO" && user.role !== "BU") {
+    throw new Error("You can only reset passwords for HO or BU users");
+  }
+
+  // Hash the new password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  // Update the user's password
+  user.password = hashedPassword;
+  await user.save();
+
+  return user;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   registerAgencyService,
   getPendingHostService,
@@ -234,5 +294,6 @@ module.exports = {
   signinAgencyService,
   updateAgencyById,
   getAllHostsByAgency,
-  detailsHostByUserId
+  detailsHostByUserId,
+  passwordResetService
 };

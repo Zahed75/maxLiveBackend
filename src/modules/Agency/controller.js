@@ -10,8 +10,10 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const {
   AGENCY_OWNER,
   ADMIN,
+  MASTER_PORTAL
 }=require('../../config/constants');
 const { BadRequest } = require("../../utility/errors");
+const { messaging } = require("firebase-admin");
 
 
 const registerAgencyHandler = asyncHandler(async (req, res) => {
@@ -76,6 +78,8 @@ const updateAgencyHandler=asyncHandler(async(req,res)=>{
 });
 
 
+
+
 const getAllHostsByAgency = asyncHandler(async(req,res)=>{
   const { agencyId } = req.query;
 
@@ -106,13 +110,37 @@ const getHostbyIdHandler = asyncHandler(async(req,res)=>{
 
 
 
+const passResetHandler = asyncHandler(async(req,res)=>{
+  const { adminId, userId, newPassword } = req.body;
+
+ 
+    // Validate input
+    if (!adminId || !userId || !newPassword) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+    // Call the service to reset the password
+    const user = await agencyService.passwordResetService(adminId, userId, newPassword);
+    
+    res.status(200).json({
+      message:"Password Reset SuccessFully!",
+      user
+    })
+  
+})
+
+
+
+router.put('/setPassword',passResetHandler)
+
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
 roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)//authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN])
 router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
-router.get('/hosts',getAllHostsByAgency)
-router.get('/:id',getHostbyIdHandler)
+router.get('/hosts',getAllHostsByAgency);
+router.get('/:id',getHostbyIdHandler);
+
+
 
 module.exports = router;
