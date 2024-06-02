@@ -270,18 +270,35 @@ const passwordResetService = async (adminId, userId, newPassword)=>{
 }
 
 
+// declained Host
 
 
 
+const declineHost = async (adminId, hostId)=>{
 
+  const admin = await User.findById(adminId);
+  const host = await User.findById(hostId);
 
+  if (!admin || !host) {
+    throw new Error("Admin or host not found");
+  }
 
+  // Check if the admin has the correct role
+  if (admin.role !== "MP" && admin.role !== "AD") {
+    throw new Error("You do not have permission to decline hosts");
+  }
 
+  // Check if the user is a host
+  if (host.role !== "HO") {
+    throw new Error("You can only decline host users");
+  }
 
+  // Set the host status to 'rejected'
+  host.hostStatus = "rejected";
+  await host.save();
 
-
-
-
+  return host;
+}
 
 
 
@@ -295,5 +312,6 @@ module.exports = {
   updateAgencyById,
   getAllHostsByAgency,
   detailsHostByUserId,
-  passwordResetService
+  passwordResetService,
+  declineHost
 };

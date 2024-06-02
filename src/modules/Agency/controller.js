@@ -126,12 +126,33 @@ const passResetHandler = asyncHandler(async(req,res)=>{
       user
     })
   
-})
+});
+
+
+
+const declinedHostHandler = asyncHandler(async(req,res)=>{
+
+  const { adminId, hostId } = req.body;
+
+    if (!adminId || !hostId) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+
+    const host = await agencyService.declineHost(adminId, hostId);
+    res.status(200).json({ message: "Host declined successfully", host });
+  
+
+});
+
+
+
+
+
+
 
 
 
 router.put('/setPassword',passResetHandler)
-
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
 roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
@@ -140,7 +161,7 @@ router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
 router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
-
+router.post('/declinedHost',declinedHostHandler)
 
 
 module.exports = router;
