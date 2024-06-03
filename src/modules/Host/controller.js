@@ -30,10 +30,33 @@ const applyToBeHostHandler = asyncHandler(async (req, res) => {
   });
 
   
+
+
+// delete host Controller
+
+
+const deleteHostHandler = asyncHandler(async(req,res)=>{
+
+  const {id}=req.params;
+  const hosts = await hostService.deleteHostService(id,req.body);
+
+  res.status(200).json({
+    message:"Host Delete SuccessFully",
+    hosts
+  })
+
+})
+
+
+
+
+
 router.post("/applytoBeHost/:userId/:agencyId/:hostId",  multerMiddleware.upload.fields([
   { name: 'nidFront', maxCount: 1 },
   { name: 'nidBack', maxCount: 1 }
 ]),applyToBeHostHandler);
+
+router.delete('/:id',deleteHostHandler)
 
 
 

@@ -1,6 +1,8 @@
 const User = require("../User/model");
+const Host = require('../Host/model');
 const Agency = require("../Agency/model");
 const { generateHostId } = require("../../utility/common");
+const { NotFound,BadRequest,Unauthorized } = require("../../utility/errors");
 
 const applyToBeHostService = async (
   userId,
@@ -45,6 +47,24 @@ const applyToBeHostService = async (
 
 
 
+// delete Host service
+
+const deleteHostService = async (id)=>{
+  
+  const hostUsers = Host.findByIdAndDelete({_id:id});
+  if(!hostUsers){
+    throw new NotFound("Host not found")
+  }
+  return hostUsers;
+
+}
+
+
+
+
 module.exports = {
-   applyToBeHostService
-   };
+
+   applyToBeHostService,
+   deleteHostService
+
+};

@@ -123,6 +123,18 @@ const registerUserHandler = asyncHandler(async (req, res) => {
 
 
 
+const getAllAdminHandler = asyncHandler(async(req,res)=>{
+  const agencies = await adminService.getAllAdminService();
+  
+  res.status(200).json({
+    message:"Get All Agency Fetched Successfully!",
+    agencies
+  })
+});
+
+
+
+
 router.post("/approve-agency", approveAgencyHandler);
 router.delete("/remove-agency", removeAgencyHandler);
 router.post("/ban-agency", banAgencyHandler);
@@ -132,4 +144,5 @@ router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
 router.get('/agencies',getAllAgenciesHandler)
 router.post('/userManage', authMiddleware,roleMiddleware([MASTER_PORTAL,ADMIN]),registerUserHandler)
+router.get('/countryPortal-List',getAllAdminHandler)
 module.exports = router;

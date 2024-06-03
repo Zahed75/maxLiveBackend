@@ -235,6 +235,20 @@ const registerUserService = async (userData) => {
 };
 
 
+// get ALL Admin
+
+
+const getAllAdminService = async () => {
+  try {
+    const agencies = await User.find({ role: "AD" });
+  
+    return agencies;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
 
 module.exports = {
   approveAgency,
@@ -245,5 +259,6 @@ module.exports = {
   makeAdminService,
   transferAgencyService,
   getAllAgencies,
-  registerUserService
+  registerUserService,
+  getAllAdminService
 };
