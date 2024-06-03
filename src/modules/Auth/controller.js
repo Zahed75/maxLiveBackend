@@ -29,7 +29,7 @@ const registerUserHandler = asyncHandler(async (req, res) => {
     const result = await authService.registerUserService(userData);
 
     // Send response based on the result
-    res.status(result.status).json({
+    res.status(200).json({
       message:"User Create SuccessFully",
       result
     });
