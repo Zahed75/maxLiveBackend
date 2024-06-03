@@ -169,6 +169,35 @@ const unblockHostHandler = asyncHandler(async (req, res) => {
 });
 
 
+// get all agency list handler
+
+// const getAllAgenciesHandler = asyncHandler(async (req, res) => {
+//   const { page, limit } = req.query;
+
+//   console.log('Request query parameters:', { page, limit }); // Debug log
+
+//   try {
+//     const agencies = await agencyService.getAllAgenciesService(page, limit);
+//     res.status(200).json({
+//       message: "Get All Agency List Successfully!",
+//       agencies,
+//     });
+//   } catch (error) {
+//     console.error('Error in getAllAgenciesHandler:', error.message); // Debug log
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+
+
+
+const getAllAgenciesHandler = asyncHandler(async (req, res) => {
+    const agencies = await agencyService.getAllAgenciesService();
+    res.status(200).json({
+      message:"",
+      
+    })
+});
+
 
 router.put('/unblock-host',unblockHostHandler)
 router.put('/setPassword',passResetHandler)
@@ -180,8 +209,8 @@ router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
 router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
-router.post('/declined',blockHostHandler)
-
+router.post('/declined',blockHostHandler);
+router.get('/agencies',getAllAgenciesHandler)
 
 
 module.exports = router;

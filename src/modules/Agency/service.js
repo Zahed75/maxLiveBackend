@@ -323,6 +323,29 @@ const unblockHostService = async (adminId, id) => {
 };
 
 
+// getAll Agency list
+// const getAllAgenciesService = async (page, limit) => {
+//   try {
+//     const options = {
+//       page: parseInt(page, 10) || 1,
+//       limit: parseInt(limit, 10) || 10,
+//       sort: { createdAt: -1 } // Sort by creation date in descending order
+//     };
+
+//     const agencies = await Agency.paginate({}, options); // Use Mongoose's pagination plugin
+//     return agencies;
+//   } catch (error) {
+//     throw new Error(error.message);
+//   }
+// };
+
+
+const getAllAgenciesService = async (page, limit) => {
+  const agencies = await agencyModel.find();
+  return agencies;
+};
+
+
 
 
 
@@ -336,6 +359,7 @@ module.exports = {
   detailsHostByUserId,
   passwordResetService,
   blockHostService,
-  unblockHostService
+  unblockHostService,
+  getAllAgenciesService
 
 };

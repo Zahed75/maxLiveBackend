@@ -26,20 +26,6 @@ const agencySchema = new mongoose.Schema({
     enum: ["BD", "NEP", "IND"], 
 
   },
-  // role: {
-  //   type: String,
-  //   // BU -> Basic User
-  //   // HO -> Host
-  //   // AG ->Agency Owner
-  //   // MP -> Master Portal
-  //   // AD -> Admin
-  //   //CN ->Coin Resller
-  //   //BR -> Bean Reseller
-
-  //   enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
-  //   require: [true, "Role must be selected"],
-  //   default: "AG"
-  // },
   
   presentAddress: {
     type: String,
