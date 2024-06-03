@@ -302,6 +302,28 @@ const blockHostService = async (adminId, id) => {
 
 
 
+// Update block host
+
+
+const unblockHostService = async (adminId, id) => {
+  const admin = await User.findById(adminId);
+  if (!admin) {
+    throw new Error("Admin not found!");
+  }
+
+  const host = await Host.findById(id);
+  if (!host) {
+    throw new Error("Host not found!");
+  }
+
+  host.isBlock = false;
+  await host.save();
+
+  return host;
+};
+
+
+
 
 
 module.exports = {
@@ -313,6 +335,7 @@ module.exports = {
   getAllHostsByAgency,
   detailsHostByUserId,
   passwordResetService,
-  blockHostService 
+  blockHostService,
+  unblockHostService
 
 };

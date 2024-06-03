@@ -155,9 +155,22 @@ const blockHostHandler = asyncHandler(async (req, res) => {
 
 
 
+//update Block Host Controller
+const unblockHostHandler = asyncHandler(async (req, res) => {
+  
+  const { adminId,hostId } =req.body;
+  
+  const users = await agencyService.unblockHostService(adminId,hostId);
+  res.status(200).json({
+    message:"Host Unblocked Successfully!",
+    users
+  })
+
+});
 
 
 
+router.put('/unblock-host',unblockHostHandler)
 router.put('/setPassword',passResetHandler)
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
