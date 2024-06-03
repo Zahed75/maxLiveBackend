@@ -150,6 +150,7 @@ const grantMaxPowerService = async (agencyId) => {
   }
 };
 
+
 const makeAdminService = async (agencyId) => {
   try {
     const agency = await agencyModel.findById(agencyId);
@@ -169,6 +170,9 @@ const makeAdminService = async (agencyId) => {
     };
   }
 };
+
+
+
 const transferAgencyService = async (AgencyId, newAgencyId) => {
   try {
     const agency = await agencyModel.findById(AgencyId);

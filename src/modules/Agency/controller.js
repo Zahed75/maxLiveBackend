@@ -193,8 +193,8 @@ const unblockHostHandler = asyncHandler(async (req, res) => {
 const getAllAgenciesHandler = asyncHandler(async (req, res) => {
     const agencies = await agencyService.getAllAgenciesService();
     res.status(200).json({
-      message:"",
-      
+      message:"GetAll Agency Fetched Successfully",
+      agencies
     })
 });
 
@@ -203,7 +203,7 @@ router.put('/unblock-host',unblockHostHandler)
 router.put('/setPassword',passResetHandler)
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 router.get("/getAllPendingHostHandler",authMiddleware,
-roleMiddleware([AGENCY_OWNER, ADMIN]),getAllPendingHostHandler);
+roleMiddleware([AGENCY_OWNER, ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)//authMiddleware,roleMiddleware([AGENCY_OWNER, ADMIN])
 router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);

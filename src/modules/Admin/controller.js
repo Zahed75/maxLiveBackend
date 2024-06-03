@@ -15,6 +15,7 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
 const { messaging } = require("firebase-admin");
 
+
 const approveAgencyHandler = asyncHandler(async (req, res) => {
   const { password, email, adminId } = req.body;
 
@@ -31,6 +32,8 @@ const approveAgencyHandler = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Error approving agency" });
   }
 });
+
+
 
 const removeAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
