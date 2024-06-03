@@ -130,20 +130,26 @@ const passResetHandler = asyncHandler(async(req,res)=>{
 
 
 
-const declinedHostHandler = asyncHandler(async(req,res)=>{
+
+const blockHostHandler = asyncHandler(async (req, res) => {
+  console.log("Request Body:", req.body); // Log the request body
 
   const { adminId, hostId } = req.body;
 
-    if (!adminId || !hostId) {
-      return res.status(400).json({ message: "Please provide all required fields" });
-    }
+  if (!adminId || !hostId) {
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
 
-    const host = await agencyService.declineHost(adminId, hostId);
-    res.status(200).json({ message: "Host declined successfully", host });
-  
-
+  try {
+    const host = await agencyService.blockHostService(adminId, hostId);
+    res.status(200).json({
+      message: "Host Blocked Successfully!",
+      host,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
-
 
 
 
@@ -161,7 +167,8 @@ router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
 router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
-router.post('/declinedHost',declinedHostHandler)
+router.post('/declined',blockHostHandler)
+
 
 
 module.exports = router;

@@ -5,7 +5,7 @@ const { NotFound, BadRequest } = require("../../utility/errors");
 const { asyncHandler } = require("../../utility/common");
 const bcrypt = require('bcryptjs');
 const jwt= require('jsonwebtoken');
-
+const mongoose = require("mongoose");
 
 
 const registerAgencyService = async (userId, agencyData, files) => {
@@ -273,32 +273,32 @@ const passwordResetService = async (adminId, userId, newPassword)=>{
 // declained Host
 
 
+const blockHostService = async (adminId, id) => {
+  console.log(`Admin ID: ${adminId}`);
+  console.log(`Host ID: ${id}`);
 
-const declineHost = async (adminId, hostId)=>{
+  try {
+    const admin = await User.findById(adminId);
+    if (!admin) {
+      throw new Error("Admin not found");
+    }
 
-  const admin = await User.findById(adminId);
-  const host = await User.findById(hostId);
+    // Convert hostId to ObjectId
+    const host = await Host.findOne({ _id:id });
+    if (!host) {
+      throw new Error("Host not found");
+    }
 
-  if (!admin || !host) {
-    throw new Error("Admin or host not found");
+    host.isBlock = true;
+    await host.save();
+
+    return host;
+
+  } catch (error) {
+    console.error("Error in blockHostService:", error);
+    throw error; // Rethrow the error to be caught in the controller
   }
-
-  // Check if the admin has the correct role
-  if (admin.role !== "MP" && admin.role !== "AD") {
-    throw new Error("You do not have permission to decline hosts");
-  }
-
-  // Check if the user is a host
-  if (host.role !== "HO") {
-    throw new Error("You can only decline host users");
-  }
-
-  // Set the host status to 'rejected'
-  host.hostStatus = "rejected";
-  await host.save();
-
-  return host;
-}
+};
 
 
 
@@ -313,5 +313,6 @@ module.exports = {
   getAllHostsByAgency,
   detailsHostByUserId,
   passwordResetService,
-  declineHost
+  blockHostService 
+
 };
