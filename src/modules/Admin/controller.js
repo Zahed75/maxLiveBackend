@@ -6,6 +6,7 @@ const {
   AGENCY_OWNER,
   MASTER_PORTAL,
   SUPER_ADMIN,
+  ADMIN,
 } = require("../../config/constants");
 
 const adminService = require("./service");
@@ -96,17 +97,29 @@ const transferAgencyHandler = asyncHandler(async (req, res) => {
 
 
 
-const getAllAgenciesHandler = async (req, res) => {
-  try {
-    const agencies = await adminService.getAllAgencies();
-    res.json(agencies);
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: "Error fetching agencies" });
-  }
-};
+const getAllAgenciesHandler = asyncHandler(async(req,res)=>{
+  const agencies = await adminService.getAllAgencies();
+  
+  res.status(200).json({
+    message:"Get All Agency Fetched Successfully!",
+    agencies
+  })
+})
 
 
+
+// User Manage
+const registerUserHandler = asyncHandler(async (req, res) => {
+
+    const userData = req.body;
+    const newUser = await adminService.registerUserService(userData);
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: newUser,
+    });
+  
+});
 
 
 
@@ -118,5 +131,5 @@ router.post("/grant-max-power", grantMaxPowerHandler);
 router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
 router.get('/agencies',getAllAgenciesHandler)
-
+router.post('/userManage', authMiddleware,roleMiddleware([MASTER_PORTAL,ADMIN]),registerUserHandler)
 module.exports = router;

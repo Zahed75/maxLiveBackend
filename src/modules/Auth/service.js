@@ -195,6 +195,7 @@ const signinUserService = async (email,password) => {
  const accessToken = jwt.sign({ user }, 'SecretKey12345', { expiresIn: '3d' });
     // User is authenticated, return sanitized user data (excluding sensitive fields)
     const sanitizedUser = {
+      user_id: user.id,
       accessToken,
       email: user.email,
       phoneNumber: user.phoneNumber,

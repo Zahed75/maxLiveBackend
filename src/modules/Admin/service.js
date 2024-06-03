@@ -205,6 +205,35 @@ const getAllAgencies = async () => {
 };
 
 
+// all User Manage
+const registerUserService = async (userData) => {
+  try {
+    const { email, password, ...rest } = userData;
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+
+    // Create new user with additional fields set to true
+    const newUser = new User({
+      email,
+      password,
+      ...rest,
+      isVerified: true,
+      isApproved: true,
+      isActive: true,
+    });
+
+    await newUser.save();
+
+    return newUser;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 
 
 module.exports = {
@@ -215,5 +244,6 @@ module.exports = {
   grantMaxPowerService,
   makeAdminService,
   transferAgencyService,
-  getAllAgencies
+  getAllAgencies,
+  registerUserService
 };
