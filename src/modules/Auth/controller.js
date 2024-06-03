@@ -19,7 +19,7 @@ const { asyncHandler } = require("../../utility/common");
 
 
 const registerUserHandler = asyncHandler(async (req, res) => {
-  try {
+ 
     const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
 
     const userData = {
@@ -29,11 +29,11 @@ const registerUserHandler = asyncHandler(async (req, res) => {
     const result = await authService.registerUserService(userData);
 
     // Send response based on the result
-    res.status(result.status).json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+    res.status(result.status).json({
+      message:"User Create SuccessFully",
+      result
+    });
+ 
 });
 
 
