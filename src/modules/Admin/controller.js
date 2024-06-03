@@ -69,6 +69,7 @@ const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
+
 const makeAdminHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.makeAdminService(agencyId);
@@ -77,6 +78,10 @@ const makeAdminHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
+
+
+
+
 const transferAgencyHandler = asyncHandler(async (req, res) => {
   const { AgencyId, newAgencyId } = req.body;
   const result = await adminService.transferAgencyService(
@@ -89,6 +94,20 @@ const transferAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
+
+
+const getAllAgenciesHandler = async (req, res) => {
+  try {
+    const agencies = await adminService.getAllAgencies();
+    res.json(agencies);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Error fetching agencies" });
+  }
+};
+
+
+
 router.post("/approve-agency", approveAgencyHandler);
 router.delete("/remove-agency", removeAgencyHandler);
 router.post("/ban-agency", banAgencyHandler);
@@ -96,5 +115,6 @@ router.post("/disable-agency", disableAgencyHandler);
 router.post("/grant-max-power", grantMaxPowerHandler);
 router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
+router.get('/agencies',getAllAgenciesHandler)
 
 module.exports = router;

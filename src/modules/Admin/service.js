@@ -193,6 +193,18 @@ const transferAgencyService = async (AgencyId, newAgencyId) => {
   }
 };
 
+
+const getAllAgencies = async () => {
+  try {
+    // const agencies = await User.find({ role: "AG" });
+    const agencies = await agencyModel.find();
+    return agencies;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
 module.exports = {
   approveAgency,
   removeAgencyService,
@@ -201,4 +213,5 @@ module.exports = {
   grantMaxPowerService,
   makeAdminService,
   transferAgencyService,
+  getAllAgencies
 };

@@ -2,9 +2,9 @@ const { required, ref } = require("joi");
 const mongoose = require("mongoose");
 
 const agencySchema = new mongoose.Schema({
-  userId:{
-    type : mongoose.Schema.Types.ObjectId,
-    ref:'user',
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: [true, "User id is required"],
     unique: true,
   },
