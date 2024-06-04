@@ -173,26 +173,24 @@ const approveHostService = async (userId, role) => {
   return host;
 };
 
+
+
 // signinAgencyService.js
 const signinAgencyService = async (email, password) => {
   try {
     // Find user by email
     const agency = await agencyModel.findOne({ email });
 
-    // Check if user exists
+
     if (!agency) {
       throw new BadRequest("Invalid email or password.");
     }
-
-    // Check if the agency is banned
     if (agency.agencyStatus === 'banned') {
       throw new BadRequest("This agency is banned and cannot sign in.");
     }
 
-    // Validate password using bcrypt.compare
-    const isMatch = await bcrypt.compare(password, agency.password);
 
-    // Check password match
+    const isMatch = await bcrypt.compare(password, agency.password);
     if (!isMatch) {
       throw new BadRequest("Invalid email or password.");
     }
@@ -200,20 +198,26 @@ const signinAgencyService = async (email, password) => {
     // Generate JWT token with minimal payload
     const payload = { id: agency._id, role: agency.role };
     const accessToken = jwt.sign(payload, 'shrtKey123', { expiresIn: '10d' });
+    
 
     // Update isVerified field in the agency document
     await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
 
     // User is authenticated, return sanitized user data (excluding sensitive fields)
-    const sanitizedUser = {
-      accessToken,
-      email: agency.email,
-      phoneNumber: agency.phoneNumber,
-      role: agency.role,
-      isVerified: true,
-    };
+    console.log(agency);
 
-    return sanitizedUser;
+    const sanitizedUser = {
+
+    accessToken,
+    email: agency.email,
+    phoneNumber: agency.phoneNumber,
+    role: agency.role,
+    isVerified: true,
+  
+};
+      
+
+    return{agency,sanitizedUser}
   } catch (error) {
     console.error(error);
     throw error;
