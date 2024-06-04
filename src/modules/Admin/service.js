@@ -104,7 +104,7 @@ const banAgencyService = async (id) => {
 
     agency.agencyStatus = "banned";
     agency.isActive = false;
-    agency.isActive = false;
+    agency.isVerified = false;
     agency.isApproved=false;
     await agency.save();
     return { success: true, message: "Agency banned successfully." };
