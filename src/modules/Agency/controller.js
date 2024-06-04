@@ -90,6 +90,9 @@ const signinAgencyController = asyncHandler(async (req, res) => {
 });
 
 
+
+
+
 const updateAgencyHandler=asyncHandler(async(req,res)=>{
     const {id} = req.params;
     const editAgency = await agencyService.updateAgencyById(id,req.body);
@@ -228,8 +231,7 @@ router.put('/setPassword',passResetHandler);
 
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 
-router.get("/getAllPendingHostHandler",authMiddleware,
-roleMiddleware([AGENCY_OWNER, ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
+router.get("/getAllPendingHostHandler",getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)
 
 router.post("/agencySignin",signinAgencyController);
