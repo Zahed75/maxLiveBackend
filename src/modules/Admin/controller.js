@@ -88,6 +88,7 @@ const grantMaxPowerHandler = asyncHandler(async (req, res) => {
 });
 
 
+
 const makeAdminHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.makeAdminService(agencyId);
