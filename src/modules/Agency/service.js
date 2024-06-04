@@ -178,7 +178,7 @@ const signinAgencyService = async (email, password) => {
   try {
     // Find user by email
     const agency = await agencyModel.findOne({ email });
-    
+
     // Check if user exists
     if (!agency) {
       throw new BadRequest("Invalid email or password.");
@@ -197,9 +197,10 @@ const signinAgencyService = async (email, password) => {
       throw new BadRequest("Invalid email or password.");
     }
 
-    // Generate JWT token with user data payload
-    const accessToken = jwt.sign({ agency }, 'SecretKey12345', { expiresIn: '3d' });
-    
+    // Generate JWT token with minimal payload
+    const payload = { id: agency._id, role: agency.role };
+    const accessToken = jwt.sign(payload, 'shrtKey123', { expiresIn: '10d' });
+
     // Update isVerified field in the agency document
     await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
 
@@ -215,9 +216,13 @@ const signinAgencyService = async (email, password) => {
     return sanitizedUser;
   } catch (error) {
     console.error(error);
-    throw error; 
+    throw error;
   }
 };
+
+
+
+
 
 
 // updateAgency
