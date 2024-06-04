@@ -188,7 +188,7 @@ const signinAgencyService = async (email, password) => {
     await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
 
     // User is authenticated, return sanitized user data (excluding sensitive fields)
-    console.log(agency);
+    // console.log(agency);
 
     const sanitizedUser = {
 

@@ -88,9 +88,15 @@ const removeAgencyService = async (agencyId) => {
     };
   }
 };
-const banAgencyService = async (agencyId) => {
+
+
+
+
+
+
+const banAgencyService = async (id) => {
   try {
-    const agency = await agencyModel.findById(agencyId);
+    const agency = await agencyModel.findById({_id:id});
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -110,9 +116,13 @@ const banAgencyService = async (agencyId) => {
     };
   }
 };
-const disableAgencyService = async (agencyId) => {
+
+
+
+
+const disableAgencyService = async (id) => {
   try {
-    const agency = await agencyModel.findById(agencyId);
+    const agency = await agencyModel.findById({_id:id});
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -130,6 +140,12 @@ const disableAgencyService = async (agencyId) => {
     };
   }
 };
+
+
+
+
+
+
 const grantMaxPowerService = async (agencyId) => {
   try {
     const agency = await agencyModel.findById(agencyId);
@@ -175,7 +191,7 @@ const makeAdminService = async (agencyId) => {
 
 const transferAgencyService = async (AgencyId, newAgencyId) => {
   try {
-    const agency = await agencyModel.findById(AgencyId);
+    const agency = await agencyModel.findById({_id:AgencyId});
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -192,6 +208,7 @@ const transferAgencyService = async (AgencyId, newAgencyId) => {
     };
   }
 };
+
 
 
 const getAllAgencies = async () => {

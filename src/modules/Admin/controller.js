@@ -17,6 +17,8 @@ const { asyncHandler } = require("../../utility/common");
 const { messaging } = require("firebase-admin");
 
 
+
+
 const approveAgencyHandler = asyncHandler(async (req, res) => {
   const { password, email, adminId } = req.body;
 
@@ -36,6 +38,9 @@ const approveAgencyHandler = asyncHandler(async (req, res) => {
 
 
 
+
+
+
 const removeAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.removeAgencyService(agencyId);
@@ -45,6 +50,9 @@ const removeAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
+
+
+
 const banAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.banAgencyService(agencyId);
@@ -53,6 +61,11 @@ const banAgencyHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
+
+
+
+
+
 const disableAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.disableAgencyService(agencyId);
@@ -61,6 +74,10 @@ const disableAgencyHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
+
+
+
+
 const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.grantMaxPowerService(agencyId);
