@@ -32,14 +32,32 @@ const registerAgencyHandler = asyncHandler(async (req, res) => {
 });
 
 
+// const getAllPendingHostHandler = asyncHandler(async (req, res) => {
+//   const userRole = req.body.role;
+//   const pendingResult = await agencyService.getPendingHostService(userRole);
+//   if (!pendingResult) {
+//     return res.status(401).json({ message: "Failed to show pending result" }); // Unauthorized access
+//   }
+//   res.status(200).json(pendingResult); // Return the approval result
+// });
+
+
 const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   const userRole = req.body.role;
   const pendingResult = await agencyService.getPendingHostService(userRole);
+  
   if (!pendingResult) {
     return res.status(401).json({ message: "Failed to show pending result" }); // Unauthorized access
   }
-  res.status(200).json(pendingResult); // Return the approval result
+  
+  if (pendingResult.message) {
+    return res.status(404).json({ message: pendingResult.message }); // Return the message if no pending hosts found
+  }
+
+  res.status(200).json(pendingResult); // Return the pending hosts
 });
+
+
 
 const approveHostHandler = async (req, res) => {
   try {
@@ -50,6 +68,11 @@ const approveHostHandler = async (req, res) => {
     res.status(500).json({ message: "Error approving host", error: error.message });
   }
 };
+
+
+
+
+
 
 const signinAgencyController = asyncHandler(async (req, res) => {
   try {

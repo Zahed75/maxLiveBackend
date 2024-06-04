@@ -62,14 +62,36 @@ const generateAgencyId = () => {
 
 
 
+// const getPendingHostService = async (role) => {
+//   try {
+//     // Assuming req.user.role contains the role of the user making the request
+//     if (!["AG", "AD","MP"].includes(role)) {
+//       return { message: "role must be a authorized role" };
+//     }
+
+//     const pendingHosts = await User.find({ hostStatus: "Pending" });
+
+//     // Check if there are any pending hosts
+//     if (pendingHosts.length === 0) {
+//       return { message: "No pending hosts found" }; // Return a message if no pending hosts found
+//     }
+//     return pendingHosts;
+//   } catch (error) {
+//     console.error("Error saving pending hosts:", error);
+//     throw new Error("Internal server error");
+//   }
+// };
+
 const getPendingHostService = async (role) => {
   try {
     // Assuming req.user.role contains the role of the user making the request
-    if (!["AG", "AD"].includes(role)) {
-      return { message: "role must be a authorized role" };
+    if (!["AG", "AD", "MP"].includes(role)) {
+      return { message: "role must be an authorized role" };
     }
 
-    const pendingHosts = await User.find({ hostStatus: "Pending" });
+    const pendingHosts = await User.find({ hostStatus: "Pending" })
+      .select('-nidFront -nidBack')
+      .lean();
 
     // Check if there are any pending hosts
     if (pendingHosts.length === 0) {
@@ -81,6 +103,14 @@ const getPendingHostService = async (role) => {
     throw new Error("Internal server error");
   }
 };
+
+
+
+
+
+
+
+
 
 const approveHostService = async (userId, role) => {
   if (!["AG", "AD"].includes(role)) {
