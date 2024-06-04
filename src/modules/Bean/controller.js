@@ -17,29 +17,26 @@ const {
 const { BadRequest } = require("../../utility/errors");
 const { messaging } = require("firebase-admin");
 
+const beansService = require('../Bean/service');
 
 
 
-const sendBeansToAdminController = asyncHandler(async (req, res) => {
+const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
     try {
-      const { userId, adminId, amount } = req.body;
+      const { mpId, adId, amount } = req.body;
   
-      // Call the service to send beans
-      const result = await sendBeansToAdminService(userId, adminId, amount);
+      const result = await beansService.sendBeansFromMPToADService(mpId, adId, amount);
   
-      // Respond with the result
       res.status(200).json(result);
     } catch (error) {
-      // Handle errors
-      console.error(error);
+      console.error('Error in sendBeansFromMPToADController:', error);
       res.status(500).json({ error: error.message });
     }
   });
 
 
 
-
-  router.post('/send-beans-to-admin', sendBeansToAdminController);
+router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 
 
 

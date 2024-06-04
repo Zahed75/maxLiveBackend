@@ -90,12 +90,6 @@ const getPendingHostService = async (role) => {
 
 
 
-
-
-
-
-
-
 const approveHostService = async (userId, role) => {
   if (!["AG", "AD"].includes(role)) {
     throw new Error("Your role must be Agency owner or Admin");

@@ -149,10 +149,10 @@ const UserSchema = new mongoose.Schema(
     
 
     // ...Skins/Frame/Level/Coins/Beans...
-    beans: {
+    beans: { 
       type: Number,
-      default: 0,
-    },
+       default: 0 
+      },
     diamonds: {
       type: Number,
       default: 0,
@@ -176,10 +176,12 @@ const UserSchema = new mongoose.Schema(
     beans: {
       type: Number,
       default: 0,
+    
     },
     diamonds: {
       type: Number,
       default: 0,
+      
     },
     vipStatus: {
       type: Boolean,

@@ -3,48 +3,44 @@ const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const { asyncHandler } = require("../../utility/common");
-const bcrypt = require('bcryptjs');
-const jwt= require('jsonwebtoken');
-const mongoose = require("mongoose");
-const Bean = require('../Admin/model');
+
+const Bean = require('../Bean/model'); // Adjust this path as necessary
 
 
 
-const sendBeansToAdminService = async (userId, adminId, amount) => {
+
+
+const sendBeansFromMPToADService = async (mpId, adId, amount) => {
   try {
-    // Fetch the user and admin details
-    const user = await User.findById(userId);
-    const admin = await User.findById(adminId);
+    const mpUser = await User.findById(mpId);
+    const adUser = await User.findById(adId);
 
-    // Check if user and admin exist
-    if (!user || !admin) {
-      throw new Error('User or Admin not found.');
-    }
+    if (!mpUser) throw new Error('Master Portal (MP) user not found.');
+    if (!adUser) throw new Error('Admin (AD) user not found.');
+    if (mpUser.role !== 'MP') throw new Error('Sender is not authorized as Master Portal (MP).');
+    if (adUser.role !== 'AD') throw new Error('Recipient is not authorized as Admin (AD).');
 
-    // Check if the user has enough beans
-    if (user.beans < amount) {
+    const beansAmount = parseInt(amount, 10);
+
+    if (mpUser.beans < beansAmount) {
       throw new Error('Insufficient beans.');
     }
 
-    // Deduct beans from user and add to admin
-    user.beans -= amount;
-    admin.beans += amount;
+    // Update only the beans field
+    await User.findByIdAndUpdate(mpId, { $inc: { beans: -beansAmount } }, { new: true, runValidators: false });
+    await User.findByIdAndUpdate(adId, { $inc: { beans: beansAmount } }, { new: true, runValidators: false });
 
-    // Save the updated user and admin details
-    await user.save();
-    await admin.save();
-
-    // Record the transaction in the Bean model
     const transaction = new Bean({
-      userId,
-      amount,
+      userId: mpId,
+      amount: beansAmount,
       transactionType: 'send'
     });
+    
     await transaction.save();
 
-    return { message: 'Beans sent successfully.', user, admin };
+    return { message: 'Beans sent successfully.' ,transaction};
   } catch (error) {
-    console.error(error);
+    console.error('Error in sendBeansFromMPToADService:', error);
     throw error;
   }
 };
@@ -54,12 +50,8 @@ const sendBeansToAdminService = async (userId, adminId, amount) => {
 
 
 
-
-
-
-
 module.exports = {
 
-    sendBeansToAdminService
+    sendBeansFromMPToADService
 
 }
