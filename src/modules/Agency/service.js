@@ -62,36 +62,15 @@ const generateAgencyId = () => {
 
 
 
-// const getPendingHostService = async (role) => {
-//   try {
-//     // Assuming req.user.role contains the role of the user making the request
-//     if (!["AG", "AD","MP"].includes(role)) {
-//       return { message: "role must be a authorized role" };
-//     }
-
-//     const pendingHosts = await User.find({ hostStatus: "Pending" });
-
-//     // Check if there are any pending hosts
-//     if (pendingHosts.length === 0) {
-//       return { message: "No pending hosts found" }; // Return a message if no pending hosts found
-//     }
-//     return pendingHosts;
-//   } catch (error) {
-//     console.error("Error saving pending hosts:", error);
-//     throw new Error("Internal server error");
-//   }
-// };
 
 const getPendingHostService = async (role) => {
   try {
     // Assuming req.user.role contains the role of the user making the request
-    if (!["AG", "AD", "MP"].includes(role)) {
-      return { message: "role must be an authorized role" };
+    if (!["AG", "AD","MP"].includes(role)) {
+      return { message: "role must be a authorized role" };
     }
 
-    const pendingHosts = await User.find({ hostStatus: "Pending" })
-      .select('-nidFront -nidBack')
-      .lean();
+    const pendingHosts = await User.find({ hostStatus: "pending" });
 
     // Check if there are any pending hosts
     if (pendingHosts.length === 0) {
@@ -103,6 +82,11 @@ const getPendingHostService = async (role) => {
     throw new Error("Internal server error");
   }
 };
+
+
+
+
+
 
 
 
@@ -197,8 +181,8 @@ const signinAgencyService = async (email, password) => {
 
     // Generate JWT token with minimal payload
     const payload = { id: agency._id, role: agency.role };
-    const accessToken = jwt.sign(payload, 'shrtKey123', { expiresIn: '10d' });
-    
+    // const accessToken = jwt.sign(payload, 'shrtKey123', { expiresIn: '10d' });
+    const accessToken = jwt.sign({ payload }, 'SecretKey12345', { expiresIn: '3d' });
 
     // Update isVerified field in the agency document
     await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
@@ -223,6 +207,11 @@ const signinAgencyService = async (email, password) => {
     throw error;
   }
 };
+
+
+
+
+
 
 
 

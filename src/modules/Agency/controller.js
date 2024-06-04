@@ -32,30 +32,19 @@ const registerAgencyHandler = asyncHandler(async (req, res) => {
 });
 
 
-// const getAllPendingHostHandler = asyncHandler(async (req, res) => {
-//   const userRole = req.body.role;
-//   const pendingResult = await agencyService.getPendingHostService(userRole);
-//   if (!pendingResult) {
-//     return res.status(401).json({ message: "Failed to show pending result" }); // Unauthorized access
-//   }
-//   res.status(200).json(pendingResult); // Return the approval result
-// });
 
 
 const getAllPendingHostHandler = asyncHandler(async (req, res) => {
   const userRole = req.body.role;
   const pendingResult = await agencyService.getPendingHostService(userRole);
-  
   if (!pendingResult) {
     return res.status(401).json({ message: "Failed to show pending result" }); // Unauthorized access
   }
-  
-  if (pendingResult.message) {
-    return res.status(404).json({ message: pendingResult.message }); // Return the message if no pending hosts found
-  }
-
-  res.status(200).json(pendingResult); // Return the pending hosts
+  res.status(200).json(pendingResult); // Return the approval result
 });
+
+
+
 
 
 
@@ -231,7 +220,7 @@ router.put('/setPassword',passResetHandler);
 
 router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
 
-router.get("/getAllPendingHostHandler",getAllPendingHostHandler);
+router.get("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)
 
 router.post("/agencySignin",signinAgencyController);
