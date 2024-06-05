@@ -1,28 +1,39 @@
 const nodemailer = require('nodemailer');
 
-//emails
-
 
 const createToken = require('./createToken');
-const { BRAND_MANAGER } = require('../config/constants');
+
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   auth: {
-    user: '',
-    pass: '',
+    user: 'tim.ben1248@gmail.com',
+    pass: 'dbyc lhqf slei oure',
   },
 });
 
-// const transporter = nodemailer.createTransport({
-//   host: 'sandbox.smtp.mailtrap.io',
-//   port: 2525,
-//   auth: {
-//     user: 'f1d6b9428c38b9',
-//     pass: '5dd5f51f90845a',
-//   },
-// });
+
+
+
+exports.SendEmailUtility = async (EmailTo, EmailText, EmailSubject) => {
+  let mailOptions = {
+    from: 'BestElectronics-Technologies  <tech.syscomatic@gmail.com>',
+    to: EmailTo,
+    subject: EmailSubject,
+    text: EmailText,
+  };
+
+  return new Promise((resolve) => {
+    transporter.sendMail(mailOptions, (err, info) => {
+      console.log({ info });
+      if (err) {
+        resolve(err);
+      }
+      resolve(info);
+    });
+  });
+};
 
 
 
