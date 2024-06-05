@@ -248,32 +248,36 @@ const registerUserService = async (userData) => {
 
 // ALL Users Sign In
 
-const signInUserService = async (email, password) => {
+
+const signInService = async (email, password) => {
   try {
-    // Check if the user exists
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("Invalid email or password");
     }
 
-    // Verify the password
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Check if the password is correct
+    const isMatch = await user.authenticate(password);
     if (!isMatch) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid email or password");
     }
 
-    // Generate a token (using JWT)
+    // Generate a JWT token
     const token = jwt.sign(
-      { email: user.email, role: user.role },
+      { userId: user._id, email: user.email, role: user.role },
       "SecretKey12345",
       { expiresIn: '1h' }
     );
 
     return { user, token };
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(`Sign-in failed: ${error.message}`);
   }
 };
+
+
+
 
 
 
@@ -305,5 +309,5 @@ module.exports = {
   getAllAgencies,
   registerUserService,
   getAllAdminService,
-  signInUserService
+  signInService
 };

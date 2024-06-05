@@ -120,26 +120,25 @@ const registerUserHandler = asyncHandler(async (req, res) => {
 
 
 // all Users singInController
-
-const signInUserHandler = asyncHandler(async (req, res) => {
+const signInHandler = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Validate input
   if (!email || !password) {
-    return res.status(400).json({ message: "Please provide all required fields" });
+    return res.status(400).json({ message: "Please provide email and password" });
   }
 
   try {
-    // Call the service to sign in the user
-    const { user, token } = await adminService.signInUserService(email, password);
+    // Call the service to handle the sign-in
+    const { user, token } = await adminService.signInService(email, password);
 
     res.status(200).json({
-      message: "User signed in successfully",
+      message: "Sign-in successful",
       user,
       token,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Sign-in error:", error.message); // Log the error for debugging
+    res.status(401).json({ message: error.message });
   }
 });
 
@@ -173,5 +172,5 @@ router.post(
 );
 router.get("/countryPortal-List", getAllAdminHandler);
 
-router.post('/signInAllUsers',signInUserHandler)
+router.post('/signInAllUsers',signInHandler)
 module.exports = router;
