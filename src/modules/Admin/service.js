@@ -100,7 +100,7 @@ const banAgencyService = async (id) => {
     agency.isVerified = false;
     agency.isApproved=false;
     await agency.save();
-    return { success: true, message: "Agency banned successfully." };
+    return { success: true, message: "Agency banned successfully." ,data : agency};
   } catch (error) {
     console.error("Error banning agency:", error);
     return {

@@ -51,7 +51,7 @@ const banAgencyHandler = asyncHandler(async (req, res) => {
   if (!result.success) {
     return res.status(400).json({ message: result.message });
   }
-  res.status(200).json(result.message);
+  res.status(200).json({ message: result.message ,data:result.data});
 });
 
 const disableAgencyHandler = asyncHandler(async (req, res) => {
@@ -60,7 +60,7 @@ const disableAgencyHandler = asyncHandler(async (req, res) => {
   if (!result.success) {
     return res.status(400).json({ message: result.message });
   }
-  res.status(200).json(result.message);
+  res.status(200).json({ message: result.message ,data:result.data});
 });
 
 const grantMaxPowerHandler = asyncHandler(async (req, res) => {
