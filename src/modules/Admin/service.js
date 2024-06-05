@@ -79,6 +79,7 @@ const approveAgency = async (password, email, adminId) => {
     throw new Error(`Approve Agency Error: ${error.message}`);
   }
 };
+
 const removeAgencyService = async (agencyId) => {
   try {
     await agencyModel.findByIdAndDelete(agencyId);
