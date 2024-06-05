@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 
 exports.SendEmailUtility = async (EmailTo, EmailText, EmailSubject) => {
   let mailOptions = {
-    from: 'BestElectronics-Technologies  <tech.syscomatic@gmail.com>',
+    from: 'MaxLive-Technologies  <tim.ben1248@gmail.com>',
     to: EmailTo,
     subject: EmailSubject,
     text: EmailText,

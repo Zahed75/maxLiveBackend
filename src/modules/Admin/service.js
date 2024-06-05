@@ -18,24 +18,9 @@ const bcrypt = require("bcryptjs");
 const { decrypt } = require("dotenv");
 const { IosApp } = require("firebase-admin/project-management");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "shahriartasin2000@gmail.com",
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
-function sendPass(email, password) {
-  const mailOptions = {
-    from: "shahriartasin2000@gmail.com", //need to change
-    to: email,
-    subject: "Password for Sign-in",
-    text: `Your Password for sign-in is: ${password}`,
-  };
 
-  return transporter.sendMail(mailOptions);
-}
+
 
 const approveAgency = async (password, email, adminId) => {
   try {
@@ -71,7 +56,7 @@ const approveAgency = async (password, email, adminId) => {
     await agency.save();
 
     // Send the password email
-    await sendPass(email, password);
+    await SendEmailUtility(email, password);
     
     return { success: true, data: agency };
   } catch (error) {
@@ -79,6 +64,10 @@ const approveAgency = async (password, email, adminId) => {
     throw new Error(`Approve Agency Error: ${error.message}`);
   }
 };
+
+
+
+
 
 const removeAgencyService = async (agencyId) => {
   try {
