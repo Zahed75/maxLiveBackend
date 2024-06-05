@@ -263,7 +263,39 @@ const detailsHostByUserId = async(id)=>{
 
 
 
-const passwordResetService = async (adminId, userId, newPassword)=>{
+// const passwordResetService = async (adminId, userId, newPassword)=>{
+//   // Fetch the admin and user from the database
+//   const admin = await User.findById(adminId);
+//   const user = await User.findById(userId);
+
+//   if (!admin || !user) {
+//     throw new Error("Admin or user not found");
+//   }
+
+//   // Check if the admin has the correct role
+//   if (admin.role !== "MP" && admin.role !== "AD") {
+//     throw new Error("You do not have permission to reset passwords");
+//   }
+
+//   // Check if the user is an HO or BU
+//   if (user.role !== "HO" && user.role !== "BU") {
+//     throw new Error("You can only reset passwords for HO or BU users");
+//   }
+
+//   // Hash the new password
+//   const salt = await bcrypt.genSalt(10);
+//   const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+//   // Update the user's password
+//   user.password = hashedPassword;
+//   await user.save();
+
+//   return user;
+// }
+
+
+// services/agencyService.js
+const passwordResetService = async (adminId, userId, newPassword) => {
   // Fetch the admin and user from the database
   const admin = await User.findById(adminId);
   const user = await User.findById(userId);
@@ -277,9 +309,9 @@ const passwordResetService = async (adminId, userId, newPassword)=>{
     throw new Error("You do not have permission to reset passwords");
   }
 
-  // Check if the user is an HO or BU
-  if (user.role !== "HO" && user.role !== "BU") {
-    throw new Error("You can only reset passwords for HO or BU users");
+  // Check if the user's role is among the allowed roles
+  if (!["BU", "AD", "AG", "BR", "HO"].includes(user.role)) {
+    throw new Error("You can only reset passwords for BU, AD, AG, BR, or HO users");
   }
 
   // Hash the new password
@@ -291,7 +323,11 @@ const passwordResetService = async (adminId, userId, newPassword)=>{
   await user.save();
 
   return user;
-}
+};
+
+
+
+
 
 
 // declained Host
