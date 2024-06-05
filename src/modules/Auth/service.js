@@ -149,22 +149,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function sendOTP(email, otp) {
-  const mailOptions = {
-    from: "tim.ben1248@gmail.com",//need to change
-    to: email,
-    subject: "OTP for Sign-in",
-    text: `Your OTP for sign-in is: ${otp}`,
-  };
+// function sendOTP(email, otp) {
+//   const mailOptions = {
+//     from: "tim.ben1248@gmail.com",//need to change
+//     to: email,
+//     subject: "OTP for Sign-in",
+//     text: `Your OTP for sign-in is: ${otp}`,
+//   };
 
-  return transporter.sendMail(mailOptions);
-}
+//   return transporter.sendMail(mailOptions);
+// }
 
 const generateAndSendOTPService = async (email) => {
   try {
     // console.log(email)
     const otp = generateOTP();
-    await sendOTP(email, otp);
+    await SendEmailUtility(email, otp);
     return otp;
   } catch (error) {
     throw new Error("Error generating and sending OTP: " + error.message);
