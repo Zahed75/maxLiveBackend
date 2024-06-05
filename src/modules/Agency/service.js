@@ -189,8 +189,7 @@ const signinAgencyService = async (email, password) => {
     isVerified: true,
   
 };
-      
-
+    
     return{agency,sanitizedUser}
   } catch (error) {
     console.error(error);
@@ -257,7 +256,51 @@ const detailsHostByUserId = async(id)=>{
 
 
 
-const passwordResetService = async (adminId, userId, newPassword)=>{
+
+
+
+
+// const passwordResetService = async (adminId, userId, newPassword) => {
+//   // Fetch the admin and user from the database
+//   const admin = await User.findById(adminId);
+//   const user = await User.findById(userId);
+
+//   if (!admin || !user) {
+//     throw new Error("Admin or user not found");
+//   }
+
+//   // Check if the admin has the correct role
+//   if (admin.role !== "MP" && admin.role !== "AD") {
+//     throw new Error("You do not have permission to reset passwords");
+//   }
+
+//   // Check if the user is one of the allowed roles
+//   // Check if the user is one of the allowed roles
+//   const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
+//   if (!allowedRoles.includes(user.role)) {
+//     // If user role is not found, check in Agency model
+//     const agencyUser = await Agency.findOne({ userId: user._id });
+//     if (!agencyUser || !allowedRoles.includes(agencyUser.role)) {
+//       throw new Error("You can only reset passwords for specific roles");
+//     }
+//     user = agencyUser;
+//   }
+
+//   // Hash the new password
+//   const salt = await bcrypt.genSalt(10);
+//   const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+//   // Update the user's password
+//   user.password = hashedPassword;
+//   await user.save();
+
+//   return user;
+// }
+
+
+
+
+const passwordResetService = async (adminId, userId, newPassword) => {
   // Fetch the admin and user from the database
   const admin = await User.findById(adminId);
   const user = await User.findById(userId);
@@ -271,21 +314,37 @@ const passwordResetService = async (adminId, userId, newPassword)=>{
     throw new Error("You do not have permission to reset passwords");
   }
 
-  // Check if the user is an HO or BU
-  if (user.role !== "HO" && user.role !== "BU") {
-    throw new Error("You can only reset passwords for HO or BU users");
+  // Check if the user is one of the allowed roles
+  const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
+  if (!allowedRoles.includes(user.role)) {
+    throw new Error("You can only reset passwords for specific roles");
   }
 
   // Hash the new password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-  // Update the user's password
-  user.password = hashedPassword;
-  await user.save();
+  // Update the user's password or agency's password based on the role
+  if (user.role === "AG") {
+    const agency = await agencyModel.findOne({ userId: user._id });
+    if (!agency) {
+      throw new Error("Agency not found for the user");
+    }
+    agency.password = hashedPassword;
+    await agency.save();
+  } else {
+    user.password = hashedPassword;
+    await user.save();
+  }
 
   return user;
 }
+
+
+
+
+
+
 
 
 // declained Host

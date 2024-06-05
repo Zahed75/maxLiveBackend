@@ -6,6 +6,8 @@ const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
 const admin = require("firebase-admin");
 
+
+
 const resetPassword = async (email, newPassword) => {
   try {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -92,6 +94,8 @@ const getAllUserService = async (reQuerry, res) => {
     throw error;
   }
 };
+
+
 
 const updateUserInfoService = async (
   userId,

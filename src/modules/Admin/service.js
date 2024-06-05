@@ -18,24 +18,9 @@ const bcrypt = require("bcryptjs");
 const { decrypt } = require("dotenv");
 const { IosApp } = require("firebase-admin/project-management");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "shahriartasin2000@gmail.com",
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
-function sendPass(email, password) {
-  const mailOptions = {
-    from: "shahriartasin2000@gmail.com", //need to change
-    to: email,
-    subject: "Password for Sign-in",
-    text: `Your Password for sign-in is: ${password}`,
-  };
 
-  return transporter.sendMail(mailOptions);
-}
+
 
 const approveAgency = async (password, email, adminId) => {
   try {
@@ -71,7 +56,7 @@ const approveAgency = async (password, email, adminId) => {
     await agency.save();
 
     // Send the password email
-    await sendPass(email, password);
+    await SendEmailUtility(email, password);
     
     return { success: true, data: agency };
   } catch (error) {
@@ -79,6 +64,10 @@ const approveAgency = async (password, email, adminId) => {
     throw new Error(`Approve Agency Error: ${error.message}`);
   }
 };
+
+
+
+
 
 const removeAgencyService = async (agencyId) => {
   try {
@@ -256,6 +245,40 @@ const registerUserService = async (userData) => {
 };
 
 
+
+// ALL Users Sign In
+
+const signInUserService = async (email, password) => {
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Generate a token (using JWT)
+    const token = jwt.sign(
+      { email: user.email, role: user.role },
+      "SecretKey12345",
+      { expiresIn: '1h' }
+    );
+
+    return { user, token };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
+
+
+
 // get ALL Admin
 
 
@@ -281,5 +304,6 @@ module.exports = {
   transferAgencyService,
   getAllAgencies,
   registerUserService,
-  getAllAdminService
+  getAllAdminService,
+  signInUserService
 };

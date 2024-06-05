@@ -102,6 +102,9 @@ const getAllAgenciesHandler = asyncHandler(async (req, res) => {
   });
 });
 
+
+
+
 // User Manage
 const registerUserHandler = asyncHandler(async (req, res) => {
   const userData = req.body;
@@ -112,6 +115,38 @@ const registerUserHandler = asyncHandler(async (req, res) => {
     user: newUser,
   });
 });
+
+
+
+
+// all Users singInController
+
+const signInUserHandler = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
+
+  try {
+    // Call the service to sign in the user
+    const { user, token } = await adminService.signInUserService(email, password);
+
+    res.status(200).json({
+      message: "User signed in successfully",
+      user,
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+
 
 const getAllAdminHandler = asyncHandler(async (req, res) => {
   const agencies = await adminService.getAllAdminService();
@@ -137,4 +172,6 @@ router.post(
   registerUserHandler
 );
 router.get("/countryPortal-List", getAllAdminHandler);
+
+router.post('/signInAllUsers',signInUserHandler)
 module.exports = router;
