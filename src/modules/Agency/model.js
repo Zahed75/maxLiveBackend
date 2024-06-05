@@ -71,19 +71,17 @@ const agencySchema = new mongoose.Schema({
   referenceBy: {
     type: String,
   },
-  nidPhotos: [
-    {
-      type: {
-        type: String,
-        enum: ["front", "back"], // Enum for photo type: front or back
-        required: true
-      },
-      url: {
-        type: String,
-        required: true
-      }
-    }
-  ],
+  nidFront: {
+    type: String,
+    required: function () {
+      return this.role === "AG";
+    },
+  },
+  nidBack: {
+    type: String,
+    required: function () {
+      return this.role === "AG";
+    }},
   agencyStatus:{
     type:String,
     enum:["active","inactive","pending","banned"],

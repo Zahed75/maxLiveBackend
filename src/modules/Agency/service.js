@@ -18,21 +18,14 @@ const registerAgencyService = async (userId, agencyData, files) => {
     // Generate agencyId in the backend
     const agencyId = generateAgencyId(); // Implement generateAgencyId function
 
-    // Add agencyId to the agencyData
+    // Add agencyId and userId to the agencyData
     agencyData.agencyId = agencyId;
-    agencyData.userId = userId; // Add userId to the agencyData
+    agencyData.userId = userId;
 
+    // Check if NID photos are provided
     if (files && files["nidPhotoFront"] && files["nidPhotoBack"]) {
-      agencyData.nidPhotos = [
-        {
-          type: "front",
-          url: files["nidPhotoFront"][0].buffer.toString("base64"),
-        },
-        {
-          type: "back",
-          url: files["nidPhotoBack"][0].buffer.toString("base64"),
-        },
-      ];
+      agencyData.nidFront = files["nidPhotoFront"][0].path; // Save file path for front NID photo
+      agencyData.nidBack = files["nidPhotoBack"][0].path;   // Save file path for back NID photo
     } else {
       return { status: 400, message: "NID photos are required" };
     }
@@ -40,9 +33,10 @@ const registerAgencyService = async (userId, agencyData, files) => {
     // Create a new agency instance
     const newAgency = new agencyModel(agencyData);
     await newAgency.save();
-  // Update the user's role to 'AG'
-   await User.findByIdAndUpdate(userId, { role: 'AG' });
-   
+
+    // Update the user's role to 'AG'
+    await User.findByIdAndUpdate(userId, { role: 'AG' });
+
     return {
       status: 201,
       message: "Agency registered successfully",

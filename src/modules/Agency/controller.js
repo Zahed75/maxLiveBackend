@@ -7,6 +7,7 @@ const agencyService = require("../Agency/service");
 const { asyncHandler } = require("../../utility/common");
 const roleMiddleware = require('../../middlewares/roleMiddleware');
 const authMiddleware = require('../../middlewares/authMiddleware');
+const multerMiddleware = require('../../middlewares/multerMiddlware');
 const {
   AGENCY_OWNER,
   ADMIN,
@@ -30,7 +31,6 @@ const registerAgencyHandler = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 
 
@@ -218,7 +218,10 @@ router.put('/unblock-host',unblockHostHandler);
 
 router.put('/setPassword',passResetHandler);
 
-router.post("/registerAgency/:_id", upload.fields([{ name: 'nidPhotoFront', maxCount: 1 }, { name: 'nidPhotoBack', maxCount: 1 }]), registerAgencyHandler);
+router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
+  { name: 'nidPhotoFront', maxCount: 1 },
+  { name: 'nidPhotoBack', maxCount: 1 }
+]), registerAgencyHandler);
 
 router.put("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)
