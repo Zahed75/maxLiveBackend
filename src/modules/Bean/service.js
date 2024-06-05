@@ -49,50 +49,43 @@ const sendBeansFromMPToADService = async (mpId, adId, amount) => {
 
 // send Beans Admin TO Reseller
 
-
-const sendBeansFromADToBRService = async (adId, brId, amount) => {
+const sendBeansService = async (adminId, resellerId, amount) => {
   try {
-    // Validate and convert IDs to ObjectId
-    if (!mongoose.Types.ObjectId.isValid(adId) || !mongoose.Types.ObjectId.isValid(brId)) {
-      throw new Error('Invalid user ID format.');
+    const admin = await User.findById(adminId);
+    const reseller = await User.findById(resellerId);
+
+    if (!admin || admin.role !== 'AD') {
+      return { status: 400, message: 'Admin not found or not authorized' };
     }
 
-    const adUserId = mongoose.Types.ObjectId(adId);
-    const brUserId = mongoose.Types.ObjectId(brId);
-
-    const adUser = await User.findById(adUserId);
-    const brUser = await User.findById(brUserId);
-
-    if (!adUser) throw new Error('Admin (AD) user not found.');
-    if (!brUser) throw new Error('Bean Reseller (BR) user not found.');
-    if (adUser.role !== 'AD') throw new Error('Sender is not authorized as Admin (AD).');
-    if (brUser.role !== 'BR') throw new Error('Recipient is not authorized as Bean Reseller (BR).');
-
-    const beansAmount = parseInt(amount, 10);
-
-    if (adUser.beans < beansAmount) {
-      throw new Error('Insufficient beans.');
+    if (!reseller || reseller.role !== 'BR') {
+      return { status: 400, message: 'Reseller not found or not authorized' };
     }
 
-    // Update only the beans field
-    await User.findByIdAndUpdate(adUserId, { $inc: { beans: -beansAmount } }, { new: true, runValidators: false });
-    await User.findByIdAndUpdate(brUserId, { $inc: { beans: beansAmount } }, { new: true, runValidators: false });
+    if (admin.beans < amount) {
+      return { status: 400, message: 'Insufficient beans' };
+    }
+
+    admin.beans -= amount;
+    reseller.beans += amount;
+
+    await admin.save();
+    await reseller.save();
 
     const transaction = new Bean({
-      userId: adUserId,
-      amount: beansAmount,
-      transactionType: 'send'
+      userId: adminId,
+      amount: amount,
+      transactionType: 'send',
     });
+
     await transaction.save();
 
-    return { message: 'Beans sent successfully.' };
+    return { status: 200, message: 'Beans sent successfully', transaction };
   } catch (error) {
-    console.error('Error in sendBeansFromADToBRService:', error);
-    throw error;
+    console.error('Error sending beans:', error);
+    return { status: 500, message: 'Internal server error' };
   }
 };
-
-
 
 
 
@@ -103,6 +96,7 @@ const sendBeansFromADToBRService = async (adId, brId, amount) => {
 module.exports = {
 
     sendBeansFromMPToADService,
-    sendBeansFromADToBRService
+    sendBeansService
+    
 
 }

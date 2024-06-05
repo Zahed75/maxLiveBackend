@@ -26,6 +26,7 @@ const agencySchema = new mongoose.Schema({
     enum: ["BD", "NEP", "IND"], 
 
   },
+  // mandatory fields
   role: {
     type: String,
     // BU -> BASIC USER
