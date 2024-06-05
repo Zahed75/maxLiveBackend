@@ -245,6 +245,40 @@ const registerUserService = async (userData) => {
 };
 
 
+
+// ALL Users Sign In
+
+const signInUserService = async (email, password) => {
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Generate a token (using JWT)
+    const token = jwt.sign(
+      { email: user.email, role: user.role },
+      "SecretKey12345",
+      { expiresIn: '1h' }
+    );
+
+    return { user, token };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
+
+
+
 // get ALL Admin
 
 
@@ -270,5 +304,6 @@ module.exports = {
   transferAgencyService,
   getAllAgencies,
   registerUserService,
-  getAllAdminService
+  getAllAdminService,
+  signInUserService
 };
