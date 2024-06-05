@@ -39,6 +39,7 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
 
 
 
+
 // sends beans Admin to resller 
   const sendBeansToBRHandler = asyncHandler(async (req, res) => {
     const { adminId, resellerId, amount } = req.body;
@@ -47,14 +48,31 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
   
-    const result = await beansService.sendBeansService(adminId, resellerId, amount);
+    const result = await beansService.sendBeansADToBR(adminId, resellerId, amount);
   
     res.status(result.status).json(result);
   });
 
 
 
+  const sendBeansToUserHandler = asyncHandler(async (req, res) => {
+    const { resellerId, recipientId, amount } = req.body;
+  
+    if (!resellerId || !recipientId || !amount) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+  
+    const result = await beansService.sendBeansAllUsers(resellerId, recipientId, amount);
+  
+    res.status(result.status).json(result);
+  });
+
+
+
+
+
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 router.post('/send-beans-to-reseller',sendBeansToBRHandler)
+router.post('/send-beans-to-allusers',sendBeansToUserHandler)
 
 module.exports = router;

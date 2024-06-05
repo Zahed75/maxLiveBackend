@@ -1,7 +1,4 @@
-// Basic Lib Import
-require('dotenv').config();
 const express = require('express');
-// Security Middleware Lib Import
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -10,12 +7,14 @@ const hpp = require('hpp');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-
 const routes = require('./src/routes');
 const { connectWithDB } = require('./src/config/mongo');
 const { handleError } = require('./src/utility/errors.js');
 
-const app = new express();
+const app = express();
+
+// Trust proxy settings
+app.set('trust proxy', 1);  // Change the parameter according to your proxy setup
 
 // Security Middleware Implement
 app.use(helmet());
@@ -24,43 +23,27 @@ app.use(xss());
 app.use(hpp());
 
 // Serve static files from the 'upload' directory
-
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
-
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-
 app.use(cookieParser());
 
 // CORS CONFIGURATIONS
-
 const whitelist = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://v2admin.onnow.io',
-  'https://app.onnow.io',
-  'https://staging-admin.onnow.io',
   'http://localhost:3004',
   'http://localhost:3005',
   '*',
 ];
 const corsOptions = {
-  credentials: true, // This is important.
+  credentials: true,
   origin: (origin, callback) => {
     return callback(null, true);
-    // if (process.env.NODE_ENV !== 'production') {
-    //   return callback(null, true);
-    // } else {
-    //   // if (whitelist.includes(origin) || whitelist.includes('*')) {
-    //   // return callback(null, true);
-    //   // } else {
-    //   //   callback(new Error('Not allowed by CORS'));
-    //   // }
-    // }
   },
 };
 
