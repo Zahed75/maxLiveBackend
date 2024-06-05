@@ -22,6 +22,7 @@ const multerMiddleware = require('../../middlewares/multerMiddlware');
 const { BadRequest } = require("../../utility/errors");
 
 
+
 const resetPasswordHandler = asyncHandler(async (req, res) => {
   const { email, newPassword } = req.body;
 
@@ -34,16 +35,7 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
 
 
 
-// const getUserProfileBySocialId = asyncHandler(async (req, res) => {
-//   const firebaseUid = req.params.firebaseUId;
-  
-//     const user = await userService.getSocialUserById(firebaseUid);
-//     res.status(200).json({
-//       message:"Successfully Fetched all users!",
-//       user
-//     })
-  
-// });
+
 const getUserProfileBySocialId = asyncHandler(async (req, res) => {
   const { firebaseUid } = req.params;
 

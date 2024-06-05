@@ -15,7 +15,7 @@ const agencySchema = new mongoose.Schema({
   },
   agencyName: {
     type: String,
-    required: [true, "Agency name is required"],
+    // required: [true, "Agency name is required"],
   },
   agencyHolderName: {
     type: String,
@@ -50,7 +50,7 @@ const agencySchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, "Email is required"],   
+    // required: [true, "Email is required"],   
   },
   password:{
     type:String,
