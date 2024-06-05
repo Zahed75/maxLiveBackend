@@ -21,6 +21,8 @@ const beansService = require('../Bean/service');
 
 
 
+// send Beans to Master Portal to Admin
+
 const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
     try {
       const { mpId, adId, amount } = req.body;
@@ -36,8 +38,30 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
 
 
 
-router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 
+
+  // sends beans Admin to resller 
+
+
+const sendBeansFromADToBRHandler = asyncHandler(async (req, res) => {
+  try {
+    const { adId, brId, amount } = req.body;
+
+    const result = await beansService.sendBeansFromADToBRService(adId, brId, amount);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error in sendBeansFromADToBRController:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+
+router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
+router.post('/sendBeansFromADToBR', sendBeansFromADToBRHandler);
 
 
 module.exports = router;

@@ -40,7 +40,9 @@ const registerAgencyService = async (userId, agencyData, files) => {
     // Create a new agency instance
     const newAgency = new agencyModel(agencyData);
     await newAgency.save();
-
+  // Update the user's role to 'AG'
+   await User.findByIdAndUpdate(userId, { role: 'AG' });
+   
     return {
       status: 201,
       message: "Agency registered successfully",
