@@ -16,30 +16,25 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
 const { messaging } = require("firebase-admin");
 
-
-
-
 const approveAgencyHandler = asyncHandler(async (req, res) => {
-  const { password, email, adminId } = req.body;
-
   try {
-    const approvedAgency = await adminService.approveAgency(
-      password,
-      email,
-      adminId
-    );
-    res
-      .status(200)
-      .json({ message: "Agency approved successfully", approvedAgency });
+    const { password, email, adminId } = req.body;
+    const { success, data } = await adminService.approveAgency(password, email, adminId);
+    
+    if (success) {
+      res.status(200).json({
+        message: "Agency approved successfully",
+        approvedAgency: data,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: "Error approving agency" });
+    console.error('Error in approveAgencyHandler:', error);
+    res.status(500).json({
+      message: "Error approving agency",
+      error: error.message
+    });
   }
 });
-
-
-
-
-
 
 const removeAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
@@ -50,9 +45,6 @@ const removeAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
-
-
-
 const banAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.banAgencyService(agencyId);
@@ -61,10 +53,6 @@ const banAgencyHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
-
-
-
-
 
 const disableAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
@@ -75,9 +63,6 @@ const disableAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
-
-
-
 const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.grantMaxPowerService(agencyId);
@@ -87,8 +72,6 @@ const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
-
-
 const makeAdminHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.makeAdminService(agencyId);
@@ -97,9 +80,6 @@ const makeAdminHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
-
-
-
 
 const transferAgencyHandler = asyncHandler(async (req, res) => {
   const { AgencyId, newAgencyId } = req.body;
@@ -113,45 +93,34 @@ const transferAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
-
-
-const getAllAgenciesHandler = asyncHandler(async(req,res)=>{
+const getAllAgenciesHandler = asyncHandler(async (req, res) => {
   const agencies = await adminService.getAllAgencies();
-  
+
   res.status(200).json({
-    message:"Get All Agency Fetched Successfully!",
-    agencies
-  })
-})
-
-
+    message: "Get All Agency Fetched Successfully!",
+    agencies,
+  });
+});
 
 // User Manage
 const registerUserHandler = asyncHandler(async (req, res) => {
+  const userData = req.body;
+  const newUser = await adminService.registerUserService(userData);
 
-    const userData = req.body;
-    const newUser = await adminService.registerUserService(userData);
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: newUser,
-    });
-  
+  res.status(201).json({
+    message: "User registered successfully",
+    user: newUser,
+  });
 });
 
-
-
-const getAllAdminHandler = asyncHandler(async(req,res)=>{
+const getAllAdminHandler = asyncHandler(async (req, res) => {
   const agencies = await adminService.getAllAdminService();
-  
+
   res.status(200).json({
-    message:"Get All Agency Fetched Successfully!",
-    agencies
-  })
+    message: "Get All Agency Fetched Successfully!",
+    agencies,
+  });
 });
-
-
-
 
 router.post("/approve-agency", approveAgencyHandler);
 router.delete("/remove-agency", removeAgencyHandler);
@@ -160,7 +129,12 @@ router.post("/disable-agency", disableAgencyHandler);
 router.post("/grant-max-power", grantMaxPowerHandler);
 router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
-router.get('/agencies',getAllAgenciesHandler)
-router.post('/userManage', authMiddleware,roleMiddleware([MASTER_PORTAL,ADMIN]),registerUserHandler)
-router.get('/countryPortal-List',getAllAdminHandler)
+router.get("/agencies", getAllAgenciesHandler);
+router.post(
+  "/userManage",
+  authMiddleware,
+  roleMiddleware([MASTER_PORTAL, ADMIN]),
+  registerUserHandler
+);
+router.get("/countryPortal-List", getAllAdminHandler);
 module.exports = router;

@@ -48,20 +48,23 @@ const approveAgency = async (password, email, adminId) => {
 
     // Check the agency status
     if (agency.agencyStatus === "banned") {
-      return "Agency is banned and cannot be approved.";
+      throw new Error("Agency is banned and cannot be approved");
     }
     if (agency.agencyStatus === "active") {
-      return "Agency is already approved.";
+      throw new Error("Agency is already approved");
     }
     if (agency.agencyStatus !== "pending") {
-      return "Agency is not in a state that can be approved.";
+      throw new Error("Agency is not in a state that can be approved");
     }
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     // Update the agency fields
     agency.agencyStatus = "active";
     agency.isApproved = true;
     agency.isActive = true;
-    agency.password = hashedPassword; // You might want to hash the password before saving it
+    agency.password = hashedPassword;
     agency.approvedBy = adminId;
 
     // Save the updated agency
@@ -69,13 +72,13 @@ const approveAgency = async (password, email, adminId) => {
 
     // Send the password email
     await sendPass(email, password);
-    return agency;
+    
+    return { success: true, data: agency };
   } catch (error) {
-    console.error("Error approving agency:", error);
-    throw new Error("An error occurred while approving the agency.");
+    console.error('Error in approveAgency service:', error);
+    throw new Error(`Approve Agency Error: ${error.message}`);
   }
 };
-
 const removeAgencyService = async (agencyId) => {
   try {
     await agencyModel.findByIdAndDelete(agencyId);
