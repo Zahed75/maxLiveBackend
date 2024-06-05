@@ -278,7 +278,7 @@ const detailsHostByUserId = async(id)=>{
 //   }
 
 //   // Check if the user is an HO or BU
-//   if (user.role !== "HO" && user.role !== "BU") {
+//   if (user.role !== "HO" || user.role !== "BU" ||  user.role !== "AD" || user.role !== "AG" || user.role !== "BR"  ) {
 //     throw new Error("You can only reset passwords for HO or BU users");
 //   }
 
@@ -294,7 +294,7 @@ const detailsHostByUserId = async(id)=>{
 // }
 
 
-// services/agencyService.js
+
 const passwordResetService = async (adminId, userId, newPassword) => {
   // Fetch the admin and user from the database
   const admin = await User.findById(adminId);
@@ -309,9 +309,10 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     throw new Error("You do not have permission to reset passwords");
   }
 
-  // Check if the user's role is among the allowed roles
-  if (!["BU", "AD", "AG", "BR", "HO"].includes(user.role)) {
-    throw new Error("You can only reset passwords for BU, AD, AG, BR, or HO users");
+  // Check if the user is one of the allowed roles
+  const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
+  if (!allowedRoles.includes(user.role)) {
+    throw new Error("You can only reset passwords for specific roles");
   }
 
   // Hash the new password
@@ -323,7 +324,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
   await user.save();
 
   return user;
-};
+}
 
 
 
