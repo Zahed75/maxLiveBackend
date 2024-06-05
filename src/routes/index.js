@@ -14,7 +14,7 @@ const agencyRoute = require('../modules/Agency/controller');
 const hostRoute = require('../modules/Host/controller');
 const feedRoute= require('../modules/Feeds/controller');
 const adminRoute = require('../modules/Admin/controller');
-
+const beanRoute = require('../modules/Bean/controller');
 
 //EndPoint
 router.use('/auth', authRoute);
@@ -23,6 +23,7 @@ router.use('/agency',agencyRoute);
 router.use('/host',hostRoute);
 router.use('/feed',feedRoute);
 router.use('/admin',adminRoute);
+router.use('/bean',beanRoute);
 // router.use(authVerifyMiddleware);
 
 module.exports = router;
