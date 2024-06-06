@@ -255,56 +255,36 @@ const detailsHostByUserId = async(id)=>{
 
 
 
-
-
-
-
-
-
-
-
-
 // const passwordResetService = async (adminId, userId, newPassword) => {
-//   // Fetch the admin and user from the database
-//   const admin = await User.findById(adminId);
-//   const user = await User.findById(userId);
+//   try {
+//     // Fetch the admin and user from the database
+//     const admin = await User.findById(adminId);
+//     const user = await User.findById(userId);
 
-//   if (!admin || !user) {
-//     throw new Error("Admin or user not found");
-//   }
-
-//   // Check if the admin has the correct role
-//   if (admin.role !== "MP" && admin.role !== "AD") {
-//     throw new Error("You do not have permission to reset passwords");
-//   }
-
-//   // Check if the user is one of the allowed roles
-//   const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
-//   if (!allowedRoles.includes(user.role)) {
-//     throw new Error("You can only reset passwords for specific roles");
-//   }
-
-//   // Hash the new password
-//   const salt = await bcrypt.genSalt(10);
-//   const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-//   // Update the user's password or agency's password based on the role
-//   if (user.role === "AG") {
-//     const agency = await agencyModel.findOne({ userId: user._id });
-//     if (!agency) {
-//       throw new Error("Agency not found for the user");
+//     if (!admin || !user) {
+//       throw new Error("Admin or user not found");
 //     }
-//     agency.password = hashedPassword;
-//     await agency.save();
-//   } else {
-//     user.password = hashedPassword;
+
+//     // Check if the admin has the correct role
+//     if (admin.role !== "MP" && admin.role !== "AD") {
+//       throw new Error("You do not have permission to reset passwords");
+//     }
+
+//     // Check if the user is one of the allowed roles
+//     const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
+//     if (!allowedRoles.includes(user.role)) {
+//       throw new Error("You can only reset passwords for specific roles");
+//     }
+
+//     // Set the new password (it will be hashed by the pre('save') middleware)
+//     user.password = newPassword;
 //     await user.save();
+
+//     return user;
+//   } catch (error) {
+//     throw new Error(`Failed to reset password: ${error.message}`);
 //   }
-
-//   return user;
-// }
-
-
+// };
 
 
 
@@ -313,7 +293,14 @@ const passwordResetService = async (adminId, userId, newPassword) => {
   try {
     // Fetch the admin and user from the database
     const admin = await User.findById(adminId);
-    const user = await User.findById(userId);
+    let user;
+
+    // Check if the user is an agency or a basic user
+    if (admin && admin.role === "MP" || admin.role === "AD") {
+      user = await User.findById(userId);
+    } else {
+      user = await agencyModel.findById(userId);
+    }
 
     if (!admin || !user) {
       throw new Error("Admin or user not found");
@@ -339,6 +326,16 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     throw new Error(`Failed to reset password: ${error.message}`);
   }
 };
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -397,6 +394,40 @@ const unblockHostService = async (adminId, id) => {
 
 
 
+const passwordResetAgency = async (adminId, userId, newPassword) => {
+  try {
+    // Fetch the admin from the database
+    const admin = await User.findById(adminId);
+
+    // Check if the admin has the correct role
+    if (!admin || (admin.role !== "MP" && admin.role !== "AD")) {
+      throw new Error("You do not have permission to reset passwords");
+    }
+
+    // Fetch the user (can be an agency or a basic user)
+    const user = await User.findById(userId) || await Agency.findById(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if the user is one of the allowed roles (only AD and AG)
+    if (!["AD", "AG"].includes(user.role)) {
+      throw new Error("You can only reset passwords for Admin and Agency roles");
+    }
+
+    // Set the new password (it will be hashed by the pre('save') middleware)
+    user.password = newPassword;
+    await user.save();
+
+    return user;
+  } catch (error) {
+    throw new Error(`Failed to reset password: ${error.message}`);
+  }
+};
+
+
+
 
 
 
@@ -417,6 +448,6 @@ module.exports = {
   passwordResetService,
   blockHostService,
   unblockHostService,
-
+  passwordResetAgency
 
 };
