@@ -145,6 +145,14 @@ const passResetHandler = asyncHandler(async(req,res)=>{
 
 
 
+// change the agency password
+
+
+
+
+
+
+
 
 const blockHostHandler = asyncHandler(async (req, res) => {
   console.log("Request Body:", req.body); // Log the request body
@@ -207,6 +215,31 @@ const unblockHostHandler = asyncHandler(async (req, res) => {
 
 
 
+// agency password Reset
+
+const AgencypassResetHandler = asyncHandler(async (req, res) => {
+  const { adminId, userId, newPassword } = req.body;
+
+  // Validate input
+  if (!adminId || !userId || !newPassword) {
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
+
+  try {
+    // Call the service to reset the password
+    const user = await passwordResetAgency(adminId, userId, newPassword);
+
+    res.status(200).json({
+      message: "Password reset successfully!",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
 
 
 
@@ -215,9 +248,7 @@ const unblockHostHandler = asyncHandler(async (req, res) => {
 
 
 router.put('/unblock-host',unblockHostHandler);
-
 router.put('/setPassword',passResetHandler);
-
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }
@@ -225,14 +256,11 @@ router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
 
 router.put("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)
-
 router.post("/agencySignin",signinAgencyController);
 router.put("/:id",updateAgencyHandler);
 router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
-
 router.post('/declined',blockHostHandler);
-
-
+router.post('/agencyPassReset',AgencypassResetHandler);
 
 module.exports = router;
