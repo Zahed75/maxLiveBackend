@@ -247,8 +247,14 @@ const AgencypassResetHandler = asyncHandler(async (req, res) => {
 
 
 
+
+
+
 router.put('/unblock-host',unblockHostHandler);
-router.put('/setPassword',passResetHandler);
+
+router.put('/setPassword',authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),passResetHandler);
+
+
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }

@@ -86,6 +86,7 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
     profilePicturePath
   );
   res.status(200).json({
+    message:" User info updated successfully",
     updatedUser,
   });
 });

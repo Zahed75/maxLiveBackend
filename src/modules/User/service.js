@@ -8,6 +8,7 @@ const admin = require("firebase-admin");
 
 
 
+
 const resetPassword = async (email, newPassword) => {
   try {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -27,6 +28,9 @@ const resetPassword = async (email, newPassword) => {
     throw new Error("Failed to reset password.", error);
   }
 };
+
+
+
 
 //getAllUser
 

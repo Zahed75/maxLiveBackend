@@ -252,44 +252,7 @@ const detailsHostByUserId = async(id)=>{
 
 
 
-
-
-
-// const passwordResetService = async (adminId, userId, newPassword) => {
-//   try {
-//     // Fetch the admin and user from the database
-//     const admin = await User.findById(adminId);
-//     const user = await User.findById(userId);
-
-//     if (!admin || !user) {
-//       throw new Error("Admin or user not found");
-//     }
-
-//     // Check if the admin has the correct role
-//     if (admin.role !== "MP" && admin.role !== "AD") {
-//       throw new Error("You do not have permission to reset passwords");
-//     }
-
-//     // Check if the user is one of the allowed roles
-//     const allowedRoles = ["BU", "HO", "AD", "AG", "BR"];
-//     if (!allowedRoles.includes(user.role)) {
-//       throw new Error("You can only reset passwords for specific roles");
-//     }
-
-//     // Set the new password (it will be hashed by the pre('save') middleware)
-//     user.password = newPassword;
-//     await user.save();
-
-//     return user;
-//   } catch (error) {
-//     throw new Error(`Failed to reset password: ${error.message}`);
-//   }
-// };
-
-
-
-
-const passwordResetService = async (adminId, userId, newPassword) => {
+const passwordResetService = async (adminId, userId,id, newPassword) => {
   try {
     // Fetch the admin and user from the database
     const admin = await User.findById(adminId);
@@ -297,10 +260,13 @@ const passwordResetService = async (adminId, userId, newPassword) => {
 
     // Check if the user is an agency or a basic user
     if (admin && admin.role === "MP" || admin.role === "AD") {
+      console.log(`adminId: ${adminId}, userId: ${userId}`)
       user = await User.findById(userId);
     } else {
-      user = await agencyModel.findById(userId);
+      user = await agencyModel.findById({_id:id});
     }
+    console.log(`adminId: ${adminId}, userId: ${userId}`);
+
 
     if (!admin || !user) {
       throw new Error("Admin or user not found");
@@ -316,6 +282,8 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     if (!allowedRoles.includes(user.role)) {
       throw new Error("You can only reset passwords for specific roles");
     }
+
+    console.log(allowedRoles)
 
     // Set the new password (it will be hashed by the pre('save') middleware)
     user.password = newPassword;
@@ -398,21 +366,28 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
   try {
     // Fetch the admin from the database
     const admin = await User.findById(adminId);
+    if (!admin) {
+      throw new Error("Admin not found");
+    }
 
     // Check if the admin has the correct role
-    if (!admin || (admin.role !== "MP" && admin.role !== "AD")) {
+    if (admin.role !== "MP" && admin.role !== "AD") {
       throw new Error("You do not have permission to reset passwords");
     }
 
-    // Fetch the user (can be an agency or a basic user)
-    const user = await User.findById(userId) || await Agency.findById(userId);
-
+    // Fetch the user or agency by ID
+    let user = await User.findById(userId);
     if (!user) {
-      throw new Error("User not found");
+      user = await Agency.findById(userId);
     }
 
-    // Check if the user is one of the allowed roles (only AD and AG)
-    if (!["AD", "AG"].includes(user.role)) {
+    if (!user) {
+      throw new Error("User or Agency not found");
+    }
+
+    // Check if the user/agency is one of the allowed roles
+    const userRole = user.role;
+    if (!["AD", "AG"].includes(userRole)) {
       throw new Error("You can only reset passwords for Admin and Agency roles");
     }
 
@@ -422,9 +397,11 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
 
     return user;
   } catch (error) {
+    console.error(`Failed to reset password: ${error.message}`);
     throw new Error(`Failed to reset password: ${error.message}`);
   }
 };
+
 
 
 
