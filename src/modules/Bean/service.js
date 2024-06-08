@@ -105,7 +105,7 @@ const sendAssetsADToBR = async (adminId, resellerId, amount, assetType) => {
 
 // services/beanService.js
 
-const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
+const sendAssetsAllUsers = async (resellerId, recipientId, amount, assetType) => {
   try {
     const reseller = await User.findById(resellerId);
     const recipient = await User.findById(recipientId);
@@ -119,21 +119,28 @@ const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
       return { status: 400, message: 'Recipient not found' };
     }
 
-    if (reseller.beans < amount) {
-      return { status: 400, message: 'Insufficient beans' };
+    const validAssets = ['beans', 'coins', 'stars', 'diamonds'];
+    if (!validAssets.includes(assetType)) {
+      return { status: 400, message: 'Invalid asset type' };
     }
 
-    // Deduct beans from reseller
-    reseller.beans -= amount;
+    const assetAmount = parseInt(amount, 10);
 
-    // Add beans to recipient
+    if (reseller[assetType] < assetAmount) {
+      return { status: 400, message: 'Insufficient ' + assetType };
+    }
+
+    // Deduct asset from reseller
+    reseller[assetType] -= assetAmount;
+
+    // Add asset to recipient
     if (recipient) {
-      recipient.beans += amount;
+      recipient[assetType] += assetAmount;
       await recipient.save();
     }
 
     if (agency) {
-      agency.beans += amount;
+      agency[assetType] += assetAmount;
       await agency.save();
     }
 
@@ -141,23 +148,26 @@ const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
 
     const transaction = new Bean({
       userId: resellerId,
-      amount: amount,
+      amount: assetAmount,
       transactionType: 'send',
+      assetType: assetType
     });
 
     await transaction.save();
 
-    return { status: 200, message: 'Beans sent successfully', transaction };
+    return { status: 200, message: `${assetType} sent successfully`, transaction };
   } catch (error) {
-    console.error('Error sending beans:', error);
+    console.error('Error sending assets:', error);
     return { status: 500, message: 'Internal server error' };
   }
 };
 
+module.exports = { sendAssetsAllUsers };
 
 
 
-const sendBeansFromAgencyToHost = async (agencyId, hostId, amount) => {
+
+const sendAssetsFromAgencyToHost = async (agencyId, hostId, amount, assetType) => {
   try {
     const agency = await agencyModel.findById(agencyId);
     const host = await Host.findById(hostId);
@@ -170,31 +180,41 @@ const sendBeansFromAgencyToHost = async (agencyId, hostId, amount) => {
       return { status: 400, message: 'Host not found or not authorized' };
     }
 
-    if (agency.beans < amount) {
-      return { status: 400, message: 'Insufficient beans' };
+    const validAssets = ['beans', 'coins', 'stars', 'diamonds'];
+    if (!validAssets.includes(assetType)) {
+      return { status: 400, message: 'Invalid asset type' };
     }
 
-    agency.beans -= amount;
-    host.beans += amount;
+    const assetAmount = parseInt(amount, 10);
+
+    if (agency[assetType] < assetAmount) {
+      return { status: 400, message: 'Insufficient ' + assetType };
+    }
+
+    // Deduct asset from agency
+    agency[assetType] -= assetAmount;
+
+    // Add asset to host
+    host[assetType] += assetAmount;
 
     await agency.save();
     await host.save();
 
     const transaction = new Bean({
       userId: agencyId,
-      amount: amount,
+      amount: assetAmount,
       transactionType: 'send',
+      assetType: assetType
     });
 
     await transaction.save();
 
-    return { status: 200, message: 'Beans sent successfully', transaction };
+    return { status: 200, message: `${assetType} sent successfully`, transaction };
   } catch (error) {
-    console.error('Error sending beans:', error);
+    console.error('Error sending assets:', error);
     return { status: 500, message: 'Internal server error' };
   }
 };
-
 
 
 
@@ -204,7 +224,7 @@ module.exports = {
 
     sendBeansFromMPToADService,
     sendAssetsADToBR,
-    sendBeansAllUsers,
-    sendBeansFromAgencyToHost
+    sendAssetsAllUsers,
+    sendAssetsFromAgencyToHost 
 
 }

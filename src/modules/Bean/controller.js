@@ -58,17 +58,22 @@ const sendAssetsToBRHandler = asyncHandler(async (req, res) => {
 
 
 
-  const sendBeansToUserHandler = asyncHandler(async (req, res) => {
-    const { resellerId, recipientId, amount } = req.body;
-  
-    if (!resellerId || !recipientId || !amount) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-  
-    const result = await beansService.sendBeansAllUsers(resellerId, recipientId, amount);
-  
-    res.status(result.status).json(result);
-  });
+const sendAssetsToUserHandler = asyncHandler(async (req, res) => {
+  const { resellerId, recipientId, amount, assetType } = req.body;
+
+  if (!resellerId || !recipientId || !amount || !assetType) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const result = await beansService.sendAssetsAllUsers(resellerId, recipientId, amount, assetType);
+
+  res.status(200).json({
+    message: 'Sent Successfully',
+    result
+  })
+});
+
+
  
   
 
@@ -76,17 +81,20 @@ const sendAssetsToBRHandler = asyncHandler(async (req, res) => {
 
 
 
-  const sendBeansFromAgencyToHostHandler = asyncHandler(async (req, res) => {
-    const { agencyId, hostId, amount } = req.body;
-  
-    if (!agencyId || !hostId || !amount) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-  
-    const result = await beansService.sendBeansFromAgencyToHost(agencyId, hostId, amount);
-  
-    res.status(result.status).json(result);
-  });
+const sendAssetsFromAgencyToHostHandler = asyncHandler(async (req, res) => {
+  const { agencyId, hostId, amount, assetType } = req.body;
+
+  if (!agencyId || !hostId || !amount || !assetType) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const result = await beansService.sendAssetsFromAgencyToHost(agencyId, hostId, amount, assetType);
+
+  res.status(200).json({
+    message:"Sent Successfully!",
+    result
+  })
+});
   
 
 
@@ -95,7 +103,7 @@ const sendAssetsToBRHandler = asyncHandler(async (req, res) => {
 
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 router.post('/send-beans-to-reseller',sendAssetsToBRHandler);
-router.put('/send-beans-to-allusers',sendBeansToUserHandler);
-router.patch('/send-beans-to-host',sendBeansFromAgencyToHostHandler)
+router.patch('/send-assets-to-allusers',sendAssetsToUserHandler);
+router.patch('/send-beans-to-host',sendAssetsFromAgencyToHostHandler)
 
 module.exports = router;
