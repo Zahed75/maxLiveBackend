@@ -90,10 +90,10 @@ const hostSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ["active","inactive","pending","rejected"],
-      default : "inactive"
-      
+      enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
+      default: 'active'
     },
+     
     nidFront: {
       type: String,
       required: function () {

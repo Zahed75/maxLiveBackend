@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("./model");
+const Agency = require('../Agency/model')
+const Host = require('../Host/model')
 const { NotFound, BadRequest } = require("../../utility/errors");
 const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
@@ -195,7 +197,6 @@ const banUser = async (masterPortalId, userId) => {
     return { status: 500, message: 'Internal server error' };
   }
 };
-
 
 
 

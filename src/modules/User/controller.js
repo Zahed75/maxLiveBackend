@@ -115,9 +115,11 @@ const banUserHandler = asyncHandler(async (req, res) => {
 
   const result = await userService.banUser(masterPortalId, userId);
 
-  res.status(result.status).json(result);
+  res.status(200).json({
+    message:"User has been banned",
+    result
+  });
 });
-
 
 
 

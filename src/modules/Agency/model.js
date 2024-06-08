@@ -26,6 +26,11 @@ const agencySchema = new mongoose.Schema({
     enum: ["BD", "NEP", "IND"], 
 
   },
+  agencyStatus: {
+    type: String,
+    enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
+    default: 'active'
+  },
   // mandatory fields
   role: {
     type: String,
