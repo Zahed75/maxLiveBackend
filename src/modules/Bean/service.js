@@ -96,7 +96,7 @@ const sendBeansADToBR = async (adminId, resellerId, amount) => {
 const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
   try {
     const reseller = await User.findById(resellerId);
-    const recipient = await User.findById(recipientId);
+    const recipient = await agencyModel.findById(recipientId);
 
     if (!reseller || reseller.role !== 'BR') {
       return { status: 400, message: 'Reseller not found or not authorized' };
@@ -134,10 +134,57 @@ const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
 
 
 
+
+
+
+const sendBeansFromAgencyToHost = async (agencyId, hostId, amount) => {
+  try {
+    const agency = await agencyModel.findById(agencyId);
+    const host = await Host.findById(hostId);
+
+    if (!agency || agency.role !== 'AG') {
+      return { status: 400, message: 'Agency not found or not authorized' };
+    }
+
+    if (!host || host.role !== 'HO') {
+      return { status: 400, message: 'Host not found or not authorized' };
+    }
+
+    if (agency.beans < amount) {
+      return { status: 400, message: 'Insufficient beans' };
+    }
+
+    agency.beans -= amount;
+    host.beans += amount;
+
+    await agency.save();
+    await host.save();
+
+    const transaction = new Bean({
+      userId: agencyId,
+      amount: amount,
+      transactionType: 'send',
+    });
+
+    await transaction.save();
+
+    return { status: 200, message: 'Beans sent successfully', transaction };
+  } catch (error) {
+    console.error('Error sending beans:', error);
+    return { status: 500, message: 'Internal server error' };
+  }
+};
+
+
+
+
+
+
 module.exports = {
 
     sendBeansFromMPToADService,
     sendBeansADToBR,
-    sendBeansAllUsers
+    sendBeansAllUsers,
+    sendBeansFromAgencyToHost
 
 }

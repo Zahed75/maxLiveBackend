@@ -148,6 +148,30 @@ const hostSchema = new mongoose.Schema(
       type:Boolean,
       default:false
     },
+    beans: {
+      type: Number,
+      default: 0,
+    },
+    diamonds: {
+      type: Number,
+      default: 0,
+    },
+    vipStatus: {
+      type: Boolean,
+      default: false,
+    },
+    vipLevel: {
+      type: Number,
+      default: 0,
+    },
+    frames: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Frame',
+    }],
+    skins: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Skin',
+    }],
 
     refreshToken: [String],
   },

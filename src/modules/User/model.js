@@ -173,32 +173,6 @@ const UserSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Skin',
     }],
-    beans: {
-      type: Number,
-      default: 0,
-    
-    },
-    diamonds: {
-      type: Number,
-      default: 0,
-      
-    },
-    vipStatus: {
-      type: Boolean,
-      default: false,
-    },
-    vipLevel: {
-      type: Number,
-      default: 0,
-    },
-    frames: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Frame',
-    }],
-    skins: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Skin',
-    }],
     posts: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Feed'

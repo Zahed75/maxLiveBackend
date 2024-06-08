@@ -68,11 +68,26 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
   });
 
 
+  const sendBeansFromAgencyToHostHandler = asyncHandler(async (req, res) => {
+    const { agencyId, hostId, amount } = req.body;
+  
+    if (!agencyId || !hostId || !amount) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+  
+    const result = await beansService.sendBeansFromAgencyToHost(agencyId, hostId, amount);
+  
+    res.status(result.status).json(result);
+  });
+  
+
+
 
 
 
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
-router.post('/send-beans-to-reseller',sendBeansToBRHandler)
-router.post('/send-beans-to-allusers',sendBeansToUserHandler)
+router.post('/send-beans-to-reseller',sendBeansToBRHandler);
+router.patch('/send-beans-to-allusers',sendBeansToUserHandler);
+router.patch('/send-beans-to-host',sendBeansFromAgencyToHostHandler)
 
 module.exports = router;

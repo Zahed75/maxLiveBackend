@@ -50,7 +50,7 @@ const agencySchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    // required: [true, "Email is required"],   
+      
   },
   password:{
     type:String,
@@ -73,15 +73,16 @@ const agencySchema = new mongoose.Schema({
   },
   nidFront: {
     type: String,
-    required: function () {
-      return this.role === "AG";
-    },
+    // required: function () {
+    //   return this.role === "AG";
+    // },
   },
   nidBack: {
     type: String,
-    required: function () {
-      return this.role === "AG";
-    }},
+    // required: function () {
+    //   return this.role === "AG";
+    // }
+  },
   agencyStatus:{
     type:String,
     enum:["active","inactive","pending","banned"],
@@ -106,6 +107,30 @@ const agencySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
   },
+  beans: {
+    type: Number,
+    default: 0,
+  },
+  diamonds: {
+    type: Number,
+    default: 0,
+  },
+  vipStatus: {
+    type: Boolean,
+    default: false,
+  },
+  vipLevel: {
+    type: Number,
+    default: 0,
+  },
+  frames: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Frame',
+  }],
+  skins: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Skin',
+  }],
 });
 
 const Agency = mongoose.model("Agency", agencySchema);
