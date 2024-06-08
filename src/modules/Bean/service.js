@@ -10,7 +10,7 @@ const Bean = require('../Bean/model'); // Adjust this path as necessary
 
 
 
-const sendBeansFromMPToADService = async (mpId, adId, amount) => {
+const sendBeansFromMPToADService = async (mpId, adId, amount, assetType) => {
   try {
     const mpUser = await User.findById(mpId);
     const adUser = await User.findById(adId);
@@ -20,37 +20,40 @@ const sendBeansFromMPToADService = async (mpId, adId, amount) => {
     if (mpUser.role !== 'MP') throw new Error('Sender is not authorized as Master Portal (MP).');
     if (adUser.role !== 'AD') throw new Error('Recipient is not authorized as Admin (AD).');
 
-    const beansAmount = parseInt(amount, 10);
-
-    if (mpUser.beans < beansAmount) {
-      throw new Error('Insufficient beans.');
+    const validAssets = ['beans', 'coins', 'diamonds', 'stars'];
+    if (!validAssets.includes(assetType)) {
+      throw new Error('Invalid asset type.');
     }
 
-    // Update only the beans field
-    await User.findByIdAndUpdate(mpId, { $inc: { beans: -beansAmount } }, { new: true, runValidators: false });
-    await User.findByIdAndUpdate(adId, { $inc: { beans: beansAmount } }, { new: true, runValidators: false });
+    const assetAmount = parseInt(amount, 10);
+
+    // MP does not need to have any initial amounts of these assets
+    // So no need to check for mpUser.assetType < assetAmount
+
+    // Update only the specified asset field
+    await User.findByIdAndUpdate(adId, { $inc: { [assetType]: assetAmount } }, { new: true, runValidators: false });
 
     const transaction = new Bean({
       userId: mpId,
-      amount: beansAmount,
-      transactionType: 'send'
+      amount: assetAmount,
+      transactionType: 'send',
+      assetType: assetType
     });
-    
+
     await transaction.save();
 
-    return { message: 'Beans sent successfully.' ,transaction};
+    return { message: `${assetType} sent successfully.`, transaction };
   } catch (error) {
-    console.error('Error in sendBeansFromMPToADService:', error);
+    console.error('Error in sendAssetsFromMPToADService:', error);
     throw error;
   }
 };
 
 
 
-
 // send Beans Admin TO Reseller
 
-const sendBeansADToBR = async (adminId, resellerId, amount) => {
+const sendAssetsADToBR = async (adminId, resellerId, amount, assetType) => {
   try {
     const admin = await User.findById(adminId);
     const reseller = await User.findById(resellerId);
@@ -63,30 +66,39 @@ const sendBeansADToBR = async (adminId, resellerId, amount) => {
       return { status: 400, message: 'Reseller not found or not authorized' };
     }
 
-    if (admin.beans < amount) {
-      return { status: 400, message: 'Insufficient beans' };
+    const validAssets = ['beans', 'coins', 'stars', 'diamonds'];
+    if (!validAssets.includes(assetType)) {
+      return { status: 400, message: 'Invalid asset type' };
     }
 
-    admin.beans -= amount;
-    reseller.beans += amount;
+    const assetAmount = parseInt(amount, 10);
+
+    if (admin[assetType] < assetAmount) {
+      return { status: 400, message: 'Insufficient ' + assetType };
+    }
+
+    admin[assetType] -= assetAmount;
+    reseller[assetType] += assetAmount;
 
     await admin.save();
     await reseller.save();
 
     const transaction = new Bean({
       userId: adminId,
-      amount: amount,
+      amount: assetAmount,
       transactionType: 'send',
+      assetType: assetType
     });
 
     await transaction.save();
 
-    return { status: 200, message: 'Beans sent successfully', transaction };
+    return { status: 200, message: `${assetType} sent successfully`, transaction };
   } catch (error) {
-    console.error('Error sending beans:', error);
+    console.error('Error sending assets:', error);
     return { status: 500, message: 'Internal server error' };
   }
 };
+
 
 
 
@@ -191,7 +203,7 @@ const sendBeansFromAgencyToHost = async (agencyId, hostId, amount) => {
 module.exports = {
 
     sendBeansFromMPToADService,
-    sendBeansADToBR,
+    sendAssetsADToBR,
     sendBeansAllUsers,
     sendBeansFromAgencyToHost
 

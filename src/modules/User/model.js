@@ -117,7 +117,7 @@ const UserSchema = new mongoose.Schema(
       enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
       default: 'active'
     },
-     
+
     otp: Number,
 
     emailChangeOTP: Number,
@@ -154,6 +154,14 @@ const UserSchema = new mongoose.Schema(
        default: 0 
       },
     diamonds: {
+      type: Number,
+      default: 0,
+    },
+    coins:{
+      type: Number,
+      default: 0,
+    },
+    star:{
       type: Number,
       default: 0,
     },

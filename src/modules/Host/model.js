@@ -156,6 +156,14 @@ const hostSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    coins:{
+      type: Number,
+      default: 0,
+    },
+    star:{
+      type: Number,
+      default: 0,
+    },
     vipStatus: {
       type: Boolean,
       default: false,

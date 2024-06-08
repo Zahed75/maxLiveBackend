@@ -24,16 +24,16 @@ const beansService = require('../Bean/service');
 // send Beans to Master Portal to Admin
 
 const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
-    try {
-      const { mpId, adId, amount } = req.body;
-  
-      const result = await beansService.sendBeansFromMPToADService(mpId, adId, amount);
-  
-      res.status(200).json(result);
-    } catch (error) {
-      console.error('Error in sendBeansFromMPToADController:', error);
-      res.status(500).json({ error: error.message });
-    }
+  try {
+    const { mpId, adId, amount, assetType } = req.body;
+
+    const result = await beansService.sendBeansFromMPToADService(mpId, adId, amount, assetType);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error in sendAssetsFromMPToADHandler:', error);
+    res.status(500).json({ error: error.message });
+  }
   });
 
 
@@ -41,17 +41,20 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
 
 
 // sends beans Admin to resller 
-  const sendBeansToBRHandler = asyncHandler(async (req, res) => {
-    const { adminId, resellerId, amount } = req.body;
-  
-    if (!adminId || !resellerId || !amount) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-  
-    const result = await beansService.sendBeansADToBR(adminId, resellerId, amount);
-  
-    res.status(result.status).json(result);
+const sendAssetsToBRHandler = asyncHandler(async (req, res) => {
+  const { adminId, resellerId, amount, assetType } = req.body;
+
+  if (!adminId || !resellerId || !amount || !assetType) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const result = await beansService.sendAssetsADToBR(adminId, resellerId, amount, assetType);
+
+  res.status(result.status).json({
+    message: result.message,
+    result
   });
+});
 
 
 
@@ -91,7 +94,7 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
 
 
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
-router.post('/send-beans-to-reseller',sendBeansToBRHandler);
+router.post('/send-beans-to-reseller',sendAssetsToBRHandler);
 router.put('/send-beans-to-allusers',sendBeansToUserHandler);
 router.patch('/send-beans-to-host',sendBeansFromAgencyToHostHandler)
 

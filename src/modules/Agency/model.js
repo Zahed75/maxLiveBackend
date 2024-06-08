@@ -124,6 +124,16 @@ const agencySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+
+  coins:{
+    type: Number,
+    default: 0,
+  },
+  star:{
+    type: Number,
+    default: 0,
+  },
+  
   vipLevel: {
     type: Number,
     default: 0,
