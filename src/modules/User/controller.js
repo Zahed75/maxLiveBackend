@@ -106,6 +106,25 @@ const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
 
 
 
+const banUserHandler = asyncHandler(async (req, res) => {
+  const { masterPortalId, userId } = req.body;
+
+  if (!masterPortalId || !userId) {
+    return res.status(400).json({ message: 'Master portal ID and user ID are required' });
+  }
+
+  const result = await userService.banUser(masterPortalId, userId);
+
+  res.status(result.status).json(result);
+});
+
+
+
+
+
+
+
+
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUid", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
@@ -120,5 +139,7 @@ router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
 
 router.post("/resetPass", resetPasswordHandler); //not tested in postman
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
+
+router.post('/banUser',banUserHandler)
 
 module.exports = router;

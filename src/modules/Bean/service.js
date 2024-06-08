@@ -96,25 +96,36 @@ const sendBeansADToBR = async (adminId, resellerId, amount) => {
 const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
   try {
     const reseller = await User.findById(resellerId);
-    const recipient = await agencyModel.findById(recipientId);
+    const recipient = await User.findById(recipientId);
+    const agency = await agencyModel.findById(recipientId); // Correctly fetching the agency using recipientId
 
     if (!reseller || reseller.role !== 'BR') {
       return { status: 400, message: 'Reseller not found or not authorized' };
     }
 
-    if (!recipient || !['BU', 'HO', 'AG'].includes(recipient.role)) {
-      return { status: 400, message: 'Recipient not found or not authorized' };
+    if (!recipient && !agency) {
+      return { status: 400, message: 'Recipient not found' };
     }
 
     if (reseller.beans < amount) {
       return { status: 400, message: 'Insufficient beans' };
     }
 
+    // Deduct beans from reseller
     reseller.beans -= amount;
-    recipient.beans += amount;
+
+    // Add beans to recipient
+    if (recipient) {
+      recipient.beans += amount;
+      await recipient.save();
+    }
+
+    if (agency) {
+      agency.beans += amount;
+      await agency.save();
+    }
 
     await reseller.save();
-    await recipient.save();
 
     const transaction = new Bean({
       userId: resellerId,
@@ -130,9 +141,6 @@ const sendBeansAllUsers = async (resellerId, recipientId, amount) => {
     return { status: 500, message: 'Internal server error' };
   }
 };
-
-
-
 
 
 

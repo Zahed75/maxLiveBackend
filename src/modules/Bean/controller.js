@@ -66,6 +66,11 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
   
     res.status(result.status).json(result);
   });
+ 
+  
+
+
+
 
 
   const sendBeansFromAgencyToHostHandler = asyncHandler(async (req, res) => {
@@ -87,7 +92,7 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
 
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 router.post('/send-beans-to-reseller',sendBeansToBRHandler);
-router.patch('/send-beans-to-allusers',sendBeansToUserHandler);
+router.put('/send-beans-to-allusers',sendBeansToUserHandler);
 router.patch('/send-beans-to-host',sendBeansFromAgencyToHostHandler)
 
 module.exports = router;
