@@ -1,5 +1,5 @@
 var jwt = require('jsonwebtoken');
-
+const User = require('../modules/User/model')
 
 module.exports = (req, res, next) => {
     let Token = req.headers['authorization']?.split(' ')[1]; // Assuming 'Authorization' header
@@ -20,6 +20,13 @@ module.exports = (req, res, next) => {
         }
     });
 };
+
+
+
+
+
+
+
 
 
 

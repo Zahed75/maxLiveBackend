@@ -124,24 +124,57 @@ const banUserHandler = asyncHandler(async (req, res) => {
 
 
 
+// get User Details
+
+// src/controllers/userController.js
+
+const getUserDetails = async (req, res) => {
+  try {
+      const user = req.user; // User is already set by the middleware
+
+      res.json({
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          beans: user.beans,
+          coins: user.coins,
+          stars: user.stars,
+          diamonds: user.diamonds,
+          vipStatus: user.vipStatus,
+          vipLevel: user.vipLevel,
+          frames: user.frames,
+          skins: user.skins,
+          posts: user.posts,
+          followers: user.followers,
+          following: user.following,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+      });
+  } catch (error) {
+      console.log("Error in getUserDetails controller:", error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+
+
 
 
 
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUid", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)
-
-
 router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
 ]),updateUserInfoHandler);
-
-
-
-
 router.post("/resetPass", resetPasswordHandler); //not tested in postman
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
+router.post('/banUser',banUserHandler);
 
-router.post('/banUser',banUserHandler)
+router.get('/getUserDetails',authMiddleware,getUserDetails)
 
 module.exports = router;

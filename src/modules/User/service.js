@@ -201,6 +201,10 @@ const banUser = async (masterPortalId, userId) => {
 
 
 
+
+
+
+
 module.exports = {
   resetPassword,
   getSocialUserById,
@@ -209,5 +213,5 @@ module.exports = {
   applyToBeHostService,
   getUserById,
   deleteUserById,
-  banUser
+  banUser,
 };
