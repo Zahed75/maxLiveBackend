@@ -213,6 +213,28 @@ const getALLBannedUsers = async()=>{
 }
 
 
+// how many users created current day
+
+const getAccountsCreatedToday = async () => {
+  
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const accountsToday = await User.find({
+          createdAt: { $gte: startOfDay, $lte: endOfDay }
+      });
+
+      if(!accountsToday){
+        throw new BadRequest("No accounts were created")
+      }
+      return accountsToday.length;
+
+};
+
+
 
 
 module.exports = {
@@ -224,5 +246,6 @@ module.exports = {
   getUserById,
   deleteUserById,
   banUser,
-  getALLBannedUsers
+  getALLBannedUsers,
+  getAccountsCreatedToday
 };

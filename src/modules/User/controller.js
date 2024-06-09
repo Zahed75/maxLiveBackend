@@ -138,6 +138,15 @@ const getAllBannedUsersHandler = asyncHandler(async(req,res)=>{
 })
 
 
+const getAccountsCreatedToday = async (req, res) => {
+  try {
+      const accountsCreatedToday = await userService.getAccountsCreatedToday();
+      res.json({ accountsCreatedToday });
+  } catch (error) {
+      console.log("Error in getAccountsCreatedToday controller:", error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
 
@@ -149,11 +158,9 @@ router.get('/getUserById/:userId',getUserById)
 router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
 ]),updateUserInfoHandler);
-router.post("/resetPass", resetPasswordHandler); //not tested in postman
+router.post("/resetPass", resetPasswordHandler);
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
 router.post('/banUser',banUserHandler);
-
-// router.get('/getUserDetails',authMiddleware,getUserDetails)
 router.get('/allBannedUsers',getAllUsersHandler)
-
+router.get('/accounts-created-today',getAccountsCreatedToday)
 module.exports = router;
