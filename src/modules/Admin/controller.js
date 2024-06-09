@@ -16,6 +16,7 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
 const { messaging } = require("firebase-admin");
 
+
 const approveAgencyHandler = asyncHandler(async (req, res) => {
   try {
     const { password, email, adminId } = req.body;
@@ -36,6 +37,9 @@ const approveAgencyHandler = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
 const removeAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.removeAgencyService(agencyId);
@@ -44,6 +48,9 @@ const removeAgencyHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
+
+
+
 
 const banAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
@@ -54,6 +61,10 @@ const banAgencyHandler = asyncHandler(async (req, res) => {
   res.status(200).json({ message: result.message ,data:result.data});
 });
 
+
+
+
+
 const disableAgencyHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.disableAgencyService(agencyId);
@@ -62,6 +73,10 @@ const disableAgencyHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json({ message: result.message ,data:result.data});
 });
+
+
+
+
 
 const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
@@ -72,6 +87,10 @@ const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   res.status(200).json(result.message);
 });
 
+
+
+
+
 const makeAdminHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.makeAdminService(agencyId);
@@ -80,6 +99,9 @@ const makeAdminHandler = asyncHandler(async (req, res) => {
   }
   res.status(200).json(result.message);
 });
+
+
+
 
 const transferAgencyHandler = asyncHandler(async (req, res) => {
   const { AgencyId, newAgencyId } = req.body;
@@ -156,6 +178,26 @@ const getAllAdminHandler = asyncHandler(async (req, res) => {
   });
 });
 
+
+
+
+
+// How Many Hosts Approve todays
+
+
+const getApprovedHostsTodayHandler = asyncHandler(async(req,res)=>{
+  const approvedHosts = await adminService.getApprovedHostsToday();
+  //res.json({ count: approvedHosts.length, approvedHosts });
+
+  res.status(200).json({
+    message:"Host Approved list successfully",
+    count:approvedHosts.length,
+    approvedHosts
+  })
+
+})
+
+
 router.post("/approve-agency", approveAgencyHandler);
 router.delete("/remove-agency", removeAgencyHandler);
 router.post("/ban-agency", banAgencyHandler);
@@ -173,4 +215,5 @@ router.post(
 router.get("/countryPortal-List", getAllAdminHandler);
 
 router.post('/signInAllUsers',signInHandler)
+router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler)
 module.exports = router;

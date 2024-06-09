@@ -298,6 +298,29 @@ const getAllAdminService = async () => {
 
 
 
+// how many Host Approved todays
+const getApprovedHostsToday = async () => {
+  try {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const approvedHostsToday = await User.find({
+          isApproved: true,
+          role: "HO",
+          updatedAt: { $gte: startOfDay, $lte: endOfDay }
+      });
+
+      return approvedHostsToday;
+  } catch (error) {
+      console.error("Error fetching approved hosts today:", error);
+      throw new Error('Internal server error');
+  }
+};
+
+
 module.exports = {
   approveAgency,
   removeAgencyService,
@@ -309,5 +332,6 @@ module.exports = {
   getAllAgencies,
   registerUserService,
   getAllAdminService,
-  signInService
+  signInService,
+  getApprovedHostsToday
 };

@@ -192,24 +192,7 @@ const unblockHostHandler = asyncHandler(async (req, res) => {
 });
 
 
-// get all agency list handler
 
-// const getAllAgenciesHandler = asyncHandler(async (req, res) => {
-//   const { page, limit } = req.query;
-
-//   console.log('Request query parameters:', { page, limit }); // Debug log
-
-//   try {
-//     const agencies = await agencyService.getAllAgenciesService(page, limit);
-//     res.status(200).json({
-//       message: "Get All Agency List Successfully!",
-//       agencies,
-//     });
-//   } catch (error) {
-//     console.error('Error in getAllAgenciesHandler:', error.message); // Debug log
-//     res.status(500).json({ message: error.message });
-//   }
-// });
 
 
 
@@ -249,17 +232,12 @@ const AgencypassResetHandler = asyncHandler(async (req, res) => {
 
 
 
-
 router.put('/unblock-host',unblockHostHandler);
-
 router.put('/setPassword',authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),passResetHandler);
-
-
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }
 ]), registerAgencyHandler);
-
 router.put("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId",approveHostHandler)
 router.post("/agencySignin",signinAgencyController);
@@ -268,5 +246,4 @@ router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
 router.post('/declined',blockHostHandler);
 router.post('/agencyPassReset',AgencypassResetHandler);
-
 module.exports = router;
