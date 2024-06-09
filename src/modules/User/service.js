@@ -200,7 +200,17 @@ const banUser = async (masterPortalId, userId) => {
 
 
 
+// getALL Banned Users
 
+const getALLBannedUsers = async()=>{
+
+  const bannedUsers = User.find({ hostStatus: 'banned'});
+  if(!bannedUsers){
+    throw new BadRequest("User not found")
+  }
+  return bannedUsers;
+
+}
 
 
 
@@ -214,4 +224,5 @@ module.exports = {
   getUserById,
   deleteUserById,
   banUser,
+  getALLBannedUsers
 };
