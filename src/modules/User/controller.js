@@ -73,6 +73,8 @@ const getUserById = asyncHandler(async(req,res)=>{
   }
 })
 
+
+
 const getAllUsersHandler = asyncHandler(async (req, res) => {
   const users = await userService.getAllUserService(req.query);
   res.status(200).json({ users });
@@ -90,6 +92,9 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
     updatedUser,
   });
 });
+
+
+
 
 
 
@@ -113,7 +118,7 @@ const banUserHandler = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Master portal ID and user ID are required' });
   }
 
-  const result = await userService.banUser(masterPortalId, userId);
+  const result = await userService.getALLBannedUsers(masterPortalId, userId);
 
   res.status(200).json({
     message:"User has been banned",
