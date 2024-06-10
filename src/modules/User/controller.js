@@ -166,6 +166,6 @@ router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
 router.post("/resetPass", resetPasswordHandler);
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
 router.post('/banUser',banUserHandler);
-router.get('/allBannedUsers',getAllUsersHandler)
+router.get('/allBannedUsers',getAllBannedUsersHandler)
 router.get('/accounts-created-today',getAccountsCreatedToday)
 module.exports = router;
