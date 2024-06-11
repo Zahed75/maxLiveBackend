@@ -187,8 +187,6 @@ const getAllAdminHandler = asyncHandler(async (req, res) => {
 
 const getApprovedHostsTodayHandler = asyncHandler(async(req,res)=>{
   const approvedHosts = await adminService.getApprovedHostsToday();
-  //res.json({ count: approvedHosts.length, approvedHosts });
-
   res.status(200).json({
     message:"Host Approved list successfully",
     count:approvedHosts.length,
@@ -198,6 +196,40 @@ const getApprovedHostsTodayHandler = asyncHandler(async(req,res)=>{
 })
 
 
+
+// const resetPasswordForRoles = async (req, res) => {
+//   const { userId } = req.body;
+//   const newPassword = Math.random().toString(36).slice(-8); // Generate a random password
+
+//       const user = await adminService.resetPasswordForRoles(userId, newPassword);
+//       res.status(200).json({
+//         message: 'Password reset successfully', user
+//       })
+// };
+
+
+
+const resetPasswordForRoles = asyncHandler(async (req, res) => {
+  const { userId, role } = req.body;
+
+  if (!userId || !role) {
+    return res.status(400).json({
+      message: 'User ID and role are required'
+    });
+  }
+
+  try {
+    const user = await adminService.resetPasswordForRoles(userId, role);
+    res.status(200).json({
+      message: 'Password reset successfully',
+      user
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+});
 
 
 
@@ -222,6 +254,8 @@ router.post(
 );
 router.get("/countryPortal-List", getAllAdminHandler);
 
-router.post('/signInAllUsers',signInHandler)
-router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler)
+router.post('/signInAllUsers',signInHandler);
+router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler);
+router.patch('/reset-password', authMiddleware, roleMiddleware([MASTER_PORTAL, ADMIN]), resetPasswordForRoles)
+
 module.exports = router;

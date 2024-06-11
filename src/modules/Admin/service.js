@@ -11,8 +11,8 @@ const {
 
 const { generateOTP } = require("../../utility/common");
 const nodemailer = require("nodemailer");
+const {SendEmailUtility} = require('../../utility/email');
 
-const { SendEmailUtility } = require("../../utility/email");
 const createToken = require("../../utility/createToken");
 const bcrypt = require("bcryptjs");
 const { decrypt } = require("dotenv");
@@ -325,6 +325,62 @@ const getApprovedHostsToday = async () => {
 
 
 
+// ADMIN/HOST Password Request
+
+// const resetPasswordForRoles = async (userId, newPassword) => {
+
+//       const user = await User.findById(userId);
+
+//       if (!user || !['BR', 'AD', 'BU', 'HO', 'AG'].includes(user.role)) {
+//           throw new Error('User not found or not authorized');
+//       }
+
+//       const salt = await bcrypt.genSalt(10);
+//       user.password = await bcrypt.hash(newPassword, salt);
+
+//       await user.save();
+
+//       const emailSubject = 'Password Reset';
+//       const emailText = `Your new password is: ${newPassword}`;
+//       await SendEmailUtility(user.email, emailText, emailSubject);
+
+//       return user;
+ 
+// };
+
+
+const resetPasswordForRoles = async (userId, role) => {
+  const newPassword = Math.random().toString(36).slice(-8);
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  let user;
+
+  if (role === 'AG') {
+    user = await agencyModel.findById(userId);
+    if (!user) {
+      throw new Error('Agency not found');
+    }
+    user.password = hashedPassword;
+    await user.save();
+    await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
+  } else {
+    user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.password = hashedPassword;
+    await user.save();
+    await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
+  }
+
+  return user;
+};
+
+
+
+
+
+
+
 
 
 
@@ -344,5 +400,6 @@ module.exports = {
   registerUserService,
   getAllAdminService,
   signInService,
-  getApprovedHostsToday
+  getApprovedHostsToday,
+  resetPasswordForRoles,
 };
