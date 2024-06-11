@@ -408,6 +408,17 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
 
 
 
+// get-Agency Details
+
+const getAgencyById = async (id) => {
+
+    const agency = await agencyModel.findById(id); 
+    if(!agency){
+      throw new BadRequest("Agency Not Found")
+    }
+    return agency; 
+  
+};
 
 
 
@@ -425,6 +436,7 @@ module.exports = {
   passwordResetService,
   blockHostService,
   unblockHostService,
-  passwordResetAgency
+  passwordResetAgency,
+  getAgencyById
 
 };

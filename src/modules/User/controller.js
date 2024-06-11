@@ -162,6 +162,8 @@ const getAccountsCreatedToday = async (req, res) => {
 
 
 
+
+
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUid", getUserProfileBySocialId);
 router.get('/getUserById/:userId',getUserById)

@@ -225,6 +225,21 @@ const AgencypassResetHandler = asyncHandler(async (req, res) => {
 
 
 
+// Controller function to get agency details by ID
+const getAgencyDetailsById = asyncHandler(async(req,res)=>{
+
+  const { id } = req.params;
+  const agency = await agencyService.getAgencyById(id); 
+
+  if (!agency) {
+    throw new NotFound('Agency not found');
+  }
+
+  res.status(200).json({
+    message:"Agency Details Successfully!",
+    agency
+  })
+})
 
 
 
@@ -246,4 +261,5 @@ router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
 router.post('/declined',blockHostHandler);
 router.post('/agencyPassReset',AgencypassResetHandler);
+router.get('/detailsAgency/:id',getAgencyDetailsById)
 module.exports = router;
