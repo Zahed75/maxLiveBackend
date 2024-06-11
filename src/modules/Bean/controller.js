@@ -98,6 +98,23 @@ const sendAssetsFromAgencyToHostHandler = asyncHandler(async (req, res) => {
   
 
 
+const getBeansSentByUser = async (req, res) => {
+  try {
+    const { userId, startDate, endDate } = req.query;
+
+    if (!userId || !startDate || !endDate) {
+      return res.status(400).json({ message: 'Missing required query parameters: userId, startDate, endDate' });
+    }
+
+    const result = await beansService.getBeansSentByUserService(userId, startDate, endDate);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message });
+  }
+};
+
+
+
 
 
 
@@ -105,5 +122,5 @@ router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
 router.post('/send-beans-to-reseller',sendAssetsToBRHandler);
 router.patch('/send-assets-to-allusers',sendAssetsToUserHandler);
 router.patch('/send-beans-to-host',sendAssetsFromAgencyToHostHandler)
-
+router.get('/beans-sent',getBeansSentByUser)
 module.exports = router;

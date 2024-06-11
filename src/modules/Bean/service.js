@@ -220,11 +220,57 @@ const sendAssetsFromAgencyToHost = async (agencyId, hostId, amount, assetType) =
 
 
 
+const getBeansSentByUserService = async (userId, startDate, endDate) => {
+  try {
+    // Validate date inputs
+    if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
+      throw new BadRequest('Invalid date format');
+    }
+
+    // Convert to Date objects
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Ensure endDate is after startDate
+    if (start > end) {
+      throw new BadRequest('End date must be after start date');
+    }
+
+    // Find all transactions where beans were sent by the specified user within the date range
+    const transactions = await Bean.find({
+      userId: userId,
+      transactionType: 'send',
+      createdAt: {
+        $gte: start,
+        $lte: end
+      }
+    });
+
+    if (!transactions.length) {
+      throw new NotFound('No transactions found for the specified date range');
+    }
+
+    // Calculate the total beans sent
+    const totalBeansSent = transactions.reduce((total, transaction) => total + transaction.amount, 0);
+
+    return { totalBeansSent, transactions };
+  } catch (error) {
+    console.error('Error fetching beans sent by user:', error);
+    throw error;
+  }
+};
+
+
+
+
+
+
 module.exports = {
 
     sendBeansFromMPToADService,
     sendAssetsADToBR,
     sendAssetsAllUsers,
-    sendAssetsFromAgencyToHost 
+    sendAssetsFromAgencyToHost,
+    getBeansSentByUserService,
 
 }
