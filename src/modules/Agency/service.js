@@ -35,7 +35,7 @@ const registerAgencyService = async (userId, agencyData, files) => {
     await newAgency.save();
 
     // Update the user's role to 'AG'
-    await User.findByIdAndUpdate(userId, { role: 'AG' });
+    // await User.findByIdAndUpdate(userId, { role: 'AG' });
 
     return {
       status: 201,
