@@ -75,10 +75,15 @@ const getUserById = asyncHandler(async(req,res)=>{
 
 
 
+
+
 const getAllUsersHandler = asyncHandler(async (req, res) => {
   const users = await userService.getAllUserService(req.query);
   res.status(200).json({ users });
 });
+
+
+
 
 const updateUserInfoHandler = asyncHandler(async (req, res) => {
   const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';

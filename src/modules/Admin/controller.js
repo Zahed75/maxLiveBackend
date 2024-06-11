@@ -197,16 +197,6 @@ const getApprovedHostsTodayHandler = asyncHandler(async(req,res)=>{
 
 
 
-// const resetPasswordForRoles = async (req, res) => {
-//   const { userId } = req.body;
-//   const newPassword = Math.random().toString(36).slice(-8); // Generate a random password
-
-//       const user = await adminService.resetPasswordForRoles(userId, newPassword);
-//       res.status(200).json({
-//         message: 'Password reset successfully', user
-//       })
-// };
-
 
 
 const resetPasswordForRoles = asyncHandler(async (req, res) => {

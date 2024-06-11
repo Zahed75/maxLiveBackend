@@ -61,6 +61,8 @@ const getUserById = async (userId) => {
   }
 };
 
+
+
 const getAllUserService = async (reQuerry, res) => {
   try {
     const { page = 1, limit = 10 } = reQuerry; // Default values for page and limit
@@ -73,16 +75,27 @@ const getAllUserService = async (reQuerry, res) => {
 
     const skip = (page - 1) * limit; 
 
-    const [users, totalUsersCount] = await Promise.all([
+    // Fetch users from User model
+    const [usersFromUserModel, usersFromAgencyModel] = await Promise.all([
       User.find() // Select specific fields if desired
         .skip(skip)
         .limit(limit),
-      User.countDocuments(),
+      Agency.find()
+        .skip(skip)
+        .limit(limit),
+      Host.find()
+          .skip(skip)
+          .limit(limit)
     ]);
+
+    // Combine users from both models
+    const users = [...usersFromUserModel, ...usersFromAgencyModel];
 
     if (!users.length) {
       return res.status(204).json({ message: "No users found" });
     }
+
+    const totalUsersCount = users.length; // Total count of users
 
     const totalPages = Math.ceil(totalUsersCount / limit); // Calculate total pages
 

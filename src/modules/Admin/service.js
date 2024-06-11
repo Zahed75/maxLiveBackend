@@ -324,31 +324,6 @@ const getApprovedHostsToday = async () => {
 
 
 
-
-// ADMIN/HOST Password Request
-
-// const resetPasswordForRoles = async (userId, newPassword) => {
-
-//       const user = await User.findById(userId);
-
-//       if (!user || !['BR', 'AD', 'BU', 'HO', 'AG'].includes(user.role)) {
-//           throw new Error('User not found or not authorized');
-//       }
-
-//       const salt = await bcrypt.genSalt(10);
-//       user.password = await bcrypt.hash(newPassword, salt);
-
-//       await user.save();
-
-//       const emailSubject = 'Password Reset';
-//       const emailText = `Your new password is: ${newPassword}`;
-//       await SendEmailUtility(user.email, emailText, emailSubject);
-
-//       return user;
- 
-// };
-
-
 const resetPasswordForRoles = async (userId, role) => {
   const newPassword = Math.random().toString(36).slice(-8);
   const hashedPassword = await bcrypt.hash(newPassword, 10);
