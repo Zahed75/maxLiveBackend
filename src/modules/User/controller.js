@@ -123,7 +123,7 @@ const banUserHandler = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Master portal ID and user ID are required' });
   }
 
-  const result = await userService.getALLBannedUsers(masterPortalId, userId);
+  const result = await userService.banUser(masterPortalId, userId);
 
   res.status(200).json({
     message:"User has been banned",
@@ -161,6 +161,24 @@ const getAccountsCreatedToday = async (req, res) => {
 
 
 
+const unBannedUserHandler = asyncHandler(async (req, res) => {
+  const { masterPortalId, userId } = req.body;
+
+  if (!masterPortalId || !userId) {
+    return res.status(400).json({ message: 'Master portal ID and user ID are required' });
+  }
+
+  const result = await userService.unBanUser(masterPortalId, userId);
+
+  res.status(200).json({
+    message:"User has been Unbanned Successfully",
+    result
+  });
+});
+
+
+
+
 
 
 
@@ -173,6 +191,7 @@ router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
 router.post("/resetPass", resetPasswordHandler);
 router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
 router.post('/banUser',banUserHandler);
-router.get('/allBannedUsers',getAllBannedUsersHandler)
-router.get('/accounts-created-today',getAccountsCreatedToday)
+router.get('/allBannedUsers',getAllBannedUsersHandler);
+router.get('/accounts-created-today',getAccountsCreatedToday);
+router.patch('/unbanned',unBannedUserHandler);
 module.exports = router;

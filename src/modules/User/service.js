@@ -255,6 +255,41 @@ const getAccountsCreatedToday = async () => {
 
 
 
+const unBanUser = async (masterPortalId, userId) => {
+  try {
+    // Verify the master portal user
+    const masterPortal = await User.findById(masterPortalId);
+    if (!masterPortal || masterPortal.role !== 'MP') {
+      return { status: 400, message: 'Master Portal not found or not authorized' };
+    }
+
+    // Attempt to find and ban the user in the User model
+    const user = await User.findById(userId);
+    if (user) {
+      user.isActive = false;
+      user.hostStatus = 'unbanned';
+      await user.save();
+      return { status: 200, message: 'User banned successfully', user };
+    }
+
+    // Attempt to find and ban the user in the Agency model
+    const agency = await Agency.findById(userId);
+    if (agency) {
+      agency.isActive = false;
+      agency.agencyStatus = 'unbanned';
+      await agency.save();
+      return { status: 200, message: 'Agency banned successfully', agency };
+    }
+
+    return { status: 404, message: 'User or agency not found' };
+  } catch (error) {
+    console.error('Error banning user:', error);
+    return { status: 500, message: 'Internal server error' };
+  }
+};
+
+
+
 
 module.exports = {
   resetPassword,
@@ -266,5 +301,10 @@ module.exports = {
   deleteUserById,
   banUser,
   getALLBannedUsers,
-  getAccountsCreatedToday
+  getAccountsCreatedToday,
+  unBanUser
+  
 };
+
+
+

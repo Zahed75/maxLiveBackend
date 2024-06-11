@@ -114,7 +114,7 @@ const UserSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
+      enum: ['active', 'inactive', 'banned','unbanned'], // Add 'banned' to the enum values
       default: 'active'
     },
 
@@ -146,8 +146,6 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    
-
     // ...Skins/Frame/Level/Coins/Beans...
     beans: { 
       type: Number,
