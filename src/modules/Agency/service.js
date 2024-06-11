@@ -421,6 +421,32 @@ const getAgencyById = async (id) => {
 };
 
 
+const transferHostToAgency = async (hostId, newAgencyId) => {
+  try {
+    // Find the host
+    const host = await Host.findOne({ _id: hostId, role: 'HO' });
+    if (!host) {
+      throw new NotFound('Host not found');
+    }
+
+    // Check if the new agency exists
+    const newAgency = await agencyModel.findById(newAgencyId);
+    if (!newAgency) {
+      throw new NotFound('New agency not found');
+    }
+
+    // Transfer the host to the new agency
+    host.agencyId = newAgencyId;
+    await host.save();
+
+    return host;
+  } catch (error) {
+    console.error('Error transferring host to new agency:', error);
+    throw error;
+  }
+};
+
+
 
 
 
@@ -437,6 +463,7 @@ module.exports = {
   blockHostService,
   unblockHostService,
   passwordResetAgency,
-  getAgencyById
+  getAgencyById,
+  transferHostToAgency
 
 };

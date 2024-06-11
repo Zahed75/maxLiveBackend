@@ -243,6 +243,22 @@ const getAgencyDetailsById = asyncHandler(async(req,res)=>{
 
 
 
+const transferHostToAgencyHandler = asyncHandler(async (req, res) => {
+  const { hostId, newAgencyId } = req.body;
+
+  // Validate request body
+  if (!hostId || !newAgencyId) {
+    return res.status(400).json({ message: 'Host ID and new Agency ID are required' });
+  }
+
+  // Call the service function
+  const updatedHost = await agencyService.transferHostToAgency(hostId, newAgencyId);
+
+  res.status(200).json({ message: 'Host transferred successfully', updatedHost });
+});
+
+
+
 
 
 
@@ -261,5 +277,6 @@ router.get('/hosts',getAllHostsByAgency);
 router.get('/:id',getHostbyIdHandler);
 router.post('/declined',blockHostHandler);
 router.post('/agencyPassReset',AgencypassResetHandler);
-router.get('/detailsAgency/:id',getAgencyDetailsById)
+router.get('/detailsAgency/:id',getAgencyDetailsById);
+router.patch('/transferHost',transferHostToAgencyHandler);
 module.exports = router;
