@@ -1,4 +1,3 @@
-const { required, ref } = require("joi");
 const mongoose = require("mongoose");
 
 const agencySchema = new mongoose.Schema({
@@ -8,14 +7,14 @@ const agencySchema = new mongoose.Schema({
     required: [true, "User id is required"],
     unique: true,
   },
-  agencyId:{
-    type : String,
-    max :[30,"agencyId should be under 30 characters"],
-    required: [true, "Agency id is required"]
+  agencyId: {
+    type: String,
+    max: [30, "agencyId should be under 30 characters"],
+    required: [true, "Agency id is required"],
   },
   agencyName: {
     type: String,
-    // required: [true, "Agency name is required"],
+    required: false, // Make this field optional
   },
   agencyHolderName: {
     type: String,
@@ -23,29 +22,18 @@ const agencySchema = new mongoose.Schema({
   },
   country: {
     type: String,
-    enum: ["BD", "NEP", "IND"], 
-
+    enum: ["BD", "NEP", "IND"],
   },
   agencyStatus: {
     type: String,
-    enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
-    default: 'active'
+    enum: ['active', 'inactive', 'banned'],
+    default: 'active',
   },
-  // mandatory fields
   role: {
     type: String,
-    // BU -> BASIC USER
-    // HO -> HOST
-    //AG-AGENCY 
-    //MP -> MASTER PORTAL
-    // AD -> ADMIN
-    //CN - COIN 
-    // BR -BEAN RESELLER
     enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
     required: true,
   },
-
-  
   presentAddress: {
     type: String,
     required: [true, "Present address is required"],
@@ -55,10 +43,9 @@ const agencySchema = new mongoose.Schema({
   },
   email: {
     type: String,
-      
   },
-  password:{
-    type:String,
+  password: {
+    type: String,
   },
   phone: {
     type: String,
@@ -78,36 +65,30 @@ const agencySchema = new mongoose.Schema({
   },
   nidFront: {
     type: String,
-    // required: function () {
-    //   return this.role === "AG";
-    // },
   },
   nidBack: {
     type: String,
-    // required: function () {
-    //   return this.role === "AG";
-    // }
   },
-  agencyStatus:{
-    type:String,
-    enum:["active","inactive","pending","banned"],
-    default:"pending"
+  agencyStatus: {
+    type: String,
+    enum: ["active", "inactive", "pending", "banned"],
+    default: "pending",
   },
-  isActive:{
-    type:Boolean,
-    default:false
+  isActive: {
+    type: Boolean,
+    default: false,
   },
   isVerified: {
     type: Boolean,
     default: false,
   },
-  maxPower:{
-    type:Boolean,
+  maxPower: {
+    type: Boolean,
   },
   isApproved: {
     type: Boolean,
     default: false,
-  },  
+  },
   approvedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
@@ -124,16 +105,14 @@ const agencySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
-  coins:{
+  coins: {
     type: Number,
     default: 0,
   },
-  star:{
+  star: {
     type: Number,
     default: 0,
   },
-  
   vipLevel: {
     type: Number,
     default: 0,
@@ -146,6 +125,10 @@ const agencySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Skin',
   }],
+  agencyEmail: {
+    type: String,
+    required: false, // Make this field optional
+  },
 });
 
 const Agency = mongoose.model("Agency", agencySchema);
