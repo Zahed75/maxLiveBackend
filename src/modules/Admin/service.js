@@ -251,40 +251,28 @@ const registerUserService = async (userData) => {
 
 const signInService = async (email, password) => {
   try {
-    // Find user by email
+    // Find the user by email
     const user = await User.findOne({ email });
-
-    // Check if user exists
     if (!user) {
-      throw new BadRequest("Invalid email or password.");
+      throw new Error("Invalid email or password");
     }
 
-    // Validate password using bcrypt.compare
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    // Check password match
+    // Check if the password is correct
+    const isMatch = await user.authenticate(password);
     if (!isMatch) {
-      throw new BadRequest("Invalid email or password.");
+      throw new Error("Invalid email or password");
     }
- // Generate JWT token with user data payload
- const accessToken = jwt.sign({ user }, 'SecretKey12345', { expiresIn: '3d' });
-    // User is authenticated, return sanitized user data (excluding sensitive fields)
-    const sanitizedUser = {
-      user_id: user.id,
-      accessToken,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
-      isActive: user.isActive,
-      isVerified: user.isVerified,
-     
-      
-    };
 
-    return sanitizedUser;
+    // Generate a JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      "SecretKey12345",
+      { expiresIn: '1h' }
+    );
+
+    return { user, token };
   } catch (error) {
-    console.error(error);
-    throw error; 
+    throw new Error(`Sign-in failed: ${error.message}`);
   }
 };
 
