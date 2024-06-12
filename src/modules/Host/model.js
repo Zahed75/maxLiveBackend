@@ -90,7 +90,7 @@ const hostSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned'], // Add 'banned' to the enum values
+      enum: ['active', 'inactive', 'banned','pending'], // Add 'banned' to the enum values
       default: 'active'
     },
      

@@ -142,6 +142,12 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
 
+    hostStatus: {
+      type: String,
+      enum: ['active', 'inactive', 'banned','pending'], // Add 'banned' to the enum values
+      default: 'active'
+    },
+
     isVerified: {
       type: Boolean,
       default: false,
