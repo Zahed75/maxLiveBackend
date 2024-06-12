@@ -146,6 +146,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    passwordResetRequested: {
+      type: Boolean,
+      default: false
+    },
     // ...Skins/Frame/Level/Coins/Beans...
     beans: { 
       type: Number,
@@ -185,6 +189,7 @@ const UserSchema = new mongoose.Schema(
     }],
     refreshToken: [String],
   },
+  
   
   { timestamps: true }
 );

@@ -125,24 +125,23 @@ const getHostbyIdHandler = asyncHandler(async(req,res)=>{
 
 
 
-const passResetHandler = asyncHandler(async(req,res)=>{
+
+const passResetHandler = asyncHandler(async (req, res) => {
   const { adminId, userId, newPassword } = req.body;
 
- 
-    // Validate input
-    if (!adminId || !userId || !newPassword) {
-      return res.status(400).json({ message: "Please provide all required fields" });
-    }
-    // Call the service to reset the password
-    const user = await agencyService.passwordResetService(adminId, userId, newPassword);
-    
-    res.status(200).json({
-      message:"Password Reset SuccessFully!",
-      user
-    })
-  
-});
+  // Validate input
+  if (!adminId || !userId || !newPassword) {
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
 
+  // Call the service to reset the password
+  const user = await agencyService.passwordResetService(adminId, userId, newPassword);
+
+  res.status(200).json({
+    message: "Password Reset Successfully!",
+    user
+  });
+});
 
 
 // change the agency password
@@ -264,7 +263,7 @@ const transferHostToAgencyHandler = asyncHandler(async (req, res) => {
 
 
 router.put('/unblock-host',unblockHostHandler);
-router.put('/setPassword',authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),passResetHandler);
+router.patch('/setPassword', authMiddleware, roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]), passResetHandler);
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }

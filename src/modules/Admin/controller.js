@@ -223,6 +223,16 @@ const resetPasswordForRoles = asyncHandler(async (req, res) => {
 
 
 
+const getPasswordResetRequests = async (req, res) => {
+  try {
+    const result = await getPasswordResetRequestsService();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message });
+  }
+};
+
+
 
 
 

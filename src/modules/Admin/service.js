@@ -353,6 +353,16 @@ const resetPasswordForRoles = async (userId, role) => {
 
 
 
+const getPasswordResetRequestsService = async () => {
+  try {
+    const users = await User.find({ passwordResetRequested: true });
+    const count = users.length;
+    return { count, users };
+  } catch (error) {
+    console.error('Error fetching password reset requests:', error);
+    throw error;
+  }
+};
 
 
 
