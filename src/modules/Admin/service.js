@@ -370,6 +370,34 @@ const getPasswordResetRequestsService = async () => {
 
 
 
+// enabale agency
+
+const enableAgency = async (agencyId) => {
+  try {
+    // Find the agency by its ID and update the `isActive` field to true
+    const agency = await agencyModel.findByIdAndUpdate(
+      agencyId,
+      { isActive: true, 
+        agencyStatus: 'enabled',
+        isVerified:true,
+        isApproved:true
+
+       },
+      { new: true }
+    );
+
+    if (!agency) {
+      throw new Error('Agency not found');
+    }
+
+    return { status: 200, message: 'Agency enabled successfully', agency };
+  } catch (error) {
+    console.error(`Failed to enable agency: ${error.message}`);
+    throw new Error(`Failed to enable agency: ${error.message}`);
+  }
+};
+
+
 
 
 
@@ -387,4 +415,5 @@ module.exports = {
   signInService,
   getApprovedHostsToday,
   resetPasswordForRoles,
+  enableAgency
 };

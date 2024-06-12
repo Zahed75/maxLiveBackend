@@ -78,6 +78,8 @@ const disableAgencyHandler = asyncHandler(async (req, res) => {
 
 
 
+
+
 const grantMaxPowerHandler = asyncHandler(async (req, res) => {
   const { agencyId } = req.body;
   const result = await adminService.grantMaxPowerService(agencyId);
@@ -236,6 +238,25 @@ const getPasswordResetRequests = async (req, res) => {
 
 
 
+// enable agency
+
+const enableAgencyHandler = async (req, res) => {
+  const { agencyId } = req.body;
+
+  // Validate input
+  if (!agencyId) {
+    return res.status(400).json({ message: 'Agency ID is required' });
+  }
+
+  try {
+    const result = await adminService.enableAgency(agencyId);
+    res.status(result.status).json({ message: result.message, agency: result.agency });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 
 
 
@@ -249,6 +270,7 @@ router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
 router.get("/agencies", getAllAgenciesHandler);
 
+
 router.post(
   "/userManage", registerUserHandler
 );
@@ -258,5 +280,5 @@ router.get("/countryPortal-List", getAllAdminHandler);
 router.post('/signInAllUsers',signInHandler);
 router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler);
 router.patch('/reset-password', authMiddleware, roleMiddleware([MASTER_PORTAL, ADMIN]), resetPasswordForRoles)
-
+router.put('/enable-agency',enableAgencyHandler)
 module.exports = router;

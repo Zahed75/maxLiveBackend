@@ -71,7 +71,7 @@ const agencySchema = new mongoose.Schema({
   },
   agencyStatus: {
     type: String,
-    enum: ["active", "inactive", "pending", "banned"],
+    enum: ["active", "inactive", "pending", "banned",'disabled','enabled'],
     default: "pending",
   },
   isActive: {
