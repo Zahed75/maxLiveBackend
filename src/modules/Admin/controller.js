@@ -250,10 +250,7 @@ router.post("/transfer-agency", transferAgencyHandler);
 router.get("/agencies", getAllAgenciesHandler);
 
 router.post(
-  "/userManage",
-  authMiddleware,
-  roleMiddleware([MASTER_PORTAL, ADMIN]),
-  registerUserHandler
+  "/userManage", registerUserHandler
 );
 
 router.get("/countryPortal-List", getAllAdminHandler);
