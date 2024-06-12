@@ -144,23 +144,16 @@ const registerUserHandler = asyncHandler(async (req, res) => {
 // all Users singInController
 const signInHandler = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "Please provide email and password" });
-  }
-
   try {
-    // Call the service to handle the sign-in
-    const { user, token } = await adminService.signInService(email, password);
-
+    const user = await adminService.signInService(email, password);
     res.status(200).json({
-      message: "Sign-in successful",
+      message: "User signed in successfully.",
       user,
-      token,
     });
   } catch (error) {
-    console.error("Sign-in error:", error.message); // Log the error for debugging
-    res.status(401).json({ message: error.message });
+    res.status(401).json({
+      error: error.message,
+    });
   }
 });
 
@@ -248,12 +241,14 @@ router.post("/grant-max-power", grantMaxPowerHandler);
 router.post("/make-admin", makeAdminHandler);
 router.post("/transfer-agency", transferAgencyHandler);
 router.get("/agencies", getAllAgenciesHandler);
+
 router.post(
   "/userManage",
   authMiddleware,
   roleMiddleware([MASTER_PORTAL, ADMIN]),
   registerUserHandler
 );
+
 router.get("/countryPortal-List", getAllAdminHandler);
 
 router.post('/signInAllUsers',signInHandler);
