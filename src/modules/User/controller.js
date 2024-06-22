@@ -65,12 +65,13 @@ const getUserProfileBySocialId = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async(req,res)=>{
   const userId = req.params.userId;
-  try {
+
     const user = await userService.getUserById(userId);
-    res.status(200).json({ user });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  res.status(200).json({
+    message: 'User get Successfully',
+    user
+  })
+
 })
 
 

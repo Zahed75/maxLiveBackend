@@ -229,7 +229,7 @@ const resetPasswordForRoles = asyncHandler(async (req, res) => {
 
 const getPasswordResetRequests = async (req, res) => {
   try {
-    const result = await getPasswordResetRequestsService();
+    const result = await adminService.getPasswordResetRequestsService();
     res.status(200).json(result);
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message });
@@ -279,6 +279,9 @@ router.get("/countryPortal-List", getAllAdminHandler);
 
 router.post('/signInAllUsers',signInHandler);
 router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler);
-router.patch('/reset-password', authMiddleware, roleMiddleware([MASTER_PORTAL, ADMIN]), resetPasswordForRoles)
-router.put('/enable-agency',enableAgencyHandler)
+router.patch('/reset-password', authMiddleware, roleMiddleware([MASTER_PORTAL, ADMIN]), resetPasswordForRoles);
+router.put('/enable-agency',enableAgencyHandler);
+router.get('/getPassRequest',getPasswordResetRequests)
+
+
 module.exports = router;

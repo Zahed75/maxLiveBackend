@@ -415,5 +415,6 @@ module.exports = {
   signInService,
   getApprovedHostsToday,
   resetPasswordForRoles,
-  enableAgency
+  enableAgency,
+  getPasswordResetRequestsService
 };
