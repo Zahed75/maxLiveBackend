@@ -136,10 +136,9 @@ const passResetHandler = asyncHandler(async (req, res) => {
 
   // Call the service to reset the password
   const user = await agencyService.passwordResetService(adminId, userId, newPassword);
-console.log(adminId, userId, newPassword)
   res.status(200).json({
     message: "Password Reset Successfully!",
-    // user
+    user
   });
 });
 
