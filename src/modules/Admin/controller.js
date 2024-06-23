@@ -204,18 +204,18 @@ const getApprovedHostsTodayHandler = asyncHandler(async(req,res)=>{
 
 
 const resetPasswordForRoles = asyncHandler(async (req, res) => {
-  const { userId, role } = req.body;
+  const { email, role } = req.body;
 
-  if (!userId || !role) {
+  console.log(role)
+  if (!email || !role) {
     return res.status(400).json({
       message: 'User ID and role are required'
     });
   }
-
   try {
-    const user = await adminService.resetPasswordForRoles(userId, role);
+    const user = await adminService.resetPasswordForRoles(email, role);
     res.status(200).json({
-      message: 'Password reset successfully',
+      message: 'Password reset request sent successfully',
       user
     });
   } catch (error) {
@@ -279,7 +279,7 @@ router.get("/countryPortal-List", getAllAdminHandler);
 
 router.post('/signInAllUsers',signInHandler);
 router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler);
-router.patch('/reset-password', authMiddleware, roleMiddleware([MASTER_PORTAL, ADMIN]), resetPasswordForRoles);
+router.patch('/reset-password', resetPasswordForRoles);
 router.put('/enable-agency',enableAgencyHandler);
 router.get('/getPassRequest',getPasswordResetRequests)
 

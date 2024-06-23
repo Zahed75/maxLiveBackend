@@ -9,6 +9,7 @@ const authVerifyMiddleware = require('../middlewares/authMiddleware');
 
 //routes
 const authRoute = require('../modules/Auth/controller');
+const SeatBesideHostRoutes = require('../modules/SeatBesideHost/route');
 const userRoute=require('../modules/User/controller');
 const agencyRoute = require('../modules/Agency/controller');
 const hostRoute = require('../modules/Host/controller');
@@ -32,6 +33,7 @@ router.use('/admin',adminRoute);
 router.use('/bean',beanRoute);
 router.use('/reseller',resellerRoute);
 router.use('/skin',SkinRoute);
+router.use('/seat-beside-host',SeatBesideHostRoutes);
 // router.use(authVerifyMiddleware);
 
 module.exports = router;

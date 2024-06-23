@@ -250,11 +250,6 @@ const getAccountsCreatedToday = async () => {
 
 
 
-
-
-
-
-
 const unBanUser = async (masterPortalId, userId) => {
   try {
     // Verify the master portal user

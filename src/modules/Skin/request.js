@@ -1,18 +1,17 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
-const SkinValidationSchema = Joi.object().keys({
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  email: Joi.string().required(),
-  password: Joi.string().required(),
-  role: Joi.string().required(),
-  
-});
-
-const SkinValidate = (data) => {
-  const result = SkinValidationSchema.validate(data);
-  result.value = data;
-  return result;
+const SKINS = {
+  FRAME: "FRAME",
+  ENTRY: "ENTRY",
+  RIDE: "RIDE",
 };
 
-module.exports = { SkinValidate };
+const createSkinValidationSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  beans: Joi.number().required(),
+  type: Joi.string().required().valid(SKINS),
+});
+
+
+
+module.exports = { createSkinValidationSchema };

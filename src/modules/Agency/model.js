@@ -129,6 +129,10 @@ const agencySchema = new mongoose.Schema({
     type: String,
     required: false, // Make this field optional
   },
+  passwordResetRequested: {
+    type: Boolean,
+    default: false
+  },
 });
 
 const Agency = mongoose.model("Agency", agencySchema);

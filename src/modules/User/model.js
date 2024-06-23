@@ -2,6 +2,30 @@ const bcrypt = require("bcryptjs");
 const { required } = require("joi");
 const mongoose = require("mongoose");
 
+
+const UserSkinsSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User"
+    },
+    skin: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Skin"
+    },
+    expiresIn: {
+      type: Number,
+      required: true
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+
 const UserSchema = new mongoose.Schema(
   {
     firebaseUid: String,
@@ -186,8 +210,8 @@ const UserSchema = new mongoose.Schema(
       ref: 'Frame',
     }],
     skins: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Skin',
+      type: UserSkinsSchema,
+      // ref: 'Skin',
     }],
     posts: [{
       type: mongoose.Schema.Types.ObjectId,
