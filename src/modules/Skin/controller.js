@@ -1,7 +1,9 @@
 const express = require("express");
 const { asyncHandler } = require("../../utility/common");
 const multerMiddleware = require("../../middlewares/multerMiddlware");
-const { getAllSkin, sendSkinService, createSkinService } = require("./service");
+const { getAllSkin, sendSkinService, createSkinService, deleteSkinService } = require("./service");
+const { SkinValidate, createSkinValidationSchema } = require("./request");
+const handleValidation = require("../../middlewares/schemaValidation");
 
 const router = express.Router();
 
@@ -29,9 +31,19 @@ const sendSkinHandler = asyncHandler(async (req, res) => {
   });
 });
 
+const deleteSkinsHandler = asyncHandler(async (req, res) => {
+  const result = await deleteSkinService({id:req.params.id});
+  res.status(200).json({
+    message: "Skin deleted successfully",
+    result,
+  });
+});
+
 router.get("/", getAllSkinsHandler);
+router.put("/delete-skin/:id", deleteSkinsHandler);
 router.post(
   "/create-skin",
+  // handleValidation(createSkinValidationSchema),
   multerMiddleware.upload.fields([{ name: "file", maxCount: 1 }]),
   createSkinHandler
 );
