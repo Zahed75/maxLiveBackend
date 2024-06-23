@@ -26,7 +26,7 @@ const {feedUpload} = require('../../utility/multer');
 
 
 
-// CreatePostHandler
+// CreatePostHandler    
 const createPostHandler = async (req, res) => {
     const userId = req.body.userId;
     if (!userId) {
