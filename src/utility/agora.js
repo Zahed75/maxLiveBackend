@@ -1,8 +1,8 @@
 const RtcTokenBuilder = require('agora-access-token').RtcTokenBuilder;
 const RtcRole = require('agora-access-token').RtcRole;
 
-const APP_ID = 'your_agora_app_id'; // Replace with your Agora App ID
-const APP_CERTIFICATE = 'your_agora_app_certificate'; // Replace with your Agora App Certificate
+const APP_ID = 'dd737f26b0224c57b79b6ba03e702a89'; // Replace with your Agora App ID
+const APP_CERTIFICATE = '011484d150b44cc2a803223cacd62692'; // Replace with your Agora App Certificate
 
 const generateAgoraToken = (channelName, uid) => {
   // Define the expiration time of the token
