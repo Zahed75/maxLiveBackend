@@ -256,9 +256,10 @@ const signInService = async (email, password) => {
     if (!user) {
       throw new Error("Invalid email or password");
     }
-
+    
     // Check if the password is correct
     const isMatch = await user.authenticate(password);
+    console.log(password)
     if (!isMatch) {
       throw new Error("Invalid email or password");
     }

@@ -9,12 +9,43 @@ const {
   BASIC_USER, AGENCY_OWNER, MASTER_PORTAL,SUPER_ADMIN
 }=require('../../config/constants');
 
+const AgoraAccessToken = require('agora-access-token'); // Import agora-access-token
+
+// Other imports...
 
 const authService = require("./service");
 const { adminValidate } = require("./request");
 const roleMiddleware = require("../../middlewares/roleMiddleware");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
+
+
+const { generateAgoraToken } = require('../../utility/agora'); // Import Agora utility
+
+
+
+
+const generateAgoraTokens = async (req, res) => {
+  const { channelName, uid } = req.body;
+
+  try {
+    // Validate input
+    if (!channelName || typeof uid !== 'number') {
+      return res.status(400).json({ message: 'Invalid input. Channel name and UID are required.' });
+    }
+
+    // Generate Agora token
+    const token = generateAgoraToken(channelName, uid);
+
+    // Return the token in the response
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error('Failed to generate Agora token:', error);
+    res.status(500).json({ message: 'Failed to generate Agora token' });
+  }
+};
+
+
 
 
 
@@ -135,5 +166,6 @@ router.post("/expireOTP", expireOTP);
 router.post("/signInUser", userSignInHandler);
 
 router.post('/registerMaster',registerMasterPortalHandler)
+router.post('/agora-token',generateAgoraTokens);
 
 module.exports = router;

@@ -3,8 +3,8 @@ const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const { asyncHandler } = require("../../utility/common");
-const bcrypt = require('bcryptjs'); 
-const jwt= require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const mongoose = require("mongoose");
 
 
@@ -13,7 +13,7 @@ const registerAgencyService = async (userId, agencyData, files) => {
     const existingAgency = await agencyModel.findOne({ userId });
     if (existingAgency) {
       return { status: 501, message: "User already has an agency" };
-    } 
+    }
 
     // Generate agencyId in the backend
     const agencyId = generateAgencyId(); // Implement generateAgencyId function
@@ -62,7 +62,7 @@ const generateAgencyId = () => {
 const getPendingHostService = async (role) => {
   try {
     // Assuming req.user.role contains the role of the user making the request
-    if (!["AG", "AD","MP"].includes(role)) {
+    if (!["AG", "AD", "MP"].includes(role)) {
       return { message: "role must be a authorized role" };
     }
 
@@ -182,15 +182,15 @@ const signinAgencyService = async (email, password) => {
 
     const sanitizedUser = {
 
-    accessToken,
-    email: agency.email,
-    phoneNumber: agency.phoneNumber,
-    role: agency.role,
-    isVerified: true,
-  
-};
-    
-    return{agency,sanitizedUser}
+      accessToken,
+      email: agency.email,
+      phoneNumber: agency.phoneNumber,
+      role: agency.role,
+      isVerified: true,
+
+    };
+
+    return { agency, sanitizedUser }
   } catch (error) {
     console.error(error);
     throw error;
@@ -209,12 +209,12 @@ const signinAgencyService = async (email, password) => {
 
 // updateAgency
 
-const updateAgencyById = async(id,value)=>{
-  const agencyList= await agencyModel.findByIdAndUpdate({_id:id},value,{
-    new:true,
+const updateAgencyById = async (id, value) => {
+  const agencyList = await agencyModel.findByIdAndUpdate({ _id: id }, value, {
+    new: true,
   });
 
-  if(!agencyList){
+  if (!agencyList) {
     throw new NotFound("Agency not found in this ID");
   }
   return agencyList;
@@ -227,22 +227,22 @@ const updateAgencyById = async(id,value)=>{
 // GetALL host By Agency ID
 
 const getAllHostsByAgency = async (agencyId) => {
-  
-    // Fetch hosts associated with the agencyId
-    const hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
 
-    if (!hosts.length) {
-      throw new Error('No hosts found for this agency');
-    }
+  // Fetch hosts associated with the agencyId
+  const hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
 
-    return hosts;
-  
+  if (!hosts.length) {
+    throw new Error('No hosts found for this agency');
+  }
+
+  return hosts;
+
 };
 
 
-const detailsHostByUserId = async(id)=>{
-  const hostInfo= await Host.findById({_id:id});
-  if(!hostInfo){
+const detailsHostByUserId = async (id) => {
+  const hostInfo = await Host.findById({ _id: id });
+  if (!hostInfo) {
     throw new NotFound("Host not found in this ID");
 
   }
@@ -257,7 +257,7 @@ const detailsHostByUserId = async(id)=>{
 
 
 const passwordResetService = async (adminId, userId, newPassword) => {
-  console.log(adminId,userId, newPassword)
+  console.log(adminId, userId, newPassword)
   try {
     // Fetch the admin from the database
     const admin = await User.findById(adminId);
@@ -293,10 +293,11 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     if (typeof newPassword !== 'string') {
       throw new Error("New password must be a string");
     }
-
+    console.log(user.password)
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    user.password = await bcrypt.hash(newPassword, 12);
+    user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+    console.log(user.password)
 
     return { status: 200, message: "Password reset successfully", user };
   } catch (error) {
@@ -331,7 +332,7 @@ const blockHostService = async (adminId, id) => {
     }
 
     // Convert hostId to ObjectId
-    const host = await Host.findOne({ _id:id });
+    const host = await Host.findOne({ _id: id });
     if (!host) {
       throw new Error("Host not found");
     }
@@ -422,12 +423,12 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
 
 const getAgencyById = async (id) => {
 
-    const agency = await agencyModel.findById(id); 
-    if(!agency){
-      throw new BadRequest("Agency Not Found")
-    }
-    return agency; 
-  
+  const agency = await agencyModel.findById(id);
+  if (!agency) {
+    throw new BadRequest("Agency Not Found")
+  }
+  return agency;
+
 };
 
 
