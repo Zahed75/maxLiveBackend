@@ -20,7 +20,7 @@ const skinSchema = new mongoose.Schema({
     required: true,
   },
 });
-
+  
 const Skin = mongoose.model("Skin", skinSchema);
 
 module.exports = { Skin };
