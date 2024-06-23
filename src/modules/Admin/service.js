@@ -267,12 +267,12 @@ const signInService = async (email, password) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       "SecretKey12345",
-      { expiresIn: '1h' }
+      { expiresIn: '1d' }
     );
 
     return { user, token };
   } catch (error) {
-    throw new Error(`Sign-in failed: ${error.message}`);
+    throw new Error(`${error.message}`);
   }
 };
 
