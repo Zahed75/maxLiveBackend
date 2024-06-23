@@ -62,6 +62,12 @@ const sendSkinService = async (payload) => {
 
 const deleteSkinService = async (payload) => {
   const {_id} = payload
+  const isSkinExist = Skin.findById(_id);
+  if(!isSkinExist){
+    throw new Error("Skin does not exists")
+  }
+
+
   await Skin.deleteOne({_id})
   await User.updateMany(
     { skins: _id }, 
