@@ -293,11 +293,10 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     if (typeof newPassword !== 'string') {
       throw new Error("New password must be a string");
     }
-    console.log(user.password)
     // Set the new password (hashing will be done automatically by the pre-save hook)
     user.password = await bcrypt.hash(newPassword, 10);
+    user.passwordResetRequested = false
     await user.save();
-    console.log(user.password)
 
     return { status: 200, message: "Password reset successfully", user };
   } catch (error) {

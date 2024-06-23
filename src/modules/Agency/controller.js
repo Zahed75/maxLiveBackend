@@ -12,7 +12,7 @@ const {
   AGENCY_OWNER,
   ADMIN,
   MASTER_PORTAL
-}=require('../../config/constants');
+} = require('../../config/constants');
 const { BadRequest } = require("../../utility/errors");
 const { messaging } = require("firebase-admin");
 
@@ -66,11 +66,11 @@ const approveHostHandler = async (req, res) => {
 const signinAgencyController = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const sanitizedUser = await agencyService.signinAgencyService(email, password);
-    
+
     // Respond with sanitized user data
-    res.status(200).json({message:"sign in success",user :sanitizedUser});
+    res.status(200).json({ message: "sign in success", user: sanitizedUser });
   } catch (error) {
     // Handle errors
     console.error(error);
@@ -82,20 +82,20 @@ const signinAgencyController = asyncHandler(async (req, res) => {
 
 
 
-const updateAgencyHandler=asyncHandler(async(req,res)=>{
-    const {id} = req.params;
-    const editAgency = await agencyService.updateAgencyById(id,req.body);
-    res.status(200).json({
-      message:"Agency Updated Successfully!",
-      editAgency
-    });
+const updateAgencyHandler = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const editAgency = await agencyService.updateAgencyById(id, req.body);
+  res.status(200).json({
+    message: "Agency Updated Successfully!",
+    editAgency
+  });
 
 });
 
 
 
 
-const getAllHostsByAgency = asyncHandler(async(req,res)=>{
+const getAllHostsByAgency = asyncHandler(async (req, res) => {
   const { agencyId } = req.query;
 
   if (!agencyId) {
@@ -114,11 +114,11 @@ const getAllHostsByAgency = asyncHandler(async(req,res)=>{
 
 
 
-const getHostbyIdHandler = asyncHandler(async(req,res)=>{
-  const {id} = req.params;
+const getHostbyIdHandler = asyncHandler(async (req, res) => {
+  const { id } = req.params;
   const host = await agencyService.detailsHostByUserId(id);
   res.status(200).json({
-    message:"Host Details Fetched Successfully!",
+    message: "Host Details Fetched Successfully!",
     host
   })
 })
@@ -178,12 +178,12 @@ const blockHostHandler = asyncHandler(async (req, res) => {
 
 //update Block Host Controller
 const unblockHostHandler = asyncHandler(async (req, res) => {
-  
-  const { adminId,hostId } =req.body;
-  
-  const users = await agencyService.unblockHostService(adminId,hostId);
+
+  const { adminId, hostId } = req.body;
+
+  const users = await agencyService.unblockHostService(adminId, hostId);
   res.status(200).json({
-    message:"Host Unblocked Successfully!",
+    message: "Host Unblocked Successfully!",
     users
   })
 
@@ -224,17 +224,17 @@ const AgencypassResetHandler = asyncHandler(async (req, res) => {
 
 
 // Controller function to get agency details by ID
-const getAgencyDetailsById = asyncHandler(async(req,res)=>{
+const getAgencyDetailsById = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
-  const agency = await agencyService.getAgencyById(id); 
+  const agency = await agencyService.getAgencyById(id);
 
   if (!agency) {
     throw new NotFound('Agency not found');
   }
 
   res.status(200).json({
-    message:"Agency Details Successfully!",
+    message: "Agency Details Successfully!",
     agency
   })
 })
@@ -261,20 +261,20 @@ const transferHostToAgencyHandler = asyncHandler(async (req, res) => {
 
 
 
-router.put('/unblock-host',unblockHostHandler);
-router.patch('/setPassword', authMiddleware, roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]), passResetHandler);
+router.put('/unblock-host', unblockHostHandler);
+router.patch('/setPassword', authMiddleware, roleMiddleware([MASTER_PORTAL]), passResetHandler);
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }
 ]), registerAgencyHandler);
-router.put("/getAllPendingHostHandler",authMiddleware,roleMiddleware([AGENCY_OWNER,ADMIN,MASTER_PORTAL]),getAllPendingHostHandler);
-router.post("/approveHostHandler/:userId",approveHostHandler)
-router.post("/agencySignin",signinAgencyController);
-router.put("/:id",updateAgencyHandler);
-router.get('/hosts',getAllHostsByAgency);
-router.get('/:id',getHostbyIdHandler);
-router.post('/declined',blockHostHandler);
-router.post('/agencyPassReset',AgencypassResetHandler);
-router.get('/detailsAgency/:id',getAgencyDetailsById);
-router.patch('/transferHost',transferHostToAgencyHandler);
+router.put("/getAllPendingHostHandler", authMiddleware, roleMiddleware([AGENCY_OWNER, ADMIN, MASTER_PORTAL]), getAllPendingHostHandler);
+router.post("/approveHostHandler/:userId", approveHostHandler)
+router.post("/agencySignin", signinAgencyController);
+router.put("/:id", updateAgencyHandler);
+router.get('/hosts', getAllHostsByAgency);
+router.get('/:id', getHostbyIdHandler);
+router.post('/declined', blockHostHandler);
+router.post('/agencyPassReset', AgencypassResetHandler);
+router.get('/detailsAgency/:id', getAgencyDetailsById);
+router.patch('/transferHost', transferHostToAgencyHandler);
 module.exports = router;

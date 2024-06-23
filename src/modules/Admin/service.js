@@ -325,27 +325,25 @@ const getApprovedHostsToday = async () => {
 
 
 
-const resetPasswordForRoles = async (userId, role) => {
-  const newPassword = Math.random().toString(36).slice(-8);
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+const resetPasswordForRoles = async (email, role) => {
   let user;
-
+console.log(role)
   if (role === 'AG') {
-    user = await agencyModel.findById(userId);
+    user = await agencyModel.findOne({email});
     if (!user) {
       throw new Error('Agency not found');
     }
-    user.password = hashedPassword;
+    user.passwordResetRequested = true;
     await user.save();
-    await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
+    // await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
   } else {
-    user = await User.findById(userId);
+    user = await User.findOne({email});
     if (!user) {
       throw new Error('User not found');
     }
-    user.password = hashedPassword;
+    user.passwordResetRequested = true;
     await user.save();
-    await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
+    // await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
   }
 
   return user;
@@ -357,8 +355,9 @@ const resetPasswordForRoles = async (userId, role) => {
 const getPasswordResetRequestsService = async () => {
   try {
     const users = await User.find({ passwordResetRequested: true });
-    const count = users.length;
-    return { count, users };
+    const agencies = await agencyModel.find({passwordResetRequested: true})
+    const count = users.length + agencies.length;
+    return { count, users: [...users, ...agencies] };
   } catch (error) {
     console.error('Error fetching password reset requests:', error);
     throw error;
