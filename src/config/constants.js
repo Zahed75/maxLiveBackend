@@ -5,5 +5,6 @@ module.exports = {
     HOST: 'HO',
     AGENCY_OWNER: 'AG',
     ADMIN:'AD',
+    MASTER_PORTAL: 'MP'
   };
   

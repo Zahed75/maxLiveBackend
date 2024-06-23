@@ -257,6 +257,7 @@ const detailsHostByUserId = async(id)=>{
 
 
 const passwordResetService = async (adminId, userId, newPassword) => {
+  console.log(adminId,userId, newPassword)
   try {
     // Fetch the admin from the database
     const admin = await User.findById(adminId);
@@ -294,7 +295,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     }
 
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    user.password = newPassword;
+    user.password = await bcrypt.hash(newPassword, 12);
     await user.save();
 
     return { status: 200, message: "Password reset successfully", user };

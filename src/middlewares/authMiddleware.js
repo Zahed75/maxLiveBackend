@@ -3,7 +3,6 @@ const User = require('../modules/User/model')
 
 module.exports = (req, res, next) => {
     let Token = req.headers['authorization']?.split(' ')[1]; // Assuming 'Authorization' header
-
     jwt.verify(Token, "SecretKey12345", function (err, decoded) {
         if (err) {
             console.log(err)
