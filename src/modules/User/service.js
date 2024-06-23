@@ -76,7 +76,7 @@ const getAllUserService = async (reQuerry, res) => {
     const skip = (page - 1) * limit; 
 
     // Fetch users from User model
-    const [usersFromUserModel, usersFromAgencyModel] = await Promise.all([
+    const [usersFromUserModel, usersFromAgencyModel, usersFromHostModel] = await Promise.all([
       User.find() // Select specific fields if desired
         .skip(skip)
         .limit(limit),
@@ -89,7 +89,7 @@ const getAllUserService = async (reQuerry, res) => {
     ]);
 
     // Combine users from both models
-    const users = [...usersFromUserModel, ...usersFromAgencyModel];
+    const users = [...usersFromUserModel, ...usersFromAgencyModel, ...usersFromHostModel];
 
     if (!users.length) {
       return res.status(204).json({ message: "No users found" });
