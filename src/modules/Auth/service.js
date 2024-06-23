@@ -11,13 +11,38 @@ const {
 const {generateOTP}=require('../../utility/common');
 const nodemailer = require("nodemailer");
 
-
 const{SendEmailUtility}=require('../../utility/email');
 const createToken = require('../../utility/createToken');
 const bcrypt = require('bcryptjs');
 const { decrypt } = require('dotenv');
 const { IosApp } = require('firebase-admin/project-management');
 const { captureRejectionSymbol } = require('nodemailer/lib/xoauth2');
+const AgoraAccessToken = require('agora-access-token'); // Import agora-access-token
+
+// Other imports...
+
+const { generateAgoraToken } = require('../../utility/agora'); // Import Agora utility
+
+
+
+
+
+// const generateRoomToken = async (req, res) => {
+//   const { channelName, uid } = req.body;
+
+//   try {
+//     const token = generateAgoraToken(channelName, uid);
+
+//     res.status(200).json({ token });
+//   } catch (error) {
+//     console.error('Failed to generate Agora token:', error);
+//     res.status(500).json({ message: 'Failed to generate Agora token' });
+//   }
+// };
+
+
+
+
 
 
 
@@ -229,7 +254,8 @@ module.exports = {
   expireOTP,
   generateAndSendOTPService,
   signinUserService,
-  registerMasterPortalUser
+  registerMasterPortalUser,
+  // generateRoomToken
 };
 
 
