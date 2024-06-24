@@ -99,7 +99,7 @@ const banAgencyService = async (id) => {
     agency.agencyStatus = "banned";
     agency.isActive = false;
     agency.isVerified = false;
-    agency.isApproved=false;
+    agency.isApproved= false;
     await agency.save();
     return { success: true, message: "Agency banned successfully." ,data : agency};
   } catch (error) {
@@ -123,7 +123,8 @@ const disableAgencyService = async (id) => {
     }
 
     agency.isActive = false;
-    agency.isVerified=false;
+    agency.isVerified = false;
+    agency.agencyStatus = 'disabled'
     await agency.save();
     return { success: true, message: "Agency disabled successfully." };
   } catch (error) {
