@@ -49,23 +49,41 @@ const generateAgoraTokens = async (req, res) => {
 
 
 
+// const registerUserHandler = asyncHandler(async (req, res) => {
+ 
+//     const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
+
+//     const userData = {
+//       ...req.body,
+//       profilePicture: profilePicturePath,
+//     };
+//     const result = await authService.registerUserService(userData);
+
+//     // Send response based on the result
+//     res.status(200).json({
+//       message:"User Create SuccessFully",
+//       result
+//     });
+ 
+// });
+
+
 const registerUserHandler = asyncHandler(async (req, res) => {
- 
-    const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
+  const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
 
-    const userData = {
-      ...req.body,
-      profilePicture: profilePicturePath,
-    };
-    const result = await authService.registerUserService(userData);
+  const userData = {
+    ...req.body,
+    profilePicture: profilePicturePath,
+  };
 
-    // Send response based on the result
-    res.status(200).json({
-      message:"User Create SuccessFully",
-      result
-    });
- 
+  const result = await authService.registerUserService(userData);
+
+  // Send response based on the result
+  res.status(result.status).json(result);
 });
+
+
+
 
 
 

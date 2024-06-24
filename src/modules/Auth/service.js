@@ -27,23 +27,36 @@ const { generateAgoraToken } = require('../../utility/agora'); // Import Agora u
 
 
 
-// const generateRoomToken = async (req, res) => {
-//   const { channelName, uid } = req.body;
 
+
+
+
+
+
+
+// const registerUserService = async (userData) => {
 //   try {
-//     const token = generateAgoraToken(channelName, uid);
+//     const { email, profilePicture } = userData;
 
-//     res.status(200).json({ token });
+//     // Generate OTP and send
+//     const otp = await generateAndSendOTPService(email);
+
+//     // Create a new user with profile picture and NID photos
+//     const newUser = await User.create({ ...userData, otp });
+    
+//     if (!newUser) {
+//       throw new BadRequest("Could Not Create User");
+//     }
+
+//     // Update the newly created user with NID photo URLs
+//     await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture } });
+
+//     return { status: 201, message: 'User registered successfully', user: newUser };
 //   } catch (error) {
-//     console.error('Failed to generate Agora token:', error);
-//     res.status(500).json({ message: 'Failed to generate Agora token' });
+//     console.error('Error registering user:', error);
+//     return { status: 500, message: 'Internal server error' };
 //   }
 // };
-
-
-
-
-
 
 
 const registerUserService = async (userData) => {
@@ -53,22 +66,26 @@ const registerUserService = async (userData) => {
     // Generate OTP and send
     const otp = await generateAndSendOTPService(email);
 
-    // Create a new user with profile picture and NID photos
+    // Create a new user with profile picture and OTP
     const newUser = await User.create({ ...userData, otp });
     
     if (!newUser) {
-      throw new BadRequest("Could Not Create User");
+      throw new BadRequest("Could not create user");
     }
 
-    // Update the newly created user with NID photo URLs
+    // Update the newly created user with profile picture
     await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture } });
 
-    return { status: 201, message: 'User registered successfully', user: newUser };
+    // Fetch the updated user data
+    const updatedUser = await User.findById(newUser._id);
+
+    return { status: 201, message: 'User registered successfully', user: updatedUser };
   } catch (error) {
     console.error('Error registering user:', error);
     return { status: 500, message: 'Internal server error' };
   }
 };
+
 
 
 
