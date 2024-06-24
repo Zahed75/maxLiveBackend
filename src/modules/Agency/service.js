@@ -1,16 +1,15 @@
-const agencyModel = require("../Agency/model");
+const Agency = require("../Agency/model");
 const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
 const { asyncHandler } = require("../../utility/common");
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-
 
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
-    const existingAgency = await agencyModel.findOne({ userId });
+    const existingAgency = await Agency.findOne({ userId });
     if (existingAgency) {
       return { status: 501, message: "User already has an agency" };
     }
@@ -25,13 +24,13 @@ const registerAgencyService = async (userId, agencyData, files) => {
     // Check if NID photos are provided
     if (files && files["nidPhotoFront"] && files["nidPhotoBack"]) {
       agencyData.nidFront = files["nidPhotoFront"][0].path; // Save file path for front NID photo
-      agencyData.nidBack = files["nidPhotoBack"][0].path;   // Save file path for back NID photo
+      agencyData.nidBack = files["nidPhotoBack"][0].path; // Save file path for back NID photo
     } else {
       return { status: 400, message: "NID photos are required" };
     }
 
     // Create a new agency instance
-    const newAgency = new agencyModel(agencyData);
+    const newAgency = new Agency(agencyData);
     await newAgency.save();
 
     // Update the user's role to 'AG'
@@ -47,17 +46,13 @@ const registerAgencyService = async (userId, agencyData, files) => {
     return { status: 500, message: "Internal server error" };
   }
 };
+
 const generateAgencyId = () => {
   const timestamp = new Date().getTime();
   const randomNumber = Math.floor(Math.random() * 1000000);
   const agencyId = `AGY${timestamp}${randomNumber}`;
   return agencyId;
 };
-
-
-
-
-
 
 const getPendingHostService = async (role) => {
   try {
@@ -79,13 +74,6 @@ const getPendingHostService = async (role) => {
   }
 };
 
-
-
-
-
-
-
-
 const approveHostService = async (userId, role) => {
   if (!["AG", "AD"].includes(role)) {
     throw new Error("Your role must be Agency owner or Admin");
@@ -105,7 +93,7 @@ const approveHostService = async (userId, role) => {
     throw new Error("User is not eligible for approval");
   }
 
-  const agency = await agencyModel.findOne({ agencyId: user.agencyId });
+  const agency = await Agency.findOne({ agencyId: user.agencyId });
   if (!agency) {
     throw new Error("Couldn't find agencyID");
   }
@@ -133,8 +121,8 @@ const approveHostService = async (userId, role) => {
     presentAddress: user.presentAddress,
     agencyEmail: agency.email,
     isActive: user.isActive,
-    isApproved: true,//true after approval
-    role: "HO",//role is getting changed from BU to Ho after approval
+    isApproved: true, //true after approval
+    role: "HO", //role is getting changed from BU to Ho after approval
     isVerified: user.isVerified,
     refreshToken: user.refreshToken,
   });
@@ -147,22 +135,18 @@ const approveHostService = async (userId, role) => {
   return host;
 };
 
-
-
 // signinAgencyService.js
 const signinAgencyService = async (email, password) => {
   try {
     // Find user by email
-    const agency = await agencyModel.findOne({ email });
-
+    const agency = await Agency.findOne({ email });
 
     if (!agency) {
       throw new BadRequest("Invalid email or password.");
     }
-    if (agency.agencyStatus === 'banned') {
+    if (agency.agencyStatus === "banned") {
       throw new BadRequest("This agency is banned and cannot sign in.");
     }
-
 
     const isMatch = await bcrypt.compare(password, agency.password);
     if (!isMatch) {
@@ -172,45 +156,35 @@ const signinAgencyService = async (email, password) => {
     // Generate JWT token with minimal payload
     const payload = { id: agency._id, role: agency.role };
     // const accessToken = jwt.sign(payload, 'shrtKey123', { expiresIn: '10d' });
-    const accessToken = jwt.sign({ payload }, 'SecretKey12345', { expiresIn: '3d' });
+    const accessToken = jwt.sign({ payload }, "SecretKey12345", {
+      expiresIn: "3d",
+    });
 
     // Update isVerified field in the agency document
-    await agencyModel.updateOne({ _id: agency._id }, { isVerified: true });
+    await Agency.updateOne({ _id: agency._id }, { isVerified: true });
 
     // User is authenticated, return sanitized user data (excluding sensitive fields)
     // console.log(agency);
 
     const sanitizedUser = {
-
       accessToken,
       email: agency.email,
       phoneNumber: agency.phoneNumber,
       role: agency.role,
       isVerified: true,
-
     };
 
-    return { agency, sanitizedUser }
+    return { agency, sanitizedUser };
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-
-
-
-
-
-
-
-
-
-
 // updateAgency
 
 const updateAgencyById = async (id, value) => {
-  const agencyList = await agencyModel.findByIdAndUpdate({ _id: id }, value, {
+  const agencyList = await Agency.findByIdAndUpdate({ _id: id }, value, {
     new: true,
   });
 
@@ -218,46 +192,34 @@ const updateAgencyById = async (id, value) => {
     throw new NotFound("Agency not found in this ID");
   }
   return agencyList;
-}
-
-
-
-
+};
 
 // GetALL host By Agency ID
 
 const getAllHostsByAgency = async (agencyId) => {
-
   // Fetch hosts associated with the agencyId
-  let hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
+  let hosts = await Host.find({ agencyId }).populate(
+    "userId",
+    "firstName lastName email"
+  );
 
   if (!hosts.length) {
-    hosts = []
+    hosts = [];
   }
 
   return hosts;
-
 };
-
 
 const detailsHostByUserId = async (id) => {
   const hostInfo = await Host.findById({ _id: id });
   if (!hostInfo) {
     throw new NotFound("Host not found in this ID");
-
   }
   return hostInfo;
-
-}
-
-
-
-
-
-
+};
 
 const passwordResetService = async (adminId, userId, newPassword) => {
-  console.log(adminId, userId, newPassword)
+  console.log(adminId, userId, newPassword);
   try {
     // Fetch the admin from the database
     const admin = await User.findById(adminId);
@@ -273,7 +235,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     // Fetch the user or agency by ID
     let user = await User.findById(userId);
     if (!user) {
-      user = await agencyModel.findById(userId);
+      user = await Agency.findById(userId);
     }
     if (!user) {
       user = await Host.findById(userId);
@@ -290,12 +252,12 @@ const passwordResetService = async (adminId, userId, newPassword) => {
     }
 
     // Ensure newPassword is a string
-    if (typeof newPassword !== 'string') {
+    if (typeof newPassword !== "string") {
       throw new Error("New password must be a string");
     }
     // Set the new password (hashing will be done automatically by the pre-save hook)
     user.password = await bcrypt.hash(newPassword, 10);
-    user.passwordResetRequested = false
+    user.passwordResetRequested = false;
     await user.save();
 
     return { status: 200, message: "Password reset successfully", user };
@@ -305,20 +267,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
 // declained Host
-
 
 const blockHostService = async (adminId, id) => {
   console.log(`Admin ID: ${adminId}`);
@@ -340,17 +289,13 @@ const blockHostService = async (adminId, id) => {
     await host.save();
 
     return host;
-
   } catch (error) {
     console.error("Error in blockHostService:", error);
     throw error; // Rethrow the error to be caught in the controller
   }
 };
 
-
-
 // Update block host
-
 
 const unblockHostService = async (adminId, id) => {
   const admin = await User.findById(adminId);
@@ -368,9 +313,6 @@ const unblockHostService = async (adminId, id) => {
 
   return host;
 };
-
-
-
 
 const passwordResetAgency = async (adminId, userId, newPassword) => {
   try {
@@ -398,7 +340,9 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
     // Check if the user/agency is one of the allowed roles
     const userRole = user.role;
     if (!["AD", "AG"].includes(userRole)) {
-      throw new Error("You can only reset passwords for Admin and Agency roles");
+      throw new Error(
+        "You can only reset passwords for Admin and Agency roles"
+      );
     }
 
     // Set the new password (it will be hashed by the pre('save') middleware)
@@ -412,46 +356,44 @@ const passwordResetAgency = async (adminId, userId, newPassword) => {
   }
 };
 
-
-
-
-
-
-
 // get-Agency Details
 
 const getAgencyById = async (id) => {
-
-  const agency = await agencyModel.findById(id);
+  const agency = await Agency.findById(id);
   if (!agency) {
-    throw new BadRequest("Agency Not Found")
+    throw new BadRequest("Agency Not Found");
   }
   return agency;
-
 };
-
 
 const transferHostToAgency = async (hostId, newAgencyId) => {
   try {
-    // Find the host
-    const host = await Host.findOne({ _id: hostId, role: 'HO' });
+    const host = await Host.findOne({ _id: hostId, role: "HO" });
     if (!host) {
-      throw new NotFound('Host not found');
+      throw new NotFound("Host not found");
     }
 
-    // Check if the new agency exists
-    const newAgency = await agencyModel.findById(newAgencyId);
+    const newAgency = await Agency.findById(newAgencyId);
     if (!newAgency) {
-      throw new NotFound('New agency not found');
+      throw new NotFound("New agency not found");
     }
 
-    // Transfer the host to the new agency
+    if (host.agencyId && !host.previousAgency.includes(host.agencyId)) {
+      host.previousAgency.push(host.agencyId);
+    }
+
     host.agencyId = newAgencyId;
+
+    host.previousAgency = host.previousAgency.filter(
+      (agencyId) => agencyId.toString() !== newAgencyId.toString()
+    );
+
+    // Save the host
     await host.save();
 
     return host;
   } catch (error) {
-    console.error('Error transferring host to new agency:', error);
+    console.error("Error transferring host to new agency:", error);
     throw error;
   }
 };
@@ -469,6 +411,5 @@ module.exports = {
   unblockHostService,
   passwordResetAgency,
   getAgencyById,
-  transferHostToAgency
-
+  transferHostToAgency,
 };
