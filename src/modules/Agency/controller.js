@@ -267,7 +267,7 @@ router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
   { name: 'nidPhotoBack', maxCount: 1 }
 ]), registerAgencyHandler);
-router.put("/getAllPendingHostHandler", authMiddleware, roleMiddleware([AGENCY_OWNER, ADMIN, MASTER_PORTAL]), getAllPendingHostHandler);
+router.put("/getAllPendingHostHandler", getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId", approveHostHandler)
 router.post("/agencySignin", signinAgencyController);
 router.put("/:id", updateAgencyHandler);

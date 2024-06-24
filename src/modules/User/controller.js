@@ -171,8 +171,8 @@ const unBannedUserHandler = asyncHandler(async (req, res) => {
 
   const result = await userService.unBanUser(masterPortalId, userId);
 
-  res.status(200).json({
-    message:"User has been Unbanned Successfully",
+  res.status(result.status).json({
+    message: result.message,
     result
   });
 });
