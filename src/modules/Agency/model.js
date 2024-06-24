@@ -32,7 +32,7 @@ const agencySchema = new mongoose.Schema({
   maxId: { 
     type: String, 
     unique: true, 
-    required: true 
+    // required: true 
   },
 
   agencyStatus: {

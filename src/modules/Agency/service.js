@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const generateMaxId = require('../../utility/maxId');
+const UserModel = require("../User/model");
 
 
 
@@ -230,7 +231,6 @@ const detailsHostByUserId = async (id) => {
 
 const passwordResetService = async (adminId, userId, newPassword) => {
 
-  console.log(adminId, userId, newPassword);
   try {
     // Fetch the admin from the database
 
@@ -270,7 +270,13 @@ const passwordResetService = async (adminId, userId, newPassword) => {
       throw new Error("New password must be a string");
     }
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    user.password = await bcrypt.hash(String(newPassword), 10);
+    if(user.role === "AG" || user.role ==="HO"){
+
+      user.password = await bcrypt.hash(newPassword, 10);
+    }else{
+
+      user.password = newPassword
+    }
     user.passwordResetRequested = false;
     await user.save();
 

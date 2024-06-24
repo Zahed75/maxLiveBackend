@@ -229,7 +229,7 @@ const signinUserService = async (email,password) => {
   try {
     // Find user by email
     const user = await User.findOne({ email });
-
+      console.log(user, "user fdg")
     // Check if user exists
     if (!user) {
       throw new BadRequest("Invalid email or password.");

@@ -70,7 +70,7 @@ const UserSchema = new mongoose.Schema(
     maxId: { 
       type: String, 
       unique: true, 
-      required: true 
+      required: false 
     },
 
     hostId: {
