@@ -1,7 +1,22 @@
 const { SeatBesideHost } = require("./model");
 
 const createSeatBesideHostService = async (payload) => {
-  const result = await SeatBesideHost.create(payload);
+  const isSkinExistsWithSameTimeAndBeans = await SeatBesideHost.findOne({
+    time: payload.time,
+  });
+  let result;
+
+  if (isSkinExistsWithSameTimeAndBeans) {
+    result = await SeatBesideHost.updateOne(
+      {
+        time: payload.time,
+      },
+      { beans: Number(payload.beans) }
+    );
+  } else {
+    result = await SeatBesideHost.create(payload);
+  }
+
   return result;
 };
 const getAllSeatBesideHostService = async () => {
@@ -10,12 +25,12 @@ const getAllSeatBesideHostService = async () => {
 };
 
 const updateSeatBesideHostService = async (payload, id) => {
-  const result = await SeatBesideHost.updateOne({_id: id}, payload);
+  const result = await SeatBesideHost.updateOne({ _id: id }, payload);
   return result;
 };
 
 module.exports = {
   createSeatBesideHostService,
   getAllSeatBesideHostService,
-  updateSeatBesideHostService
+  updateSeatBesideHostService,
 };

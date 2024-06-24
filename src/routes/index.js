@@ -17,7 +17,7 @@ const feedRoute= require('../modules/Feeds/controller');
 const adminRoute = require('../modules/Admin/controller');
 const beanRoute = require('../modules/Bean/controller');
 const resellerRoute = require('../modules/Reseller/controller');
-const SkinRoute = require('../modules/Skin/controller');
+const SkinRoute = require('../modules/Skin/route');
 
     
 
