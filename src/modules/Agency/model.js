@@ -24,15 +24,15 @@ const agencySchema = new mongoose.Schema({
     type: String,
     enum: ["BD", "NEP", "IND"],
   },
-  agencyStatus: {
-    type: String,
-    enum: ['active', 'inactive', 'banned'],
-    default: 'active',
-  },
   role: {
     type: String,
     enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
     required: true,
+  },
+  agencyStatus: {
+    type: String,
+    enum: ['active', 'inactive', 'banned'],
+    default: 'active',
   },
   presentAddress: {
     type: String,

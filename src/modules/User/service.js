@@ -73,7 +73,7 @@ const getAllUserService = async (reQuerry, res) => {
       );
     }
 
-    const skip = (page - 1) * limit; 
+    const skip = (page - 1) * limit;
 
     // Fetch users from User model
     const [usersFromUserModel, usersFromAgencyModel, usersFromHostModel] = await Promise.all([
@@ -84,8 +84,8 @@ const getAllUserService = async (reQuerry, res) => {
         .skip(skip)
         .limit(limit),
       Host.find()
-          .skip(skip)
-          .limit(limit)
+        .skip(skip)
+        .limit(limit)
     ]);
 
     // Combine users from both models
@@ -182,10 +182,10 @@ const banUser = async (masterPortalId, userId) => {
   try {
     // Verify the master portal user
     const masterPortal = await User.findById(masterPortalId);
-    if (!masterPortal || masterPortal.role !== 'MP') {
+    if (!masterPortal || masterPortal.role !== 'MP' && masterPortal.role !== 'AD') {
       return { status: 400, message: 'Master Portal not found or not authorized' };
     }
-
+    console.log(masterPortal)
     // Attempt to find and ban the user in the User model
     const user = await User.findById(userId);
     if (user) {
@@ -203,6 +203,14 @@ const banUser = async (masterPortalId, userId) => {
       await agency.save();
       return { status: 200, message: 'Agency banned successfully', agency };
     }
+    // Attempt to find and ban the user in the Host model
+    const host = await Host.findById(userId);
+    if (host) {
+      host.isActive = false;
+      host.hostStatus = 'banned';
+      await host.save();
+      return { status: 200, message: 'Host banned successfully', host };
+    }
 
     return { status: 404, message: 'User or agency not found' };
   } catch (error) {
@@ -215,10 +223,10 @@ const banUser = async (masterPortalId, userId) => {
 
 // getALL Banned Users
 
-const getALLBannedUsers = async()=>{
+const getALLBannedUsers = async () => {
 
-  const bannedUsers = User.find({ hostStatus: 'banned'});
-  if(!bannedUsers){
+  const bannedUsers = User.find({ hostStatus: 'banned' });
+  if (!bannedUsers) {
     throw new BadRequest("User not found")
   }
   return bannedUsers;
@@ -229,21 +237,21 @@ const getALLBannedUsers = async()=>{
 // how many users created current day
 
 const getAccountsCreatedToday = async () => {
-  
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
 
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
 
-      const accountsToday = await User.find({
-          createdAt: { $gte: startOfDay, $lte: endOfDay }
-      });
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
 
-      if(!accountsToday){
-        throw new BadRequest("No accounts were created")
-      }
-      return accountsToday.length;
+  const accountsToday = await User.find({
+    createdAt: { $gte: startOfDay, $lte: endOfDay }
+  });
+
+  if (!accountsToday) {
+    throw new BadRequest("No accounts were created")
+  }
+  return accountsToday.length;
 
 };
 
@@ -254,7 +262,7 @@ const unBanUser = async (masterPortalId, userId) => {
   try {
     // Verify the master portal user
     const masterPortal = await User.findById(masterPortalId);
-    if (!masterPortal || masterPortal.role !== 'MP') {
+    if (!masterPortal || masterPortal.role !== 'MP' && masterPortal.role !== 'AD') {
       return { status: 400, message: 'Master Portal not found or not authorized' };
     }
 
@@ -275,7 +283,14 @@ const unBanUser = async (masterPortalId, userId) => {
       await agency.save();
       return { status: 200, message: 'Agency unbanned successfully', agency };
     }
-
+    // Attempt to find and ban the user in the Host model
+    const host = await Host.findById(userId);
+    if (host) {
+      host.isActive = false;
+      host.hostStatus = 'unbanned';
+      await host.save();
+      return { status: 200, message: 'Host unbanned successfully', host };
+    }
     return { status: 404, message: 'User or agency not found' };
   } catch (error) {
     console.error('Error banning user:', error);
@@ -298,7 +313,7 @@ module.exports = {
   getALLBannedUsers,
   getAccountsCreatedToday,
   unBanUser
-  
+
 };
 
 

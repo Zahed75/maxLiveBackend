@@ -63,10 +63,10 @@ const getUserProfileBySocialId = asyncHandler(async (req, res) => {
 
 
 
-const getUserById = asyncHandler(async(req,res)=>{
+const getUserById = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
 
-    const user = await userService.getUserById(userId);
+  const user = await userService.getUserById(userId);
   res.status(200).json({
     message: 'User get Successfully',
     user
@@ -94,7 +94,7 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
     profilePicturePath
   );
   res.status(200).json({
-    message:" User info updated successfully",
+    message: " User info updated successfully",
     updatedUser,
   });
 });
@@ -104,13 +104,13 @@ const updateUserInfoHandler = asyncHandler(async (req, res) => {
 
 
 
-const deleteUserByIdHandler = asyncHandler(async(req,res)=>{
+const deleteUserByIdHandler = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
   const user = await userService.deleteUserById(userId);
-  if(!user){
-    return res.status(404).json({message:"User not found"});
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
-  res.status(200).json({message:"User deleted successfully",result:user});
+  res.status(200).json({ message: "User deleted successfully", result: user });
 })
 
 
@@ -126,8 +126,8 @@ const banUserHandler = asyncHandler(async (req, res) => {
 
   const result = await userService.banUser(masterPortalId, userId);
 
-  res.status(200).json({
-    message:"User has been banned",
+  res.status(result.status).json({
+    message: result.message,
     result
   });
 });
@@ -137,12 +137,12 @@ const banUserHandler = asyncHandler(async (req, res) => {
 
 
 
-const getAllBannedUsersHandler = asyncHandler(async(req,res)=>{
+const getAllBannedUsersHandler = asyncHandler(async (req, res) => {
 
   const bannedUsers = await userService.getALLBannedUsers()
 
   res.status(200).json({
-    message:"All users banned List!",
+    message: "All users banned List!",
     bannedUsers
   })
 
@@ -151,11 +151,11 @@ const getAllBannedUsersHandler = asyncHandler(async(req,res)=>{
 
 const getAccountsCreatedToday = async (req, res) => {
   try {
-      const accountsCreatedToday = await userService.getAccountsCreatedToday();
-      res.json({ accountsCreatedToday });
+    const accountsCreatedToday = await userService.getAccountsCreatedToday();
+    res.json({ accountsCreatedToday });
   } catch (error) {
-      console.log("Error in getAccountsCreatedToday controller:", error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.log("Error in getAccountsCreatedToday controller:", error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -187,14 +187,14 @@ const unBannedUserHandler = asyncHandler(async (req, res) => {
 
 router.get("/getAllUser", getAllUsersHandler);
 router.get("/firebaseUsersById/:firebaseUid", getUserProfileBySocialId);
-router.get('/getUserById/:userId',getUserById)
-router.put("/updateUserInfo/:id",  multerMiddleware.upload.fields([
+router.get('/getUserById/:userId', getUserById)
+router.put("/updateUserInfo/:id", multerMiddleware.upload.fields([
   { name: 'profilePicture', maxCount: 1 }
-]),updateUserInfoHandler);
+]), updateUserInfoHandler);
 router.post("/resetPass", resetPasswordHandler);
-router.delete("/deleteUserById/:userId",deleteUserByIdHandler);
-router.post('/banUser',banUserHandler);
-router.get('/allBannedUsers',getAllBannedUsersHandler);
-router.get('/accounts-created-today',getAccountsCreatedToday);
-router.patch('/unbanned',unBannedUserHandler);
+router.delete("/deleteUserById/:userId", deleteUserByIdHandler);
+router.post('/banUser', banUserHandler);
+router.get('/allBannedUsers', getAllBannedUsersHandler);
+router.get('/accounts-created-today', getAccountsCreatedToday);
+router.patch('/unbanned', unBannedUserHandler);
 module.exports = router;

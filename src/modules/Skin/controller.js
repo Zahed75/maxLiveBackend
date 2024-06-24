@@ -1,11 +1,10 @@
-const express = require("express");
 const { asyncHandler } = require("../../utility/common");
-const multerMiddleware = require("../../middlewares/multerMiddlware");
-const { getAllSkin, sendSkinService, createSkinService, deleteSkinService } = require("./service");
-const { SkinValidate, createSkinValidationSchema } = require("./request");
-const handleValidation = require("../../middlewares/schemaValidation");
-
-const router = express.Router();
+const {
+  getAllSkin,
+  sendSkinService,
+  createSkinService,
+  deleteSkinService,
+} = require("./service");
 
 const getAllSkinsHandler = asyncHandler(async (req, res) => {
   const result = await getAllSkin();
@@ -15,8 +14,16 @@ const getAllSkinsHandler = asyncHandler(async (req, res) => {
 });
 
 const createSkinHandler = asyncHandler(async (req, res) => {
-  const skinUrl = req.files["file"] ? req.files["file"][0].path : "";
-  const result = await createSkinService(req.body, skinUrl);
+  const file = req.files["file"] ? req.files["file"][0] : null;
+  const filePath = file ? file.path : "";
+  const fileType = file ? file.mimetype : req.body.fileType;
+
+  const payload = {
+    ...req.body,
+    fileType: fileType
+  };
+
+  const result = await createSkinService(payload, filePath);
   res.status(200).json({
     message: "Skin Created successfully",
     result,
@@ -32,7 +39,7 @@ const sendSkinHandler = asyncHandler(async (req, res) => {
 });
 
 const deleteSkinsHandler = asyncHandler(async (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
   const result = await deleteSkinService(id);
   res.status(200).json({
     message: "Skin deleted successfully",
@@ -40,15 +47,9 @@ const deleteSkinsHandler = asyncHandler(async (req, res) => {
   });
 });
 
-router.get("/", getAllSkinsHandler);
-router.put("/delete-skin/:id", deleteSkinsHandler);
-router.post(
-  "/create-skin",
-  // handleValidation(createSkinValidationSchema),
-  multerMiddleware.upload.fields([{ name: "file", maxCount: 1 }]),
-  createSkinHandler
-);
-
-router.put("/send-skin", sendSkinHandler);
-
-module.exports = router;
+module.exports = {
+  deleteSkinsHandler,
+  sendSkinHandler,
+  createSkinHandler,
+  getAllSkinsHandler,
+};

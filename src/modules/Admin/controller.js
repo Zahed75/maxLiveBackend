@@ -256,7 +256,22 @@ const enableAgencyHandler = async (req, res) => {
   }
 };
 
+// return beans from user
+const returnBeansHandler = async (req, res) => {
+  const { userId, beans } = req.body;
 
+  // Validate input
+  if (!userId || !beans) {
+    return res.status(400).json({ message: 'Please provide all required fields' });
+  }
+
+  try {
+    const result = await adminService.returnBeans(userId, beans);
+    res.status(result.status).json({ message: result.message});
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 
@@ -282,6 +297,8 @@ router.get('/getApprovedHostsToday',getApprovedHostsTodayHandler);
 router.patch('/reset-password', resetPasswordForRoles);
 router.put('/enable-agency',enableAgencyHandler);
 router.get('/getPassRequest',getPasswordResetRequests)
+router.post('/returnBeans',returnBeansHandler)
+
 
 
 module.exports = router;

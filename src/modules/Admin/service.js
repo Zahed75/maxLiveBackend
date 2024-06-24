@@ -17,6 +17,7 @@ const createToken = require("../../utility/createToken");
 const bcrypt = require("bcryptjs");
 const { decrypt } = require("dotenv");
 const { IosApp } = require("firebase-admin/project-management");
+const Host = require("../Host/model");
 
 
 
@@ -98,7 +99,7 @@ const banAgencyService = async (id) => {
     agency.agencyStatus = "banned";
     agency.isActive = false;
     agency.isVerified = false;
-    agency.isApproved=false;
+    agency.isApproved= false;
     await agency.save();
     return { success: true, message: "Agency banned successfully." ,data : agency};
   } catch (error) {
@@ -122,7 +123,8 @@ const disableAgencyService = async (id) => {
     }
 
     agency.isActive = false;
-    agency.isVerified=false;
+    agency.isVerified = false;
+    agency.agencyStatus = 'disabled'
     await agency.save();
     return { success: true, message: "Agency disabled successfully." };
   } catch (error) {
@@ -397,6 +399,31 @@ const enableAgency = async (agencyId) => {
   }
 };
 
+// return beans from users
+const returnBeans = async (userId, beans) => {
+  try {
+    let user = await User.findById(userId)
+    if(!user) {
+      user = await agencyModel.findById(userId)
+    }
+    if(!user){
+      user = await Host.findById(userId)
+    }
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (user.beans < beans) {
+      return { status: 400, message: `Insufficient beans`, user };
+    }
+    user.beans -= beans
+    user.save()
+    return { status: 200, message: `${beans} Beans returned successfully`, user };
+  } catch (error) {
+    console.error(`Failed to return beans`, error);
+    throw new Error(`Failed to return beans`);
+  }
+};
 
 
 
@@ -416,5 +443,6 @@ module.exports = {
   getApprovedHostsToday,
   resetPasswordForRoles,
   enableAgency,
-  getPasswordResetRequestsService
+  getPasswordResetRequestsService,
+  returnBeans
 };
