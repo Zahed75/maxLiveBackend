@@ -264,7 +264,7 @@ const unBanUser = async (masterPortalId, userId) => {
       user.isActive = false;
       user.hostStatus = 'unbanned';
       await user.save();
-      return { status: 200, message: 'User banned successfully', user };
+      return { status: 200, message: 'User unbanned successfully', user };
     }
 
     // Attempt to find and ban the user in the Agency model
@@ -273,7 +273,7 @@ const unBanUser = async (masterPortalId, userId) => {
       agency.isActive = false;
       agency.agencyStatus = 'unbanned';
       await agency.save();
-      return { status: 200, message: 'Agency banned successfully', agency };
+      return { status: 200, message: 'Agency unbanned successfully', agency };
     }
 
     return { status: 404, message: 'User or agency not found' };

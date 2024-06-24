@@ -229,10 +229,10 @@ const updateAgencyById = async (id, value) => {
 const getAllHostsByAgency = async (agencyId) => {
 
   // Fetch hosts associated with the agencyId
-  const hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
+  let hosts = await Host.find({ agencyId }).populate('userId', 'firstName lastName email');
 
   if (!hosts.length) {
-    throw new Error('No hosts found for this agency');
+    hosts = []
   }
 
   return hosts;

@@ -13,7 +13,7 @@ const {
   MASTER_PORTAL,
   HOST,
   BASIC_USER
-}=require('../../config/constants');
+} = require('../../config/constants');
 const { BadRequest } = require("../../utility/errors");
 const { messaging } = require("firebase-admin");
 
@@ -34,7 +34,7 @@ const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
     console.error('Error in sendAssetsFromMPToADHandler:', error);
     res.status(500).json({ error: error.message });
   }
-  });
+});
 
 
 
@@ -74,8 +74,8 @@ const sendAssetsToUserHandler = asyncHandler(async (req, res) => {
 });
 
 
- 
-  
+
+
 
 
 
@@ -89,13 +89,13 @@ const sendAssetsFromAgencyToHostHandler = asyncHandler(async (req, res) => {
   }
 
   const result = await beansService.sendAssetsFromAgencyToHost(agencyId, hostId, amount, assetType);
-
-  res.status(200).json({
-    message:"Sent Successfully!",
-    result
+  res.status(result.status).json({
+    message: result.message,
+    status: result.status,
+    transaction: result.transaction
   })
 });
-  
+
 
 
 const getBeansSentByUser = async (req, res) => {
@@ -119,8 +119,8 @@ const getBeansSentByUser = async (req, res) => {
 
 
 router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
-router.post('/send-beans-to-reseller',sendAssetsToBRHandler);
-router.patch('/send-assets-to-allusers',sendAssetsToUserHandler);
-router.patch('/send-beans-to-host',sendAssetsFromAgencyToHostHandler)
-router.get('/beans-sent',getBeansSentByUser)
+router.post('/send-beans-to-reseller', sendAssetsToBRHandler);
+router.patch('/send-assets-to-allusers', sendAssetsToUserHandler);
+router.patch('/send-beans-to-host', sendAssetsFromAgencyToHostHandler)
+router.get('/beans-sent', getBeansSentByUser)
 module.exports = router;
