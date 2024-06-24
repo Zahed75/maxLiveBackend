@@ -10,15 +10,19 @@ const Bean = require('../Bean/model'); // Adjust this path as necessary
 
 
 
-const sendBeansFromMPToADService = async (mpId, adId, amount, assetType) => {
+const sendBeansFromMPToADService = async (mpId, userId, amount, assetType) => {
   try {
     const mpUser = await User.findById(mpId);
-    const adUser = await User.findById(adId);
-
+    let user = await User.findById(userId);
+    if (!user) {
+      user = await agencyModel.findById(userId)
+    }
+    if(!user){
+      user = await Host.findById(userId)
+    }
     if (!mpUser) throw new Error('Master Portal (MP) user not found.');
-    if (!adUser) throw new Error('Admin (AD) user not found.');
+    if (!user) throw new Error('User not found.');
     if (mpUser.role !== 'MP') throw new Error('Sender is not authorized as Master Portal (MP).');
-    if (adUser.role !== 'AD') throw new Error('Recipient is not authorized as Admin (AD).');
 
     const validAssets = ['beans', 'coins', 'diamonds', 'stars'];
     if (!validAssets.includes(assetType)) {
@@ -31,7 +35,7 @@ const sendBeansFromMPToADService = async (mpId, adId, amount, assetType) => {
     // So no need to check for mpUser.assetType < assetAmount
 
     // Update only the specified asset field
-    await User.findByIdAndUpdate(adId, { $inc: { [assetType]: assetAmount } }, { new: true, runValidators: false });
+    await User.findByIdAndUpdate(userId, { $inc: { [assetType]: assetAmount } }, { new: true, runValidators: false });
 
     const transaction = new Bean({
       userId: mpId,
@@ -41,7 +45,6 @@ const sendBeansFromMPToADService = async (mpId, adId, amount, assetType) => {
     });
 
     await transaction.save();
-
     return { message: `${assetType} sent successfully.`, transaction };
   } catch (error) {
     console.error('Error in sendAssetsFromMPToADService:', error);
@@ -247,7 +250,7 @@ const getBeansSentByUserService = async (userId, startDate, endDate) => {
     });
 
     if (!transactions.length) {
-      throw new NotFound('No transactions found for the specified date range');
+      return { message: 'No transactions found for the specified date range', transactions: [], totalBeansSent: 0 }
     }
 
     // Calculate the total beans sent
@@ -267,10 +270,10 @@ const getBeansSentByUserService = async (userId, startDate, endDate) => {
 
 module.exports = {
 
-    sendBeansFromMPToADService,
-    sendAssetsADToBR,
-    sendAssetsAllUsers,
-    sendAssetsFromAgencyToHost,
-    getBeansSentByUserService,
+  sendBeansFromMPToADService,
+  sendAssetsADToBR,
+  sendAssetsAllUsers,
+  sendAssetsFromAgencyToHost,
+  getBeansSentByUserService,
 
 }
