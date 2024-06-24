@@ -17,7 +17,7 @@ const sendBeansFromMPToADService = async (mpId, userId, amount, assetType) => {
     if (!user) {
       user = await agencyModel.findById(userId)
     }
-    if(!user){
+    if (!user) {
       user = await Host.findById(userId)
     }
     if (!mpUser) throw new Error('Master Portal (MP) user not found.');
@@ -146,8 +146,8 @@ const sendAssetsAllUsers = async (resellerId, recipientId, amount, assetType) =>
       agency[assetType] += assetAmount;
       await agency.save();
     }
-
-    await reseller.save();
+    reseller.beansSent += assetAmount
+      await reseller.save();
 
     const transaction = new Bean({
       userId: resellerId,

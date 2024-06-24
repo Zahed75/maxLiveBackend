@@ -70,7 +70,7 @@ const UserSchema = new mongoose.Schema(
     maxId: { 
       type: String, 
       unique: true, 
-      required: true 
+      // required: true 
     },
 
     hostId: {
@@ -201,6 +201,10 @@ const UserSchema = new mongoose.Schema(
       default: 0,
     },
     star:{
+      type: Number,
+      default: 0,
+    },
+    beansSent:{
       type: Number,
       default: 0,
     },

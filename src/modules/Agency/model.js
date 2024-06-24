@@ -113,6 +113,10 @@ const agencySchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  receivedDiamonds: {
+    type: Number,
+    default: 0
+  },
   vipLevel: {
     type: Number,
     default: 0,
