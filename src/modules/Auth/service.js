@@ -30,6 +30,12 @@ const { generateAgoraToken } = require('../../utility/agora'); // Import Agora u
 
 
 
+const generateRoomToken = async (channelName, uid, role) => {
+  // Generate the token
+  const token = generateAgoraToken(channelName, uid, role);
+  return token;
+};
+
 
 
 
@@ -57,6 +63,9 @@ const { generateAgoraToken } = require('../../utility/agora'); // Import Agora u
 //     return { status: 500, message: 'Internal server error' };
 //   }
 // };
+
+
+
 
 
 const registerUserService = async (userData) => {
@@ -272,7 +281,7 @@ module.exports = {
   generateAndSendOTPService,
   signinUserService,
   registerMasterPortalUser,
-  // generateRoomToken
+  generateRoomToken
 };
 
 

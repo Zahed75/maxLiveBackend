@@ -25,17 +25,17 @@ const { generateAgoraToken } = require('../../utility/agora'); // Import Agora u
 
 
 
-const generateAgoraTokens = async (req, res) => {
-  const { channelName, uid } = req.body;
+const generateAgoraTokens = asyncHandler(async (req, res) => {
+  const { channelName, uid, role } = req.body;
 
   try {
     // Validate input
-    if (!channelName || typeof uid !== 'number') {
-      return res.status(400).json({ message: 'Invalid input. Channel name and UID are required.' });
+    if (!channelName || typeof uid !== 'number' || !role) {
+      return res.status(400).json({ message: 'Invalid input. Channel name, UID, and role are required.' });
     }
 
-    // Generate Agora token
-    const token = generateAgoraToken(channelName, uid);
+    // Call authService to generate token
+    const token = await authService.generateRoomToken(channelName, uid, role);
 
     // Return the token in the response
     res.status(200).json({ token });
@@ -43,7 +43,8 @@ const generateAgoraTokens = async (req, res) => {
     console.error('Failed to generate Agora token:', error);
     res.status(500).json({ message: 'Failed to generate Agora token' });
   }
-};
+});
+
 
 
 
@@ -89,11 +90,6 @@ const registerUserHandler = asyncHandler(async (req, res) => {
 
 
 // MasterPortalRegister 
-
-
-
-
-
 const registerMasterPortalHandler =asyncHandler(async(req,res)=>{
 
 
