@@ -456,11 +456,6 @@ const transferHostToAgency = async (hostId, newAgencyId) => {
   }
 };
 
-
-
-
-
-
 module.exports = {
   registerAgencyService,
   getPendingHostService,

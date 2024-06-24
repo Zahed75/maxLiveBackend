@@ -180,7 +180,12 @@ const hostSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Skin',
     }],
-
+    previousAgency: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Agency'
+      }
+    ],
     refreshToken: [String],
   },
   { timestamps: true }
