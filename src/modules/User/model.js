@@ -46,6 +46,7 @@ const UserSchema = new mongoose.Schema(
     userName: String,
 
     birthdate: String,
+    
     gender: {
       type: String,
       enum: ['male', 'female', 'others']
@@ -66,6 +67,12 @@ const UserSchema = new mongoose.Schema(
       type: String,
       
     },
+    maxId: { 
+      type: String, 
+      unique: true, 
+      required: true 
+    },
+
     hostId: {
       type: String,
       max: [8, "Your host ID must be less than 8 characters"],

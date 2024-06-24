@@ -19,10 +19,8 @@ const { IosApp } = require('firebase-admin/project-management');
 const { captureRejectionSymbol } = require('nodemailer/lib/xoauth2');
 const AgoraAccessToken = require('agora-access-token'); // Import agora-access-token
 
-// Other imports...
-
 const { generateAgoraToken } = require('../../utility/agora'); // Import Agora utility
-
+const generateMaxId = require('../../utility/maxId');
 
 
 
@@ -75,8 +73,11 @@ const registerUserService = async (userData) => {
     // Generate OTP and send
     const otp = await generateAndSendOTPService(email);
 
-    // Create a new user with profile picture and OTP
-    const newUser = await User.create({ ...userData, otp });
+    // Generate maxId
+    const maxId = generateMaxId();
+
+    // Create a new user with profile picture, OTP, and maxId
+    const newUser = await User.create({ ...userData, otp, maxId });
     
     if (!newUser) {
       throw new BadRequest("Could not create user");
@@ -94,7 +95,6 @@ const registerUserService = async (userData) => {
     return { status: 500, message: 'Internal server error' };
   }
 };
-
 
 
 
