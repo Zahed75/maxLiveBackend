@@ -32,7 +32,8 @@ const sendSkinHandler = asyncHandler(async (req, res) => {
 });
 
 const deleteSkinsHandler = asyncHandler(async (req, res) => {
-  const result = await deleteSkinService({id:req.params.id});
+  const id = req.params.id
+  const result = await deleteSkinService(id);
   res.status(200).json({
     message: "Skin deleted successfully",
     result,

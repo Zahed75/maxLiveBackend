@@ -60,19 +60,29 @@ const sendSkinService = async (payload) => {
   }
 };
 
-const deleteSkinService = async (payload) => {
-  const {_id} = payload
-  const isSkinExist = Skin.findById(_id);
-  if(!isSkinExist){
-    throw new Error("Skin does not exists")
+const deleteSkinService = async (_id) => {
+  try {
+
+    const isSkinExist = await Skin.findById(_id);
+    
+    if (!isSkinExist) {
+      throw new Error("Skin does not exist");
+    }
+
+    // Delete the skin document
+    await Skin.deleteOne({ _id });
+
+    // Remove the skin from all users' skins array
+    await User.updateMany(
+      { 'skins.skin': _id },
+      { $pull: { skins: { skin: _id } } }
+    );
+
+    return { success: true };
+  } catch (error) {
+    throw new Error(error.message);
   }
-
-
-  await Skin.deleteOne({_id})
-  await User.updateMany(
-    { skins: _id }, 
-    { $pull: { skins: _id } } 
-  );
 };
+
 
 module.exports = { getAllSkin, createSkinService, sendSkinService, deleteSkinService };
