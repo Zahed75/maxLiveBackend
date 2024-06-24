@@ -219,9 +219,13 @@ const detailsHostByUserId = async (id) => {
 };
 
 const passwordResetService = async (adminId, userId, newPassword) => {
+
   console.log(adminId, userId, newPassword);
   try {
     // Fetch the admin from the database
+
+
+
     const admin = await User.findById(adminId);
     if (!admin) {
       throw new Error("Admin not found");
@@ -256,7 +260,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
       throw new Error("New password must be a string");
     }
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = await bcrypt.hash(String(newPassword), 10);
     user.passwordResetRequested = false;
     await user.save();
 
