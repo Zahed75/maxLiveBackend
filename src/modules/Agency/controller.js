@@ -17,20 +17,26 @@ const { BadRequest } = require("../../utility/errors");
 const { messaging } = require("firebase-admin");
 
 
+
+
+
+
 const registerAgencyHandler = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params._id; // Assuming userId is available in the request
-
-    // Call the service function to handle agency registration
+    const userId = req.params._id; 
+  
     const result = await agencyService.registerAgencyService(userId, req.body, req.files);
 
-    // Send response based on the result
+  
     res.status(result.status).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
 
 
 

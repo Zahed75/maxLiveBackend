@@ -6,6 +6,14 @@ const { asyncHandler } = require("../../utility/common");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const generateMaxId = require('../../utility/maxId');
+
+
+
+
+
+
+
 
 const registerAgencyService = async (userId, agencyData, files) => {
   try {
@@ -14,27 +22,24 @@ const registerAgencyService = async (userId, agencyData, files) => {
       return { status: 501, message: "User already has an agency" };
     }
 
-    // Generate agencyId in the backend
-    const agencyId = generateAgencyId(); // Implement generateAgencyId function
+    const agencyId = generateMaxId(); // Use generateMaxId to create a unique agencyId
 
-    // Add agencyId and userId to the agencyData
     agencyData.agencyId = agencyId;
     agencyData.userId = userId;
 
-    // Check if NID photos are provided
     if (files && files["nidPhotoFront"] && files["nidPhotoBack"]) {
-      agencyData.nidFront = files["nidPhotoFront"][0].path; // Save file path for front NID photo
-      agencyData.nidBack = files["nidPhotoBack"][0].path; // Save file path for back NID photo
+      agencyData.nidFront = files["nidPhotoFront"][0].path;
+      agencyData.nidBack = files["nidPhotoBack"][0].path;
     } else {
       return { status: 400, message: "NID photos are required" };
     }
 
-    // Create a new agency instance
+    agencyData.maxId = generateMaxId();
+
     const newAgency = new Agency(agencyData);
     await newAgency.save();
 
-    // Update the user's role to 'AG'
-    // await User.findByIdAndUpdate(userId, { role: 'AG' });
+    await User.findByIdAndUpdate(userId, { role: 'AG' });
 
     return {
       status: 201,
@@ -46,6 +51,11 @@ const registerAgencyService = async (userId, agencyData, files) => {
     return { status: 500, message: "Internal server error" };
   }
 };
+
+
+
+
+
 
 const generateAgencyId = () => {
   const timestamp = new Date().getTime();
@@ -219,9 +229,13 @@ const detailsHostByUserId = async (id) => {
 };
 
 const passwordResetService = async (adminId, userId, newPassword) => {
+
   console.log(adminId, userId, newPassword);
   try {
     // Fetch the admin from the database
+
+
+
     const admin = await User.findById(adminId);
     if (!admin) {
       throw new Error("Admin not found");
@@ -256,7 +270,7 @@ const passwordResetService = async (adminId, userId, newPassword) => {
       throw new Error("New password must be a string");
     }
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = await bcrypt.hash(String(newPassword), 10);
     user.passwordResetRequested = false;
     await user.save();
 

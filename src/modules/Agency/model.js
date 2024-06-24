@@ -29,6 +29,12 @@ const agencySchema = new mongoose.Schema({
     enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
     required: true,
   },
+  maxId: { 
+    type: String, 
+    unique: true, 
+    required: true 
+  },
+
   agencyStatus: {
     type: String,
     enum: ['active', 'inactive', 'banned'],

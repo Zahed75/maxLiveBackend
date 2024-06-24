@@ -4,6 +4,9 @@ const Agency = require("../Agency/model");
 const { generateHostId } = require("../../utility/common");
 const { NotFound,BadRequest,Unauthorized } = require("../../utility/errors");
 
+const generateMaxId = require('../../utility/maxId'); 
+
+
 const applyToBeHostService = async (
   userId,
   agencyId,
@@ -24,7 +27,8 @@ const applyToBeHostService = async (
     if (!agency) {
       throw new Error("Agency not found");
     }
-
+    // Generate maxId
+    const maxId = generateMaxId();
     // Update the user's host status to "Pending"
     user.hostStatus = "pending";
     user.hostType = hostType;
@@ -34,6 +38,7 @@ const applyToBeHostService = async (
     user.isVerified = user.isVerified;
     user.isApproved = user.isApproved;
     user.profilePicture = user.profilePicture;
+    maxId, 
     user.nidFront = nidFrontPath;
     user.nidBack = nidBackPath;
     await user.save();
@@ -44,6 +49,8 @@ const applyToBeHostService = async (
     throw error;
   }
 };
+
+
 
 
 
