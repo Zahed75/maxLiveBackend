@@ -9,10 +9,19 @@ const cloudinary = require("cloudinary").v2;
 
 const createSkinService = async (payload, filePath) => {
   try {
-    if (filePath) {
+    let file = "";
+    if (payload.fileType.startsWith("image/")) {
+      if (!filePath) {
+        throw new Error("Image file is required");
+      }
       const cloudinaryResponse = await cloudinary.uploader.upload(filePath);
-      payload.file = cloudinaryResponse?.secure_url;
+      file = cloudinaryResponse?.secure_url;
+    } else if (payload.fileType.startsWith("video/")) {
+      console.log("videi");
     }
+
+    payload.file = file;
+
     const result = await Skin.create(payload);
     return result;
   } catch (error) {
@@ -62,9 +71,8 @@ const sendSkinService = async (payload) => {
 
 const deleteSkinService = async (_id) => {
   try {
-
     const isSkinExist = await Skin.findById(_id);
-    
+
     if (!isSkinExist) {
       throw new Error("Skin does not exist");
     }
@@ -74,7 +82,7 @@ const deleteSkinService = async (_id) => {
 
     // Remove the skin from all users' skins array
     await User.updateMany(
-      { 'skins.skin': _id },
+      { "skins.skin": _id },
       { $pull: { skins: { skin: _id } } }
     );
 
@@ -84,5 +92,9 @@ const deleteSkinService = async (_id) => {
   }
 };
 
-
-module.exports = { getAllSkin, createSkinService, sendSkinService, deleteSkinService };
+module.exports = {
+  getAllSkin,
+  createSkinService,
+  sendSkinService,
+  deleteSkinService,
+};
