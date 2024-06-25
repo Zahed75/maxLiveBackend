@@ -25,7 +25,7 @@ const getAllSeatBesideHostService = async () => {
 };
 
 const updateSeatBesideHostService = async (payload, id) => {
-  const result = await SeatBesideHost.updateOne({ _id: id }, {beans: payload.beans});
+  const result = await SeatBesideHost.findByIdAndUpdate(id, {beans: payload.beans});
   return result;
 };
 
