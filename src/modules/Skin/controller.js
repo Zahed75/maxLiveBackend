@@ -16,6 +16,7 @@ const getAllSkinsHandler = asyncHandler(async (req, res) => {
 const createSkinHandler = asyncHandler(async (req, res) => {
   const file = req.files["file"] ? req.files["file"][0] : null;
   const filePath = file ? file.path : "";
+  console.log(file)
   const fileType = file ? file.mimetype : req.body.fileType;
 
   const payload = {
