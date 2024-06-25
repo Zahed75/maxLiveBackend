@@ -6,6 +6,10 @@ const beanSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  recipientId: {
+    type: String,
+    required: true,
+  },
   amount: {
     type: Number,
     required: true,

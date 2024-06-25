@@ -25,9 +25,9 @@ const beansService = require('../Bean/service');
 
 const sendBeansFromMPToBRHandler = asyncHandler(async (req, res) => {
   try {
-    const { mpId, userId, amount, assetType } = req.body;
+    const { mpId, maxId, amount, assetType } = req.body;
 
-    const result = await beansService.sendBeansFromMPToADService(mpId, userId, amount, assetType);
+    const result = await beansService.sendBeansFromMPToADService(mpId, maxId, amount, assetType);
 
     res.status(200).json(result);
   } catch (error) {

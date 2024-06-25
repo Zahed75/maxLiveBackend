@@ -171,6 +171,7 @@ const makeAdminService = async (agencyId) => {
     }
 
     agency.role = "AD";
+
     await agency.save();
     return { success: true, message: "Agency made admin successfully." };
   } catch (error) {
@@ -250,18 +251,20 @@ const registerUserService = async (userData) => {
 
 // ALL Users Sign In
 
-
 const signInService = async (email, password) => {
   try {
     // Find the user by email
     const user = await User.findOne({ email });
+    console.log("User found:", user);
+
     if (!user) {
       throw new Error("Invalid email or password");
     }
-    
+
     // Check if the password is correct
-    const isMatch = await user.authenticate(password);
-    console.log(password)
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match:", isMatch);
+
     if (!isMatch) {
       throw new Error("Invalid email or password");
     }
@@ -273,11 +276,17 @@ const signInService = async (email, password) => {
       { expiresIn: '1d' }
     );
 
+    console.log("JWT token generated:", token);
+
     return { user, token };
   } catch (error) {
+    console.error(`Error in signInService: ${error.message}`);
     throw new Error(`${error.message}`);
   }
 };
+
+
+
 
 
 

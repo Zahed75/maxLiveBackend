@@ -10,15 +10,17 @@ const Bean = require('../Bean/model'); // Adjust this path as necessary
 
 
 
-const sendBeansFromMPToADService = async (mpId, userId, amount, assetType) => {
+const sendBeansFromMPToADService = async (mpId, maxId, amount, assetType) => {
   try {
     const mpUser = await User.findById(mpId);
-    let user = await User.findById(userId);
+    let user = await User.findOne({ maxId });
+    console.log(user)
+
     if (!user) {
-      user = await agencyModel.findById(userId)
+      user = await agencyModel.findOne({ maxId })
     }
     if (!user) {
-      user = await Host.findById(userId)
+      user = await Host.findOne({ maxId })
     }
     if (!mpUser) throw new Error('Master Portal (MP) user not found.');
     if (!user) throw new Error('User not found.');
@@ -35,13 +37,15 @@ const sendBeansFromMPToADService = async (mpId, userId, amount, assetType) => {
     // So no need to check for mpUser.assetType < assetAmount
 
     // Update only the specified asset field
-    await User.findByIdAndUpdate(userId, { $inc: { [assetType]: assetAmount } }, { new: true, runValidators: false });
-
+    // await User.findByIdAndUpdate(userId, { $inc: { [assetType]: assetAmount } }, { new: true, runValidators: false });
+    user[assetType] += assetAmount
+    user.save()
     const transaction = new Bean({
       userId: mpId,
       amount: assetAmount,
       transactionType: 'send',
-      assetType: assetType
+      assetType: assetType,
+      recipientId: maxId
     });
 
     await transaction.save();
@@ -111,17 +115,21 @@ const sendAssetsADToBR = async (adminId, resellerId, amount, assetType) => {
 const sendAssetsAllUsers = async (resellerId, recipientId, amount, assetType) => {
   try {
     const reseller = await User.findById(resellerId);
-    const recipient = await User.findById(recipientId);
-    const agency = await agencyModel.findById(recipientId); // Correctly fetching the agency using recipientId
+    let recipient = await User.findOne({ maxId: recipientId });
+    if (!recipient) {
+      recipient = await agencyModel.findOne({ maxId: recipientId }); // Correctly fetching the agency using recipientId
+    }
+    if (!recipient) {
+      recipient = await Host.findOne({ maxId: recipientId }); // Correctly fetching the agency using recipientId
 
+    }
     if (!reseller || reseller.role !== 'BR') {
       return { status: 400, message: 'Reseller not found or not authorized' };
     }
 
-    if (!recipient && !agency) {
+    if (!recipient) {
       return { status: 400, message: 'Recipient not found' };
     }
-
     const validAssets = ['beans', 'coins', 'stars', 'diamonds'];
     if (!validAssets.includes(assetType)) {
       return { status: 400, message: 'Invalid asset type' };
@@ -137,23 +145,18 @@ const sendAssetsAllUsers = async (resellerId, recipientId, amount, assetType) =>
     reseller[assetType] -= assetAmount;
 
     // Add asset to recipient
-    if (recipient) {
-      recipient[assetType] += assetAmount;
-      await recipient.save();
-    }
+    recipient[assetType] += assetAmount;
+    await recipient.save();
 
-    if (agency) {
-      agency[assetType] += assetAmount;
-      await agency.save();
-    }
     reseller.beansSent += assetAmount
-      await reseller.save();
+    await reseller.save();
 
     const transaction = new Bean({
       userId: resellerId,
       amount: assetAmount,
       transactionType: 'send',
-      assetType: assetType
+      assetType: assetType,
+      recipientId: recipientId
     });
 
     await transaction.save();
@@ -173,7 +176,7 @@ module.exports = { sendAssetsAllUsers };
 const sendAssetsFromAgencyToHost = async (agencyId, hostId, amount, assetType) => {
   try {
     const agency = await agencyModel.findById(agencyId);
-    const host = await Host.findById(hostId);
+    const host = await Host.findOne({maxId: hostId});
 
     if (!agency || agency.role !== 'AG') {
       return { status: 400, message: 'Agency not found or not authorized' };
@@ -200,16 +203,16 @@ const sendAssetsFromAgencyToHost = async (agencyId, hostId, amount, assetType) =
     // Add asset to host
     host[assetType] += assetAmount;
 
-    await agency.save();
-    await host.save();
-
+    
     const transaction = new Bean({
       userId: agencyId,
       amount: assetAmount,
       transactionType: 'send',
-      assetType: assetType
+      assetType: assetType,
+      recipientId: hostId
     });
-
+    await agency.save();
+    await host.save();
     await transaction.save();
 
     return { status: 200, message: `${assetType} sent successfully`, transaction };
