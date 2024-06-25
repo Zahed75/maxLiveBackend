@@ -77,6 +77,10 @@ class MongoError extends GeneralError {
   }
 }
 
+
+
+
+
 const handleError = async (err, req, res, next) => {
   console.log({ err });
   if (res.headerSent) {
@@ -84,15 +88,26 @@ const handleError = async (err, req, res, next) => {
   }
 
   let code = 500;
+  let message = err.message;
+
+
+
+
   if (err instanceof GeneralError) {
     code = err.getCode();
+  } else if (err.name === 'MongoError' && err.code === 11000) {
+    // Handle Mongoose duplicate key error
+    code = 409; // Conflict
+    message = 'Duplicate key error';
   }
+
+
 
   const correlationId = req.headers['x-correlation-id'];
 
   return res.status(code).json({
     correlationId,
-    message: err.message,
+    message,
   });
 };
 
