@@ -19,7 +19,10 @@ const { IosApp } = require('firebase-admin/project-management');
 const { captureRejectionSymbol } = require('nodemailer/lib/xoauth2');
 const AgoraAccessToken = require('agora-access-token'); // Import agora-access-token
 
-const { generateAgoraToken } = require('../../utility/agora'); // Import Agora utility
+const { generateAgoraToken } = require('../../utility/agora');
+const { RtcRole } = require('../../utility/agora');
+
+
 const generateMaxId = require('../../utility/maxId');
 
 
@@ -28,9 +31,10 @@ const generateMaxId = require('../../utility/maxId');
 
 
 
-const generateRoomToken = async (channelName, uid, role) => {
+
+const generateRoomToken = async (channelName, uid, role, tokenType, expireTime) => {
   // Generate the token
-  const token = generateAgoraToken(channelName, uid, role);
+  const token = generateAgoraToken(channelName, uid, role, tokenType, expireTime);
   return token;
 };
 
@@ -38,29 +42,6 @@ const generateRoomToken = async (channelName, uid, role) => {
 
 
 
-// const registerUserService = async (userData) => {
-//   try {
-//     const { email, profilePicture } = userData;
-
-//     // Generate OTP and send
-//     const otp = await generateAndSendOTPService(email);
-
-//     // Create a new user with profile picture and NID photos
-//     const newUser = await User.create({ ...userData, otp });
-    
-//     if (!newUser) {
-//       throw new BadRequest("Could Not Create User");
-//     }
-
-//     // Update the newly created user with NID photo URLs
-//     await User.findByIdAndUpdate(newUser._id, { $set: { profilePicture } });
-
-//     return { status: 201, message: 'User registered successfully', user: newUser };
-//   } catch (error) {
-//     console.error('Error registering user:', error);
-//     return { status: 500, message: 'Internal server error' };
-//   }
-// };
 
 
 
@@ -281,7 +262,8 @@ module.exports = {
   generateAndSendOTPService,
   signinUserService,
   registerMasterPortalUser,
-  generateRoomToken
+  generateRoomToken,
+   RtcRole 
 };
 
 

@@ -5,6 +5,9 @@ const { asyncHandler } = require("../../utility/common");
 const multerMiddleware = require('../../middlewares/multerMiddlware');
 
 
+
+
+
 const applyToBeHostHandler = asyncHandler(async (req, res) => {
     const agencyId = req.params.agencyId;
     const userId = req.params.userId;
@@ -32,9 +35,10 @@ const applyToBeHostHandler = asyncHandler(async (req, res) => {
   
 
 
+
+  
+
 // delete host Controller
-
-
 const deleteHostHandler = asyncHandler(async(req,res)=>{
 
   const {id}=req.params;
