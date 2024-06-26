@@ -8,8 +8,8 @@ const getAllSkin = async () => {
 const cloudinary = require("cloudinary").v2;
 
 const createSkinService = async (payload, filePath) => {
-  console.log(payload, filePath)
-
+  console.log(payload)
+  payload.beans = JSON.parse(payload.beans)
 
   try {
     if(!filePath){
