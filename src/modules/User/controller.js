@@ -179,6 +179,19 @@ const unBannedUserHandler = asyncHandler(async (req, res) => {
 
 
 
+const getUserLevelHandler = asyncHandler(async (req, res) => {
+  const { diamonds, role } = req.query;
+
+  const result = await userService.getUserLevelService(diamonds, role);
+
+  res.status(result.status).json({
+    message: result.message,
+    result
+  });
+});
+
+
+
 
 
 
@@ -197,4 +210,5 @@ router.post('/banUser', banUserHandler);
 router.get('/allBannedUsers', getAllBannedUsersHandler);
 router.get('/accounts-created-today', getAccountsCreatedToday);
 router.patch('/unbanned', unBannedUserHandler);
+router.get('/level',getUserLevelHandler )
 module.exports = router;

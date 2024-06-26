@@ -46,7 +46,7 @@ const UserSchema = new mongoose.Schema(
     userName: String,
 
     birthdate: String,
-    
+
     gender: {
       type: String,
       enum: ['male', 'female', 'others']
@@ -65,11 +65,11 @@ const UserSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      
+
     },
-    maxId: { 
-      type: String, 
-      unique: true, 
+    maxId: {
+      type: String,
+      unique: true,
       // required: true 
     },
 
@@ -175,7 +175,7 @@ const UserSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned','pending', 'unbanned'], // Add 'banned' to the enum values
+      enum: ['active', 'inactive', 'banned', 'pending', 'unbanned'], // Add 'banned' to the enum values
       default: 'active'
     },
 
@@ -187,24 +187,28 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    // ...Skins/Frame/Level/Coins/Beans...
-    beans: { 
+    diamondsSent: {
       type: Number,
-       default: 0 
-      },
+      default: 0
+    },
+    // ...Skins/Frame/Level/Coins/Beans...
+    beans: {
+      type: Number,
+      default: 0
+    },
     diamonds: {
       type: Number,
       default: 0,
     },
-    coins:{
+    coins: {
       type: Number,
       default: 0,
     },
-    star:{
+    star: {
       type: Number,
       default: 0,
     },
-    beansSent:{
+    beansSent: {
       type: Number,
       default: 0,
     },
@@ -230,14 +234,14 @@ const UserSchema = new mongoose.Schema(
     }],
     refreshToken: [String],
   },
-  
-  
+
+
   { timestamps: true }
 );
 
 UserSchema.pre("save", async function hashPassword(next) {
   if (this.isModified("password")) {
-    const salt = await bcrypt.genSalt(10);  
+    const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
   next();

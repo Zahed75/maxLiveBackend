@@ -7,6 +7,7 @@ const { NotFound, BadRequest } = require("../../utility/errors");
 const firebase = require("../../utility/firebaseConfig");
 const { generateOTP, generateHostId } = require("../../utility/common");
 const admin = require("firebase-admin");
+const Level = require("../Level/model");
 
 
 
@@ -69,7 +70,7 @@ const getAllUserService = async (reQuerry, res) => {
 
     // Fetch users from User model
     const [usersFromUserModel, usersFromAgencyModel, usersFromHostModel] = await Promise.all([
-      User.find() ,
+      User.find(),
       Agency.find(),
       Host.find()
     ]);
@@ -83,7 +84,7 @@ const getAllUserService = async (reQuerry, res) => {
 
     return {
       users,
-      
+
     };
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -274,6 +275,18 @@ const unBanUser = async (masterPortalId, userId) => {
     return { status: 500, message: 'Internal server error' };
   }
 };
+const getUserLevelService = async (diamonds, role) => {
+  try {
+    const level = await Level.findOne({ diamonds: { $lte: diamonds } }).sort({ diamonds: -1 }).exec();
+    if(!level) {
+      return { status: 200, message: 'User level get successfull', level: {levelName: '0', diamonds: 0} };
+    }
+    return { status: 200, message: 'User level get successfull', level: {levelName: level.levelName, diamonds: level.diamonds} };
+  } catch (error) {
+    console.error('Error banning user:', error);
+    return { status: 500, message: 'Internal server error' };
+  }
+};
 
 
 
@@ -289,7 +302,8 @@ module.exports = {
   banUser,
   getALLBannedUsers,
   getAccountsCreatedToday,
-  unBanUser
+  unBanUser,
+  getUserLevelService
 
 };
 
