@@ -65,27 +65,13 @@ const getUserById = async (userId) => {
 
 const getAllUserService = async (reQuerry, res) => {
   try {
-    const { page = 1, limit = 10 } = reQuerry; // Default values for page and limit
 
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      throw new BadRequest(
-        "Invalid page or limit parameters. Both must be positive integers."
-      );
-    }
-
-    const skip = (page - 1) * limit;
 
     // Fetch users from User model
     const [usersFromUserModel, usersFromAgencyModel, usersFromHostModel] = await Promise.all([
-      User.find() // Select specific fields if desired
-        .skip(skip)
-        .limit(limit),
-      Agency.find()
-        .skip(skip)
-        .limit(limit),
+      User.find() ,
+      Agency.find(),
       Host.find()
-        .skip(skip)
-        .limit(limit)
     ]);
 
     // Combine users from both models
@@ -95,18 +81,9 @@ const getAllUserService = async (reQuerry, res) => {
       return res.status(204).json({ message: "No users found" });
     }
 
-    const totalUsersCount = users.length; // Total count of users
-
-    const totalPages = Math.ceil(totalUsersCount / limit); // Calculate total pages
-
     return {
       users,
-      pagination: {
-        page,
-        limit,
-        totalPages,
-        totalCount: totalUsersCount,
-      },
+      
     };
   } catch (error) {
     console.error("Error fetching user:", error);

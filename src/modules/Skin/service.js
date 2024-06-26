@@ -8,7 +8,15 @@ const getAllSkin = async () => {
 const cloudinary = require("cloudinary").v2;
 
 const createSkinService = async (payload, filePath) => {
+  console.log(payload, filePath)
+
+
   try {
+    if(!filePath){
+      throw new Error("Please add media to create skin")
+    }
+
+
     let file = "";
     if (payload.fileType.startsWith("image/")) {
       if (!filePath) {
@@ -17,7 +25,8 @@ const createSkinService = async (payload, filePath) => {
       const cloudinaryResponse = await cloudinary.uploader.upload(filePath);
       file = cloudinaryResponse?.secure_url;
     } else if (payload.fileType.startsWith("video/")) {
-      console.log("videi");
+      const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {resource_type: "video"});
+      file = cloudinaryResponse?.secure_url;
     }
 
     payload.file = file;

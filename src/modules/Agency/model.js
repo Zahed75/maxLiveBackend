@@ -32,7 +32,7 @@ const agencySchema = new mongoose.Schema({
   maxId: { 
     type: String, 
     unique: true, 
-    required: true 
+    // required: true 
   },
 
   agencyStatus: {
@@ -118,6 +118,10 @@ const agencySchema = new mongoose.Schema({
   star: {
     type: Number,
     default: 0,
+  },
+  receivedDiamonds: {
+    type: Number,
+    default: 0
   },
   vipLevel: {
     type: Number,

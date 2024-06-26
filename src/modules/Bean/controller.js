@@ -23,11 +23,11 @@ const beansService = require('../Bean/service');
 
 // send Beans to Master Portal to Admin
 
-const sendBeansFromMPToADHandler = asyncHandler(async (req, res) => {
+const sendBeansFromMPToBRHandler = asyncHandler(async (req, res) => {
   try {
-    const { mpId, adId, amount, assetType } = req.body;
+    const { mpId, maxId, amount, assetType } = req.body;
 
-    const result = await beansService.sendBeansFromMPToADService(mpId, adId, amount, assetType);
+    const result = await beansService.sendBeansFromMPToADService(mpId, maxId, amount, assetType);
 
     res.status(200).json(result);
   } catch (error) {
@@ -67,8 +67,8 @@ const sendAssetsToUserHandler = asyncHandler(async (req, res) => {
 
   const result = await beansService.sendAssetsAllUsers(resellerId, recipientId, amount, assetType);
 
-  res.status(200).json({
-    message: 'Sent Successfully',
+  res.status(result.status).json({
+    message: result.message,
     result
   })
 });
@@ -118,8 +118,8 @@ const getBeansSentByUser = async (req, res) => {
 
 
 
-router.post('/send-beans-to-admin', sendBeansFromMPToADHandler);
-router.post('/send-beans-to-reseller', sendAssetsToBRHandler);
+router.post('/send-beans-MP-to-user', sendBeansFromMPToBRHandler);
+// router.post('/send-beans-to-reseller', sendAssetsToBRHandler);
 router.patch('/send-assets-to-allusers', sendAssetsToUserHandler);
 router.patch('/send-beans-to-host', sendAssetsFromAgencyToHostHandler)
 router.get('/beans-sent', getBeansSentByUser)

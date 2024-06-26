@@ -11,17 +11,13 @@ const {
 
 const { generateOTP } = require("../../utility/common");
 const nodemailer = require("nodemailer");
-const {SendEmailUtility} = require('../../utility/email');
+const { SendEmailUtility } = require("../../utility/email");
 
 const createToken = require("../../utility/createToken");
 const bcrypt = require("bcryptjs");
 const { decrypt } = require("dotenv");
 const { IosApp } = require("firebase-admin/project-management");
 const Host = require("../Host/model");
-
-
-
-
 
 const approveAgency = async (password, email, adminId) => {
   try {
@@ -58,17 +54,13 @@ const approveAgency = async (password, email, adminId) => {
 
     // Send the password email
     await SendEmailUtility(email, password);
-    
+
     return { success: true, data: agency };
   } catch (error) {
-    console.error('Error in approveAgency service:', error);
+    console.error("Error in approveAgency service:", error);
     throw new Error(`Approve Agency Error: ${error.message}`);
   }
 };
-
-
-
-
 
 const removeAgencyService = async (agencyId) => {
   try {
@@ -83,14 +75,9 @@ const removeAgencyService = async (agencyId) => {
   }
 };
 
-
-
-
-
-
 const banAgencyService = async (id) => {
   try {
-    const agency = await agencyModel.findById({_id:id});
+    const agency = await agencyModel.findById({ _id: id });
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -99,9 +86,13 @@ const banAgencyService = async (id) => {
     agency.agencyStatus = "banned";
     agency.isActive = false;
     agency.isVerified = false;
-    agency.isApproved= false;
+    agency.isApproved = false;
     await agency.save();
-    return { success: true, message: "Agency banned successfully." ,data : agency};
+    return {
+      success: true,
+      message: "Agency banned successfully.",
+      data: agency,
+    };
   } catch (error) {
     console.error("Error banning agency:", error);
     return {
@@ -111,12 +102,9 @@ const banAgencyService = async (id) => {
   }
 };
 
-
-
-
 const disableAgencyService = async (id) => {
   try {
-    const agency = await agencyModel.findById({_id:id});
+    const agency = await agencyModel.findById({ _id: id });
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -124,7 +112,7 @@ const disableAgencyService = async (id) => {
 
     agency.isActive = false;
     agency.isVerified = false;
-    agency.agencyStatus = 'disabled'
+    agency.agencyStatus = "disabled";
     await agency.save();
     return { success: true, message: "Agency disabled successfully." };
   } catch (error) {
@@ -135,11 +123,6 @@ const disableAgencyService = async (id) => {
     };
   }
 };
-
-
-
-
-
 
 const grantMaxPowerService = async (agencyId) => {
   try {
@@ -161,7 +144,6 @@ const grantMaxPowerService = async (agencyId) => {
   }
 };
 
-
 const makeAdminService = async (agencyId) => {
   try {
     const agency = await agencyModel.findById(agencyId);
@@ -171,6 +153,7 @@ const makeAdminService = async (agencyId) => {
     }
 
     agency.role = "AD";
+
     await agency.save();
     return { success: true, message: "Agency made admin successfully." };
   } catch (error) {
@@ -182,11 +165,9 @@ const makeAdminService = async (agencyId) => {
   }
 };
 
-
-
 const transferAgencyService = async (AgencyId, newAgencyId) => {
   try {
-    const agency = await agencyModel.findById({_id:AgencyId});
+    const agency = await agencyModel.findById({ _id: AgencyId });
 
     if (!agency) {
       return { success: false, message: "Agency not found." };
@@ -204,8 +185,6 @@ const transferAgencyService = async (AgencyId, newAgencyId) => {
   }
 };
 
-
-
 const getAllAgencies = async () => {
   try {
     // const agencies = await User.find({ role: "AG" });
@@ -216,7 +195,6 @@ const getAllAgencies = async () => {
   }
 };
 
-
 // all User Manage
 const registerUserService = async (userData) => {
   try {
@@ -225,7 +203,7 @@ const registerUserService = async (userData) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
     // Create new user with additional fields set to true
@@ -246,22 +224,22 @@ const registerUserService = async (userData) => {
   }
 };
 
-
-
 // ALL Users Sign In
-
 
 const signInService = async (email, password) => {
   try {
     // Find the user by email
     const user = await User.findOne({ email });
+    console.log("User found:", user);
+
     if (!user) {
       throw new Error("Invalid email or password");
     }
-    
+
     // Check if the password is correct
-    const isMatch = await user.authenticate(password);
-    console.log(password)
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match:", isMatch);
+
     if (!isMatch) {
       throw new Error("Invalid email or password");
     }
@@ -270,78 +248,67 @@ const signInService = async (email, password) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       "SecretKey12345",
-      { expiresIn: '1d' }
+      { expiresIn: "1d" }
     );
+
+    console.log("JWT token generated:", token);
 
     return { user, token };
   } catch (error) {
+    console.error(`Error in signInService: ${error.message}`);
     throw new Error(`${error.message}`);
   }
 };
 
-
-
-
-
-
-
-
 // get ALL Admin
-
 
 const getAllAdminService = async () => {
   try {
     const agencies = await User.find({ role: "AD" });
-  
+
     return agencies;
   } catch (error) {
     throw new Error(error.message);
   }
 };
 
-
-
 // how many Host Approved todays
 const getApprovedHostsToday = async () => {
   try {
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
 
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
-      const approvedHostsToday = await User.find({
-          isApproved: true,
-          role: "HO",
-          updatedAt: { $gte: startOfDay, $lte: endOfDay }
-      });
+    const approvedHostsToday = await User.find({
+      isApproved: true,
+      role: "HO",
+      updatedAt: { $gte: startOfDay, $lte: endOfDay },
+    });
 
-      return approvedHostsToday;
+    return approvedHostsToday;
   } catch (error) {
-      console.error("Error fetching approved hosts today:", error);
-      throw new Error('Internal server error');
+    console.error("Error fetching approved hosts today:", error);
+    throw new Error("Internal server error");
   }
 };
 
-
-
-
-
 const resetPasswordForRoles = async (email, role) => {
   let user;
-console.log(role)
-  if (role === 'AG') {
-    user = await agencyModel.findOne({email});
+  console.log(role);
+  if (role === "AG") {
+    user = await agencyModel.findOne({ email });
     if (!user) {
-      throw new Error('Agency not found');
+      throw new Error("Agency not found");
     }
     user.passwordResetRequested = true;
     await user.save();
     // await SendEmailUtility(user.email, `Your new password is: ${newPassword}`, 'Password Reset Notification');
   } else {
-    user = await User.findOne({email});
+    user = await User.findOne({ email });
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
     user.passwordResetRequested = true;
     await user.save();
@@ -351,26 +318,17 @@ console.log(role)
   return user;
 };
 
-
-
-
 const getPasswordResetRequestsService = async () => {
   try {
     const users = await User.find({ passwordResetRequested: true });
-    const agencies = await agencyModel.find({passwordResetRequested: true})
+    const agencies = await agencyModel.find({ passwordResetRequested: true });
     const count = users.length + agencies.length;
     return { count, users: [...users, ...agencies] };
   } catch (error) {
-    console.error('Error fetching password reset requests:', error);
+    console.error("Error fetching password reset requests:", error);
     throw error;
   }
 };
-
-
-
-
-
-
 
 // enabale agency
 
@@ -379,20 +337,20 @@ const enableAgency = async (agencyId) => {
     // Find the agency by its ID and update the `isActive` field to true
     const agency = await agencyModel.findByIdAndUpdate(
       agencyId,
-      { isActive: true, 
-        agencyStatus: 'enabled',
-        isVerified:true,
-        isApproved:true
-
-       },
+      {
+        isActive: true,
+        agencyStatus: "enabled",
+        isVerified: true,
+        isApproved: true,
+      },
       { new: true }
     );
 
     if (!agency) {
-      throw new Error('Agency not found');
+      throw new Error("Agency not found");
     }
 
-    return { status: 200, message: 'Agency enabled successfully', agency };
+    return { status: 200, message: "Agency enabled successfully", agency };
   } catch (error) {
     console.error(`Failed to enable agency: ${error.message}`);
     throw new Error(`Failed to enable agency: ${error.message}`);
@@ -402,31 +360,32 @@ const enableAgency = async (agencyId) => {
 // return beans from users
 const returnBeans = async (userId, beans) => {
   try {
-    let user = await User.findById(userId)
-    if(!user) {
-      user = await agencyModel.findById(userId)
-    }
-    if(!user){
-      user = await Host.findById(userId)
+    let user = await User.findById(userId);
+    if (!user) {
+      user = await agencyModel.findById(userId);
     }
     if (!user) {
-      throw new Error('User not found');
+      user = await Host.findById(userId);
+    }
+    if (!user) {
+      throw new Error("User not found");
     }
 
     if (user.beans < beans) {
       return { status: 400, message: `Insufficient beans`, user };
     }
-    user.beans -= beans
-    user.save()
-    return { status: 200, message: `${beans} Beans returned successfully`, user };
+    user.beans -= beans;
+    user.save();
+    return {
+      status: 200,
+      message: `${beans} Beans returned successfully`,
+      user,
+    };
   } catch (error) {
     console.error(`Failed to return beans`, error);
     throw new Error(`Failed to return beans`);
   }
 };
-
-
-
 
 module.exports = {
   approveAgency,
@@ -444,5 +403,5 @@ module.exports = {
   resetPasswordForRoles,
   enableAgency,
   getPasswordResetRequestsService,
-  returnBeans
+  returnBeans,
 };
