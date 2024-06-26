@@ -20,7 +20,10 @@ const skinSchema = new mongoose.Schema({
     required: true,
   },
   beans: {
-    type: Number,
+    type: [{
+      time: String,
+      value: Number
+    }],
     required: true,
   },
 },

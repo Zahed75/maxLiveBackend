@@ -90,10 +90,10 @@ const hostSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned','pending', 'unbanned'], // Add 'banned' to the enum values
+      enum: ['active', 'inactive', 'banned', 'pending', 'unbanned'], // Add 'banned' to the enum values
       default: 'active'
     },
-     
+
     nidFront: {
       type: String,
       required: function () {
@@ -104,10 +104,11 @@ const hostSchema = new mongoose.Schema(
       type: String,
       required: function () {
         return this.role === "HO";
-      }},
-    followers: [{ 
+      }
+    },
+    followers: [{
       type: mongoose.Schema.Types.ObjectId, ref: "User"
-     }],
+    }],
 
     otp: {
       type: Number,
@@ -144,9 +145,21 @@ const hostSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isBlock:{
-      type:Boolean,
-      default:false
+    isBlock: {
+      type: Boolean,
+      default: false
+    },
+    exchangeRequest: {
+      type: Boolean,
+      default: false
+    },
+    exchangeRequestDiamonds: {
+      type: Number,
+      default: 0,
+    },
+    totalExchanged: {
+      type: Number,
+      default: 0,
     },
     beans: {
       type: Number,
@@ -156,11 +169,11 @@ const hostSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    coins:{
+    coins: {
       type: Number,
       default: 0,
     },
-    star:{
+    star: {
       type: Number,
       default: 0,
     },

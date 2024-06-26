@@ -32,12 +32,26 @@ const {
         }); 
 };
 
+  const getSellUpdateGraphHandler = async (req, res) => {
+    const { month } = req.query;
+
+    if (!month) {
+        return res.status(400).json({ message: 'Month is required' });
+    }
+        const data = await resellerService.getSellUpdateGraphService(parseInt(month));
+        res.status(200).json({
+            message:"Reseller coin sell data fetched successfully",
+            data
+        }); 
+};
+
 
 
 
 
 
 router.get('/coins-sold-resellers-per-month',getCoinsSoldByResellersPerMonth)
+router.get('/sell-update-graph',getSellUpdateGraphHandler )
 
 
 module.exports = router;

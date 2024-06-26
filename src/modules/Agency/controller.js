@@ -23,11 +23,11 @@ const { messaging } = require("firebase-admin");
 
 const registerAgencyHandler = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params._id; 
-  
+    const userId = req.params._id;
+
     const result = await agencyService.registerAgencyService(userId, req.body, req.files);
 
-  
+
     res.status(result.status).json(result);
   } catch (error) {
     console.error(error);
@@ -262,8 +262,46 @@ const transferHostToAgencyHandler = asyncHandler(async (req, res) => {
 });
 
 
+const createExchangeRequestHandler = asyncHandler(async (req, res) => {
+  const { hostId, diamonds } = req.body;
+
+  // Validate request body
+  if (!hostId || !diamonds) {
+    return res.status(400).json({ message: 'Host ID and Diamonds are required' });
+  }
+
+  // Call the service function
+  const updatedHost = await agencyService.createExchangeRequest(hostId, diamonds);
+
+  res.status(updatedHost.status).json({ message: updatedHost.message, host: updatedHost.host });
+});
+const acceptExchangeRequestHandler = asyncHandler(async (req, res) => {
+  const { hostId } = req.query;
+  if (!hostId) {
+    return res.status(400).json({ message: 'Host ID is required' });
+  }
+
+  const response = await agencyService.acceptExchangeRequest(hostId);
+
+  res.status(response.status).json({ message: response.message, host: response.host });
+});
+const declineExchangeRequestHandler = asyncHandler(async (req, res) => {
+  const { hostId } = req.query;
+  if (!hostId) {
+    return res.status(400).json({ message: 'Host ID is required' });
+  }
+
+  const response = await agencyService.declineExchangeRequest(hostId);
+
+  res.status(response.status).json({ message: response.message, host: response.host });
+});
 
 
+const countryAgencyTargetGraphHandler = asyncHandler(async (req, res) => {
+  const response = await agencyService.countryAgencyTargetGraphService();
+
+  res.status(response.status).json({ message: response.message, result: response.countryTargets});
+});
 
 
 
@@ -278,9 +316,15 @@ router.post("/approveHostHandler/:userId", approveHostHandler)
 router.post("/agencySignin", signinAgencyController);
 router.put("/:id", updateAgencyHandler);
 router.get('/hosts', getAllHostsByAgency);
-router.get('/:id', getHostbyIdHandler);
+router.get('/countryAgencyTargetGraph', countryAgencyTargetGraphHandler)
+
 router.post('/declined', blockHostHandler);
 router.post('/agencyPassReset', AgencypassResetHandler);
 router.get('/detailsAgency/:id', getAgencyDetailsById);
 router.patch('/transferHost', transferHostToAgencyHandler);
+router.post('/createExchangeRequest', createExchangeRequestHandler);
+router.post('/acceptExchangeRequest', acceptExchangeRequestHandler)
+router.post('/declineExchangeRequest', declineExchangeRequestHandler)
+router.get('/:id', getHostbyIdHandler);
+
 module.exports = router;

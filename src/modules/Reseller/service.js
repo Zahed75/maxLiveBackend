@@ -40,13 +40,91 @@ const getCoinsSoldByResellersPerMonth = async (year, month) => {
 };
 
 
-
-
-
+// --------------------
+const getSellUpdateGraphService = async (monthNumber) => {
+    try {
+      const today = new Date();
+      const startOfMonth = new Date(today.getFullYear(), monthNumber - 1, 1);
+      const endOfMonth = new Date(today.getFullYear(), monthNumber, 0);
+      const pipeline = [
+        {
+            $match: {
+              createdAt: {
+                $gte: startOfMonth,
+                $lte: endOfMonth,
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: 'users', 
+              localField: 'userId',
+              foreignField: '_id',
+              as: 'user',
+            },
+          },
+          {
+            $unwind: '$user',
+          },
+          {
+            $match: {
+              'user.role': 'BR',
+            },
+          },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            totalAmount: { $sum: '$amount' }
+          }
+        }
+      ];
+  
+      const graphData = await Bean.aggregate(pipeline);
+      const formattedGraphData = formatGraphData(graphData, startOfMonth, today);
+      return formattedGraphData;
+    } catch (error) {
+      console.error('Error fetching graph data:', error);
+      throw new Error('Internal server error');
+    }
+  };
+  
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+};
+  
+  const formatGraphData = (graphData, startOfMonth, endOfMonth) => {
+    const formattedData = [];
+    let currentDate = new Date(startOfMonth);
+  
+    while (currentDate <= endOfMonth) {
+      const dateString = formatDate(currentDate);
+      const graphItem = graphData.find(item => item._id === dateString);
+      if (graphItem) {
+        formattedData.push({
+          date: dateString,
+          totalAmount: graphItem.totalAmount
+        });
+      } else {
+        formattedData.push({
+          date: dateString,
+          totalAmount: 0
+        });
+      }
+  
+      currentDate.setDate(currentDate.getDate() + 1); 
+    }
+  
+    return formattedData;
+  };
+//   ---------------
 
 
 
 module.exports = {
     getCoinsSoldByResellersPerMonth,
-    
+    getSellUpdateGraphService
 }

@@ -213,7 +213,7 @@ const getAllHostsByAgency = async (agencyId) => {
     "userId",
     "firstName lastName email"
   );
-console.log(agencyId)
+  console.log(agencyId)
   if (!hosts.length) {
     hosts = [];
   }
@@ -270,10 +270,10 @@ const passwordResetService = async (adminId, userId, newPassword) => {
       throw new Error("New password must be a string");
     }
     // Set the new password (hashing will be done automatically by the pre-save hook)
-    if(user.role === "AG" || user.role ==="HO"){
+    if (user.role === "AG" || user.role === "HO") {
 
       user.password = await bcrypt.hash(newPassword, 10);
-    }else{
+    } else {
 
       user.password = newPassword
     }
@@ -417,6 +417,92 @@ const transferHostToAgency = async (hostId, newAgencyId) => {
     throw error;
   }
 };
+const createExchangeRequest = async (hostId, diamonds) => {
+  try {
+    const host = await Host.findOne({ _id: hostId, role: "HO" });
+    if (!host) {
+      throw new NotFound("Host not found");
+    }
+    if (diamonds > host.diamonds) {
+      throw new Error("Insufficient diamonds")
+    }
+    host.exchangeRequest = true
+    host.exchangeRequestDiamonds += diamonds
+    // Save the host
+    await host.save();
+
+    return { status: 200, message: 'Exchange request successfull', host };
+  } catch (error) {
+    console.error("Error creating exchange request:", error);
+    throw error;
+  }
+};
+const acceptExchangeRequest = async (hostId) => {
+  try {
+    const host = await Host.findOne({ _id: hostId, role: "HO" });
+    if (!host) {
+      throw new NotFound("Host not found");
+    }
+    host.exchangeRequest = false;
+    host.beans += host.exchangeRequestDiamonds;
+    host.totalExchanged += host.exchangeRequestDiamonds
+    host.diamonds -= host.exchangeRequestDiamonds
+    host.exchangeRequestDiamonds = 0;
+    // Save the host
+    await host.save();
+
+    return { status: 200, message: 'Exchange accept successfully', host };
+  } catch (error) {
+    console.error("Error accept exchange request", error);
+    throw error;
+  }
+};
+const declineExchangeRequest = async (hostId) => {
+  try {
+    const host = await Host.findOne({ _id: hostId, role: "HO" });
+    if (!host) {
+      throw new NotFound("Host not found");
+    }
+    host.exchangeRequest = false;
+    host.exchangeRequestDiamonds = 0;
+    // Save the host
+    await host.save();
+
+    return { status: 200, message: 'Exchange decline successfully', host };
+  } catch (error) {
+    console.error("Error accept exchange request", error);
+    throw error;
+  }
+};
+
+const countryAgencyTargetGraphService = async () => {
+  try {
+    // Calculate country-wise total targets using MongoDB aggregation
+    const countryTargets = await Agency.aggregate([
+      {
+        $group: {
+          _id: "$country", // Use _id to specify the grouping key
+          totalTargets: { $sum: { $toDouble: "$monthlyTarget" } } // Convert monthlyTarget to double before summing
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          country: "$_id",
+          totalTargets: 1
+        }
+      }
+    ]);
+
+    return { status: 200, message: 'Country-wise Agency targets fetched successfully', countryTargets };
+  } catch (error) {
+    console.error("Error fetching agency targets", error);
+    throw error;
+  }
+};
+
+
+
 
 module.exports = {
   registerAgencyService,
@@ -432,4 +518,8 @@ module.exports = {
   passwordResetAgency,
   getAgencyById,
   transferHostToAgency,
+  createExchangeRequest,
+  acceptExchangeRequest,
+  declineExchangeRequest,
+  countryAgencyTargetGraphService
 };
