@@ -19,23 +19,40 @@ const roleMiddleware = require("../../middlewares/roleMiddleware");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const { asyncHandler } = require("../../utility/common");
 
-
-const { generateAgoraToken } = require('../../utility/agora'); // Import Agora utility
+const { generateRoomToken, RtcRole } = require('../Auth/service');
 
 
 
 
 const generateAgoraTokens = asyncHandler(async (req, res) => {
-  const { channelName, uid, role } = req.body;
+  const { channelName, uid, role, tokentype } = req.params;
+  let { expiry } = req.query;
 
   try {
     // Validate input
-    if (!channelName || typeof uid !== 'number' || !role) {
-      return res.status(400).json({ message: 'Invalid input. Channel name, UID, and role are required.' });
+    if (!channelName || !uid || !role || !tokentype) {
+      return res.status(400).json({ message: 'Invalid input. Channel name, UID, role, and token type are required.' });
     }
 
-    // Call authService to generate token
-    const token = await authService.generateRoomToken(channelName, uid, role);
+    // Determine role
+    let userRole;
+    if (role === 'publisher') {
+      userRole = RtcRole.PUBLISHER;
+    } else if (role === 'audience') {
+      userRole = RtcRole.SUBSCRIBER;
+    } else {
+      return res.status(400).json({ message: 'Invalid role. Role must be publisher or audience.' });
+    }
+
+    // Set default expiry time if not provided
+    if (!expiry || expiry === '') {
+      expiry = 3600; // 1 hour
+    } else {
+      expiry = parseInt(expiry, 10);
+    }
+
+    // Generate the token
+    const token = await generateRoomToken(channelName, uid, userRole, tokentype, expiry);
 
     // Return the token in the response
     res.status(200).json({ token });
@@ -48,25 +65,6 @@ const generateAgoraTokens = asyncHandler(async (req, res) => {
 
 
 
-
-
-// const registerUserHandler = asyncHandler(async (req, res) => {
- 
-//     const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
-
-//     const userData = {
-//       ...req.body,
-//       profilePicture: profilePicturePath,
-//     };
-//     const result = await authService.registerUserService(userData);
-
-//     // Send response based on the result
-//     res.status(200).json({
-//       message:"User Create SuccessFully",
-//       result
-//     });
- 
-// });
 
 
 const registerUserHandler = asyncHandler(async (req, res) => {
@@ -181,5 +179,7 @@ router.post("/signInUser", userSignInHandler);
 
 router.post('/registerMaster',registerMasterPortalHandler)
 router.post('/agora-token',generateAgoraTokens);
+
+router.get('/generateToken/:channelName/:uid/:role/:tokentype', generateAgoraTokens);
 
 module.exports = router;
