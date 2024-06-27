@@ -34,7 +34,9 @@ const registerAgencyService = async (userId, agencyData, files) => {
     } else {
       return { status: 400, message: "NID photos are required" };
     }
-
+    if (files && files['profilePicture']) {
+      agencyData.profilePicture = files['profilePicture'][0].path;
+    }
     agencyData.maxId = generateMaxId();
 
     const newAgency = new Agency(agencyData);
@@ -194,7 +196,10 @@ const signinAgencyService = async (email, password) => {
 
 // updateAgency
 
-const updateAgencyById = async (id, value) => {
+const updateAgencyById = async (id, value, profilePicturePath) => {
+  if(profilePicturePath){
+    value.profilePicture = profilePicturePath
+  }
   const agencyList = await Agency.findByIdAndUpdate({ _id: id }, value, {
     new: true,
   });

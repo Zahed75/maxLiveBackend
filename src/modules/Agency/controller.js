@@ -90,7 +90,9 @@ const signinAgencyController = asyncHandler(async (req, res) => {
 
 const updateAgencyHandler = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const editAgency = await agencyService.updateAgencyById(id, req.body);
+  const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
+
+  const editAgency = await agencyService.updateAgencyById(id, req.body, profilePicturePath);
   res.status(200).json({
     message: "Agency Updated Successfully!",
     editAgency
@@ -300,7 +302,7 @@ const declineExchangeRequestHandler = asyncHandler(async (req, res) => {
 const countryAgencyTargetGraphHandler = asyncHandler(async (req, res) => {
   const response = await agencyService.countryAgencyTargetGraphService();
 
-  res.status(response.status).json({ message: response.message, result: response.countryTargets});
+  res.status(response.status).json({ message: response.message, result: response.countryTargets });
 });
 
 
@@ -309,12 +311,15 @@ router.put('/unblock-host', unblockHostHandler);
 router.patch('/setPassword', authMiddleware, roleMiddleware([MASTER_PORTAL]), passResetHandler);
 router.post("/registerAgency/:_id", multerMiddleware.upload.fields([
   { name: 'nidPhotoFront', maxCount: 1 },
-  { name: 'nidPhotoBack', maxCount: 1 }
+  { name: 'nidPhotoBack', maxCount: 1 },
+  { name: 'profilePicture', maxCount: 1 }
 ]), registerAgencyHandler);
 router.put("/getAllPendingHostHandler", getAllPendingHostHandler);
 router.post("/approveHostHandler/:userId", approveHostHandler)
 router.post("/agencySignin", signinAgencyController);
-router.put("/:id", updateAgencyHandler);
+router.put("/:id", multerMiddleware.upload.fields([
+  { name: 'profilePicture', maxCount: 1 }
+]), updateAgencyHandler);
 router.get('/hosts', getAllHostsByAgency);
 router.get('/countryAgencyTargetGraph', countryAgencyTargetGraphHandler)
 

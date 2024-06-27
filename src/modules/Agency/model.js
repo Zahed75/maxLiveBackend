@@ -20,6 +20,9 @@ const agencySchema = new mongoose.Schema({
     type: String,
     required: [true, "Agency holder name is required"],
   },
+  profilePicture: {
+    type: String,
+  },
   country: {
     type: String,
     enum: ["BD", "NEP", "IND"],
