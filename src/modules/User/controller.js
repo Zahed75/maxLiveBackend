@@ -186,7 +186,7 @@ const getUserLevelHandler = asyncHandler(async (req, res) => {
 
   res.status(result.status).json({
     message: result.message,
-    result
+    level: result.level
   });
 });
 

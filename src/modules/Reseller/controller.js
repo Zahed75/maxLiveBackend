@@ -19,13 +19,9 @@ const {
 
 
 
-  const getCoinsSoldByResellersPerMonth = async (req, res) => {
-    const { year, month } = req.query;
-
-    if (!year || !month) {
-        return res.status(400).json({ message: 'Year and month are required' });
-    }
-        const totalCoins = await resellerService.getCoinsSoldByResellersPerMonth(parseInt(year), parseInt(month));
+  const getCoinsSoldByResellersToday = async (req, res) => {
+    
+        const totalCoins = await resellerService.getCoinsSoldByResellersToday();
         res.status(200).json({
             message:"Get Total Coins Fetched successfully",
             totalCoins
@@ -33,12 +29,12 @@ const {
 };
 
   const getSellUpdateGraphHandler = async (req, res) => {
-    const { month } = req.query;
+    const { month, year } = req.query;
 
     if (!month) {
         return res.status(400).json({ message: 'Month is required' });
     }
-        const data = await resellerService.getSellUpdateGraphService(parseInt(month));
+        const data = await resellerService.getSellUpdateGraphService(parseInt(year), parseInt(month));
         res.status(200).json({
             message:"Reseller coin sell data fetched successfully",
             data
@@ -50,7 +46,7 @@ const {
 
 
 
-router.get('/coins-sold-resellers-per-month',getCoinsSoldByResellersPerMonth)
+router.get('/coins-sold-resellers-today',getCoinsSoldByResellersToday)
 router.get('/sell-update-graph',getSellUpdateGraphHandler )
 
 

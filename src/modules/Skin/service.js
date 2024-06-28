@@ -1,5 +1,6 @@
 const { Skin } = require("./model");
 const User = require("../User/model");
+const { NotFound } = require("../../utility/errors");
 
 const getAllSkin = async () => {
   const result = await Skin.find();
@@ -39,15 +40,14 @@ const createSkinService = async (payload, filePath) => {
 };
 
 const sendSkinService = async (payload) => {
-  const { user, ...restData } = payload;
-
-  const isUserExists = await User.findOne({ _id: payload.user });
+  const { userId, ...restData } = payload;
+  const isUserExists = await User.findOne({ maxId: payload.userId });
   const isSkinExists = await Skin.findOne({ _id: payload.skin });
   if (!isUserExists) {
-    throw new Error("User doest not exists, please check your user id");
+    throw new NotFound("User not found");
   }
   if (!isSkinExists) {
-    throw new Error("Skin doest not exists, please check your skin id");
+    throw new NotFound("User not found");
   }
   const isSkinsAlreadySent = isUserExists?.skins.filter(
     (item) => item.skin === payload.skin
@@ -58,8 +58,8 @@ const sendSkinService = async (payload) => {
   }
 
   try {
-    const result = await User.findByIdAndUpdate(
-      payload.user,
+    const result = await User.findOneAndUpdate(
+      {maxId: payload.userId},
       {
         $push: {
           skins: restData,
