@@ -34,4 +34,23 @@ const skinSchema = new mongoose.Schema(
 
 const Skin = mongoose.model("Skin", skinSchema);
 
+
+
+skinSchema.pre('find', function (next) {
+  this.where({ expiryDate: { $gt: new Date() } });
+  next();
+});
+
+skinSchema.pre('findOne', function (next) {
+  this.where({ expiryDate: { $gt: new Date() } });
+  next();
+});
+
+
+
+
+
 module.exports = { Skin };
+
+
+
