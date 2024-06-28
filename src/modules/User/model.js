@@ -1,30 +1,34 @@
 const bcrypt = require("bcryptjs");
 const { required } = require("joi");
 const mongoose = require("mongoose");
-
+const addDurationToDate = require("../../utility/addDurationToDate");
 
 const UserSkinsSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "User"
+      ref: "User",
     },
     skin: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Skin"
+      ref: "Skin",
     },
     expiresIn: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
+UserSkinsSchema.pre("save", function (next) {
+  this.expiresIn = addDurationToDate(this.expiresIn, this.createdAt);
 
+  next();
+});
 
 const UserSchema = new mongoose.Schema(
   {
@@ -49,15 +53,15 @@ const UserSchema = new mongoose.Schema(
 
     gender: {
       type: String,
-      enum: ['male', 'female', 'others']
+      enum: ["male", "female", "others"],
     },
     email: {
       type: String,
       unique: true,
       required: true,
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     password: {
       type: String,
@@ -65,12 +69,11 @@ const UserSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-
     },
     maxId: {
       type: String,
       unique: true,
-      // required: true 
+      // required: true
     },
 
     hostId: {
@@ -140,13 +143,13 @@ const UserSchema = new mongoose.Schema(
 
     isApproved: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned', 'unbanned'], // Add 'banned' to the enum values
-      default: 'active'
+      enum: ["active", "inactive", "banned", "unbanned"], // Add 'banned' to the enum values
+      default: "active",
     },
 
     otp: Number,
@@ -164,10 +167,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       // BU -> BASIC USER
       // HO -> HOST
-      //AG-AGENCY 
+      //AG-AGENCY
       //MP -> MASTER PORTAL
       // AD -> ADMIN
-      //CN - COIN 
+      //CN - COIN
       // BR -BEAN RESELLER
       enum: ["BU", "HO", "AG", "MP", "AD", "CN", "BR"],
       required: true,
@@ -175,8 +178,8 @@ const UserSchema = new mongoose.Schema(
 
     hostStatus: {
       type: String,
-      enum: ['active', 'inactive', 'banned', 'pending', 'unbanned'], // Add 'banned' to the enum values
-      default: 'active'
+      enum: ["active", "inactive", "banned", "pending", "unbanned"], // Add 'banned' to the enum values
+      default: "active",
     },
 
     isVerified: {
@@ -185,16 +188,16 @@ const UserSchema = new mongoose.Schema(
     },
     passwordResetRequested: {
       type: Boolean,
-      default: false
+      default: false,
     },
     diamondsSent: {
       type: Number,
-      default: 0
+      default: 0,
     },
     // ...Skins/Frame/Level/Coins/Beans...
     beans: {
       type: Number,
-      default: 0
+      default: 0,
     },
     diamonds: {
       type: Number,
@@ -220,21 +223,26 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    frames: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Frame',
-    }],
-    skins: [{
-      type: UserSkinsSchema,
-      // ref: 'Skin',
-    }],
-    posts: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Feed'
-    }],
+    frames: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Frame",
+      },
+    ],
+    skins: [
+      {
+        type: UserSkinsSchema,
+        // ref: 'Skin',
+      },
+    ],
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Feed",
+      },
+    ],
     refreshToken: [String],
   },
-
 
   { timestamps: true }
 );
@@ -250,6 +258,15 @@ UserSchema.pre("save", async function hashPassword(next) {
 UserSchema.methods = {
   async authenticate(password) {
     return await bcrypt.compare(password, this.password);
+  },
+
+  filterExpiredSkins() {
+    const currentDate = new Date();
+
+    this.skins = this.skins.filter((skin) => {
+      const expiryDate = addDurationToDate(skin.expiresIn, skin.createdAt);
+      return expiryDate > currentDate;
+    });
   },
 };
 

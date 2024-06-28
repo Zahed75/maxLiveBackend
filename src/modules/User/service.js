@@ -40,6 +40,7 @@ const resetPassword = async (email, newPassword) => {
 const getSocialUserById = async (firebaseUid) => {
   try {
     const user = await User.findOne({ firebaseUid: firebaseUid });
+    user.filterExpiredSkins();
     return user;
   } catch (error) {
     console.error('Error finding user by Firebase UID:', error);
@@ -55,14 +56,8 @@ const getUserById = async (userId) => {
     if (!user) {
       throw new Error("User not found");
     }
-  
-    // const currentDate = new Date();
-    // const validSkins = user.skins.filter(skin => skin.expiryDate > currentDate);
-  
-    // if (validSkins.length !== user.skins.length) {
-    //   user.skins = validSkins.map(skin => skin._id);
-    //   await user.save();
-    // }
+
+    user.filterExpiredSkins();
     return user;
   } catch (error) {
     console.error("Error fetching user:", error);
