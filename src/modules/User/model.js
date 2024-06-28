@@ -16,7 +16,7 @@ const UserSkinsSchema = new mongoose.Schema(
       ref: "Skin"
     },
     expiresIn: {
-      type: Number,
+      type: String,
       required: true
     }
   },

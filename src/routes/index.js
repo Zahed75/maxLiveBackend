@@ -20,6 +20,7 @@ const resellerRoute = require('../modules/Reseller/controller');
 const SkinRoute = require('../modules/Skin/route');
 const BannerRoute = require('../modules/Banner/route');
 const LevelRoute = require('../modules/Level/controller');
+const LiveRoomRoute = require('../modules/LiveRoom/route');
 
     
 
@@ -38,6 +39,7 @@ router.use('/skin',SkinRoute);
 router.use('/seat-beside-host',SeatBesideHostRoutes);
 router.use('/banner', BannerRoute);
 router.use('/level', LevelRoute)
+router.use('/live-room', LiveRoomRoute)
 // router.use(authVerifyMiddleware);
 
 module.exports = router;

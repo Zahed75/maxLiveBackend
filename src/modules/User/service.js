@@ -51,10 +51,18 @@ const getSocialUserById = async (firebaseUid) => {
 
 const getUserById = async (userId) => {
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate('skins');
     if (!user) {
       throw new Error("User not found");
     }
+  
+    // const currentDate = new Date();
+    // const validSkins = user.skins.filter(skin => skin.expiryDate > currentDate);
+  
+    // if (validSkins.length !== user.skins.length) {
+    //   user.skins = validSkins.map(skin => skin._id);
+    //   await user.save();
+    // }
     return user;
   } catch (error) {
     console.error("Error fetching user:", error);

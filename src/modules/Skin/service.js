@@ -1,6 +1,9 @@
 const { Skin } = require("./model");
 const User = require("../User/model");
 const { NotFound } = require("../../utility/errors");
+const dayjs = require("dayjs");
+const duration = require("dayjs/plugin/duration");
+dayjs.extend(duration);
 
 const getAllSkin = async () => {
   const result = await Skin.find();
@@ -9,14 +12,13 @@ const getAllSkin = async () => {
 const cloudinary = require("cloudinary").v2;
 
 const createSkinService = async (payload, filePath) => {
-  console.log(payload)
-  payload.beans = JSON.parse(payload.beans)
+  console.log(payload);
+  payload.beans = JSON.parse(payload.beans);
 
   try {
-    if(!filePath){
-      throw new Error("Please add media to create skin")
+    if (!filePath) {
+      throw new Error("Please add media to create skin");
     }
-
 
     let file = "";
     if (payload.fileType.startsWith("image/")) {
@@ -26,7 +28,9 @@ const createSkinService = async (payload, filePath) => {
       const cloudinaryResponse = await cloudinary.uploader.upload(filePath);
       file = cloudinaryResponse?.secure_url;
     } else if (payload.fileType.startsWith("video/")) {
-      const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {resource_type: "video"});
+      const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
+        resource_type: "video",
+      });
       file = cloudinaryResponse?.secure_url;
     }
 
@@ -58,8 +62,21 @@ const sendSkinService = async (payload) => {
   }
 
   try {
-    const result = await User.findOneAndUpdate(
-      {maxId: payload.userId},
+
+    const days = parseInt(payload.expiresIn, 10);
+    const totalSeconds = days * 24 * 60 * 60; // Convert days to seconds
+
+    const timeDuration = dayjs.duration(totalSeconds, "seconds");
+    const hours = Math.floor(totalSeconds / 3600).toString();
+    const minutes = timeDuration.minutes().toString().padStart(2, '0');
+    const seconds = timeDuration.seconds().toString().padStart(2, '0');
+    const milliseconds = timeDuration.milliseconds().toString().padStart(6, '0');
+
+    restData.expiresIn = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+
+
+    const result = await User.findByIdAndUpdate(
+      payload.userId,
       {
         $push: {
           skins: restData,
