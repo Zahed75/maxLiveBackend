@@ -106,7 +106,8 @@ const updateUserInfoService = async (
     // Handle profile picture upload (if applicable):
     if (profilePicturePath) {
       // Update `updatedInfo` object to include profile picture path
-      updatedInfo.profilePicture = profilePicturePath;
+      updatedInfo.profilePicture = profilePicturePath
+      
     }
 
     const updatedResult = await User.findByIdAndUpdate(userId, updatedInfo, {

@@ -87,7 +87,7 @@ const getAllUsersHandler = asyncHandler(async (req, res) => {
 
 
 const updateUserInfoHandler = asyncHandler(async (req, res) => {
-  const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path : '';
+  const profilePicturePath = req.files['profilePicture'] ? req.files['profilePicture'][0].path.replace(/\\/g, '/') : '';
   const updatedUser = await userService.updateUserInfoService(
     req.params.id,
     req.body,
