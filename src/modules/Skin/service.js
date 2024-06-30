@@ -130,7 +130,8 @@ const buySkinService = async (payload) => {
   if (isSkinsAlreadyBuy.length > 0) {
     throw new Error("You bought this skin already");
   }
-  const expiresInTime = isSkinExists.beans.find(item => getDurationFromTime(item.time, 'full') === expiresIn)
+  // const expiresInTime = isSkinExists.beans.find(item => getDurationFromTime(item.time, 'full')  === expiresIn)
+  const expiresInTime = isSkinExists.beans.find(item => item.time  === expiresIn)
   if(expiresInTime.value > isUserExists.beans){
     throw new Error("Insufficient beans")
   }
