@@ -3,11 +3,7 @@ const { default: mongoose } = require("mongoose");
 
  const UserSkinsSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
+
     skin: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
