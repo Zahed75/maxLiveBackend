@@ -2,9 +2,19 @@ const dayjs = require("dayjs");
 const { SeatBesideHost } = require("./model");
 
 const createSeatBesideHostService = async (payload) => {
-  const days = parseInt(payload.time, 10);
-  const totalSeconds = days * 24 * 60 * 60; // Convert days to seconds
-
+  const timeNumber = parseInt(payload.time, 10);
+  let totalSeconds = 0
+  if(payload.time.includes('d')){
+   totalSeconds = timeNumber * 24 * 60 * 60;
+  }else if(payload.time.includes('h')){
+    totalSeconds = timeNumber * 60 * 60
+  
+  }else if(payload.time.includes('w')){
+    totalSeconds = timeNumber * 7 * 24 * 60 * 60
+  
+  }else if(payload.time.includes('m')){
+    totalSeconds = timeNumber * 60
+  }
   const timeDuration = dayjs.duration(totalSeconds, "seconds");
   const hours = Math.floor(totalSeconds / 3600).toString();
   const minutes = timeDuration.minutes().toString().padStart(2, '0');
