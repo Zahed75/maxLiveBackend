@@ -38,10 +38,6 @@ const Skin = mongoose.model("Skin", skinSchema);
 
 
 
-
-
-
-
 module.exports = { Skin };
 
 

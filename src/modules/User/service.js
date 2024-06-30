@@ -40,7 +40,6 @@ const resetPassword = async (email, newPassword) => {
 const getSocialUserById = async (firebaseUid) => {
   try {
     const user = await User.findOne({ firebaseUid: firebaseUid });
-    user.filterExpiredSkins();
     return user;
   } catch (error) {
     console.error('Error finding user by Firebase UID:', error);
@@ -57,7 +56,6 @@ const getUserById = async (userId) => {
       throw new Error("User not found");
     }
 
-    user.filterExpiredSkins();
     return user;
   } catch (error) {
     console.error("Error fetching user:", error);

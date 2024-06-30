@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const addDurationToDate = require("../../utility/addDurationToDate");
 const { UserSkinsSchema } = require("../../utility/common");
 
-
 // UserSkinsSchema.pre("save", function (next) {
 //   this.expiresIn = addDurationToDate(this.expiresIn, this.createdAt);
 
@@ -240,16 +239,28 @@ UserSchema.methods = {
   async authenticate(password) {
     return await bcrypt.compare(password, this.password);
   },
+};
 
-  filterExpiredSkins() {
+UserSchema.post("findOne", async function (doc, next) {
+  if (doc) {
     const currentDate = new Date();
+    const originalSkinCount = doc.skins.length;
 
-    this.skins = this.skins.filter((skin) => {
+    doc.skins = doc.skins.filter((skin) => {
       const expiryDate = addDurationToDate(skin.expiresIn, skin.createdAt);
       return expiryDate > currentDate;
     });
-  },
-};
+
+    if (doc.skins.length !== originalSkinCount) {
+      try {
+        await doc.save();
+      } catch (error) {
+        return next(error);
+      }
+    }
+  }
+  next();
+});
 
 const UserModel = mongoose.model("User", UserSchema);
 

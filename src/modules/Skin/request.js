@@ -6,9 +6,16 @@ const SKINS = {
   RIDE: "RIDE",
 };
 
+const beans = Joi.object().keys({
+  time: Joi.string().required(),
+  value: Joi.number().required()
+});
+
+
+
 const createSkinValidationSchema = Joi.object().keys({
   name: Joi.string().required(),
-  beans: Joi.number().required(),
+  beans: Joi.array().ordered(beans),
   type: Joi.string().required().valid(SKINS),
 });
 

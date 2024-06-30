@@ -16,8 +16,13 @@ const getAllSkin = async () => {
 const cloudinary = require("cloudinary").v2;
 
 const createSkinService = async (payload, filePath) => {
-  console.log(payload);
-  payload.beans = JSON.parse(payload.beans);
+
+  payload.beans = JSON.parse(payload.beans)
+  payload.beans = payload.beans.map((bean) => {
+    bean.time = getDurationFromTime(bean.time, "full");
+    return bean;
+  });
+
 
   try {
     if (!filePath) {
@@ -48,14 +53,13 @@ const createSkinService = async (payload, filePath) => {
 };
 
 const sendSkinService = async (payload) => {
-  
   const { user, ...restData } = payload;
   let isUserExists = await User.findOne({ maxId: payload.user });
   if (!isUserExists) {
-    isUserExists = await Host.findOne({ maxId: user })
+    isUserExists = await Host.findOne({ maxId: user });
   }
   if (!isUserExists) {
-    isUserExists = await Agency.findOne({ maxId: user })
+    isUserExists = await Agency.findOne({ maxId: user });
   }
   const isSkinExists = await Skin.findOne({ _id: payload.skin });
   if (!isUserExists) {
@@ -64,41 +68,51 @@ const sendSkinService = async (payload) => {
   if (!isSkinExists) {
     throw new NotFound("Skin not found");
   }
+  
   const isSkinsAlreadySent = isUserExists?.skins.find(
-    (item) => item.skin === payload.skin
+    (item) => item.skin.toString() === payload.skin
   );
 
   if (isSkinsAlreadySent) {
-    throw new Error("You sent this skin before");
+    throw new Error("Skin already sent");
   }
 
   try {
-
     const days = parseInt(payload.expiresIn, 10);
     const totalSeconds = days * 24 * 60 * 60; // Convert days to seconds
 
     const timeDuration = dayjs.duration(totalSeconds, "seconds");
     const hours = Math.floor(totalSeconds / 3600).toString();
-    const minutes = timeDuration.minutes().toString().padStart(2, '0');
-    const seconds = timeDuration.seconds().toString().padStart(2, '0');
-    const milliseconds = timeDuration.milliseconds().toString().padStart(6, '0');
+    const minutes = timeDuration.minutes().toString().padStart(2, "0");
+    const seconds = timeDuration.seconds().toString().padStart(2, "0");
+    const milliseconds = timeDuration
+      .milliseconds()
+      .toString()
+      .padStart(6, "0");
 
     restData.expiresIn = `${hours}:${minutes}:${seconds}.${milliseconds}`;
 
-    const result = await (isUserExists.role === 'AG' ? Agency : isUserExists.role === 'HO' ? Host : User).findOneAndUpdate(
-      { maxId: payload.user },
-      {
-        $push: {
-          skins: { skin: restData.skin, expiresIn: restData.expiresIn },
+    const result = await (isUserExists.role === "AG"
+      ? Agency
+      : isUserExists.role === "HO"
+      ? Host
+      : User
+    )
+      .findOneAndUpdate(
+        { maxId: payload.user },
+        {
+          $push: {
+            skins: { skin: restData.skin, expiresIn: restData.expiresIn },
+          },
         },
-      },
-      {
-        new: true,
-      }
-    ).populate({
-      path: "skins.skin",
-      model: "Skin",
-    });
+        {
+          new: true,
+        }
+      )
+      .populate({
+        path: "skins.skin",
+        model: "Skin",
+      });
     return result;
   } catch (error) {
     throw error; // Re-throw error for proper handling in controller
@@ -109,10 +123,10 @@ const buySkinService = async (payload) => {
   let isUserExists = await User.findOne({ maxId: user });
   const isSkinExists = await Skin.findById(skinId);
   if (!isUserExists) {
-    isUserExists = await Host.findOne({ maxId: user })
+    isUserExists = await Host.findOne({ maxId: user });
   }
   if (!isUserExists) {
-    isUserExists = await Agency.findOne({ maxId: user })
+    isUserExists = await Agency.findOne({ maxId: user });
   }
   if (!isUserExists) {
     throw new NotFound("User not found");
@@ -121,7 +135,7 @@ const buySkinService = async (payload) => {
     throw new NotFound("Skin not found");
   }
   if (!expiresIn) {
-    throw new Error("Expire time is required")
+    throw new Error("Expire time is required");
   }
   const isSkinsAlreadyBuy = isUserExists?.skins.filter(
     (item) => item.skin.toString() === skinId
@@ -130,29 +144,37 @@ const buySkinService = async (payload) => {
   if (isSkinsAlreadyBuy.length > 0) {
     throw new Error("You bought this skin already");
   }
-  const expiresInTime = isSkinExists.beans.find(item => getDurationFromTime(item.time, 'full') === expiresIn)
-  if(expiresInTime.value > isUserExists.beans){
-    throw new Error("Insufficient beans")
+  const expiresInTime = isSkinExists.beans.find(
+    (item) => getDurationFromTime(item.time, "full") === expiresIn
+  );
+  if (expiresInTime.value > isUserExists.beans) {
+    throw new Error("Insufficient beans");
   }
   try {
-    const result = await (isUserExists.role === 'AG' ? Agency : isUserExists.role === 'HO' ? Host : User).findOneAndUpdate(
-      { maxId: payload.user },
-      {
-        $push: {
-          skins: { skin: skinId, expiresIn },
+    const result = await (isUserExists.role === "AG"
+      ? Agency
+      : isUserExists.role === "HO"
+      ? Host
+      : User
+    )
+      .findOneAndUpdate(
+        { maxId: payload.user },
+        {
+          $push: {
+            skins: { skin: skinId, expiresIn },
+          },
+          $inc: {
+            beans: -expiresInTime.value, // assuming payload.beansDecrement is the value you want to decrement beans by
+          },
         },
-        $inc: {
-          beans: - expiresInTime.value, // assuming payload.beansDecrement is the value you want to decrement beans by
-        },
-      },
-      {
-        new: true,
-      },
-
-    ).populate({
-      path: "skins.skin",
-      model: "Skin",
-    });
+        {
+          new: true,
+        }
+      )
+      .populate({
+        path: "skins.skin",
+        model: "Skin",
+      });
     return result;
   } catch (error) {
     throw error; // Re-throw error for proper handling in controller
@@ -186,5 +208,5 @@ module.exports = {
   createSkinService,
   sendSkinService,
   deleteSkinService,
-  buySkinService
+  buySkinService,
 };
