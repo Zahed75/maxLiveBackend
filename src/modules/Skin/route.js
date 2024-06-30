@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllSkinsHandler, createSkinHandler, sendSkinHandler, deleteSkinsHandler } = require("./controller");
+const { getAllSkinsHandler, createSkinHandler, sendSkinHandler, deleteSkinsHandler, buySkinHandler } = require("./controller");
 const multerMiddleware = require("../../middlewares/multerMiddlware");
 const router = express.Router();
 
@@ -14,5 +14,6 @@ router.post(
 );
 
 router.put("/send-skin", sendSkinHandler);
+router.post("/buy-skin", buySkinHandler);
 
 module.exports = router;

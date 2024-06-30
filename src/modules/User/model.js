@@ -2,33 +2,14 @@ const bcrypt = require("bcryptjs");
 const { required } = require("joi");
 const mongoose = require("mongoose");
 const addDurationToDate = require("../../utility/addDurationToDate");
+const { UserSkinsSchema } = require("../../utility/common");
 
-const UserSkinsSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    skin: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Skin",
-    },
-    expiresIn: {
-      type: String,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
-UserSkinsSchema.pre("save", function (next) {
-  this.expiresIn = addDurationToDate(this.expiresIn, this.createdAt);
 
-  next();
-});
+// UserSkinsSchema.pre("save", function (next) {
+//   this.expiresIn = addDurationToDate(this.expiresIn, this.createdAt);
+
+//   next();
+// });
 
 const UserSchema = new mongoose.Schema(
   {

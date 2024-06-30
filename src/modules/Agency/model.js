@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { UserSkinsSchema } = require("../../utility/common");
 
 const agencySchema = new mongoose.Schema({
   userId: {
@@ -135,8 +136,8 @@ const agencySchema = new mongoose.Schema({
     ref: 'Frame',
   }],
   skins: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Skin',
+    type: UserSkinsSchema,
+    // ref: 'Skin',
   }],
   agencyEmail: {
     type: String,

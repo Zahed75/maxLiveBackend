@@ -3,8 +3,12 @@ const User = require("../User/model");
 const { NotFound } = require("../../utility/errors");
 const dayjs = require("dayjs");
 const duration = require("dayjs/plugin/duration");
+const Host = require("../Host/model");
+const Agency = require("../Agency/model");
+const { getDurationFromTime } = require("../../utility/common");
+const { default: mongoose } = require("mongoose");
 dayjs.extend(duration);
-
+const ObjectId = mongoose.Types.ObjectId;
 const getAllSkin = async () => {
   const result = await Skin.find();
   return result;
@@ -44,20 +48,27 @@ const createSkinService = async (payload, filePath) => {
 };
 
 const sendSkinService = async (payload) => {
-  const { userId, ...restData } = payload;
-  const isUserExists = await User.findOne({ maxId: payload.userId });
+  
+  const { user, ...restData } = payload;
+  let isUserExists = await User.findOne({ maxId: payload.user });
+  if (!isUserExists) {
+    isUserExists = await Host.findOne({ maxId: user })
+  }
+  if (!isUserExists) {
+    isUserExists = await Agency.findOne({ maxId: user })
+  }
   const isSkinExists = await Skin.findOne({ _id: payload.skin });
   if (!isUserExists) {
     throw new NotFound("User not found");
   }
   if (!isSkinExists) {
-    throw new NotFound("User not found");
+    throw new NotFound("Skin not found");
   }
-  const isSkinsAlreadySent = isUserExists?.skins.filter(
+  const isSkinsAlreadySent = isUserExists?.skins.find(
     (item) => item.skin === payload.skin
   );
 
-  if (isSkinsAlreadySent.length > 0) {
+  if (isSkinsAlreadySent) {
     throw new Error("You sent this skin before");
   }
 
@@ -74,12 +85,11 @@ const sendSkinService = async (payload) => {
 
     restData.expiresIn = `${hours}:${minutes}:${seconds}.${milliseconds}`;
 
-
-    const result = await User.findByIdAndUpdate(
-      payload.userId,
+    const result = await (isUserExists.role === 'AG' ? Agency : isUserExists.role === 'HO' ? Host : User).findOneAndUpdate(
+      { maxId: payload.user },
       {
         $push: {
-          skins: restData,
+          skins: { skin: restData.skin, expiresIn: restData.expiresIn },
         },
       },
       {
@@ -94,7 +104,60 @@ const sendSkinService = async (payload) => {
     throw error; // Re-throw error for proper handling in controller
   }
 };
+const buySkinService = async (payload) => {
+  const { user, skinId, expiresIn } = payload;
+  let isUserExists = await User.findOne({ maxId: user });
+  const isSkinExists = await Skin.findById(skinId);
+  if (!isUserExists) {
+    isUserExists = await Host.findOne({ maxId: user })
+  }
+  if (!isUserExists) {
+    isUserExists = await Agency.findOne({ maxId: user })
+  }
+  if (!isUserExists) {
+    throw new NotFound("User not found");
+  }
+  if (!isSkinExists) {
+    throw new NotFound("Skin not found");
+  }
+  if (!expiresIn) {
+    throw new Error("Expire time is required")
+  }
+  const isSkinsAlreadyBuy = isUserExists?.skins.filter(
+    (item) => item.skin.toString() === skinId
+  );
 
+  if (isSkinsAlreadyBuy.length > 0) {
+    throw new Error("You bought this skin already");
+  }
+  const expiresInTime = isSkinExists.beans.find(item => getDurationFromTime(item.time, 'full') === expiresIn)
+  if(expiresInTime.value > isUserExists.beans){
+    throw new Error("Insufficient beans")
+  }
+  try {
+    const result = await (isUserExists.role === 'AG' ? Agency : isUserExists.role === 'HO' ? Host : User).findOneAndUpdate(
+      { maxId: payload.user },
+      {
+        $push: {
+          skins: { skin: skinId, expiresIn },
+        },
+        $inc: {
+          beans: - expiresInTime.value, // assuming payload.beansDecrement is the value you want to decrement beans by
+        },
+      },
+      {
+        new: true,
+      },
+
+    ).populate({
+      path: "skins.skin",
+      model: "Skin",
+    });
+    return result;
+  } catch (error) {
+    throw error; // Re-throw error for proper handling in controller
+  }
+};
 const deleteSkinService = async (_id) => {
   try {
     const isSkinExist = await Skin.findById(_id);
@@ -123,4 +186,5 @@ module.exports = {
   createSkinService,
   sendSkinService,
   deleteSkinService,
+  buySkinService
 };

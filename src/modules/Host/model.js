@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { UserSkinsSchema } = require("../../utility/common");
 
 const hostSchema = new mongoose.Schema(
   {
@@ -190,8 +191,8 @@ const hostSchema = new mongoose.Schema(
       ref: 'Frame',
     }],
     skins: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Skin',
+      type: UserSkinsSchema,
+      // ref: 'Skin',
     }],
     previousAgency: [
       {
