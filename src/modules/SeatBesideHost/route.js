@@ -1,5 +1,5 @@
 const express = require("express");
-const { createSeatBesideHostHandler , getAllSeatBesideHostHandler , updateSeatBesideHostHandler} = require("./controller");
+const { createSeatBesideHostHandler , getAllSeatBesideHostHandler ,clearHotSeatHandler,bookHotSeatHandler, updateSeatBesideHostHandler} = require("./controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const roleMiddleware = require("../../middlewares/roleMiddleware");
 const { MASTER_PORTAL } = require("../../config/constants");
@@ -9,6 +9,16 @@ router.post(
   "/create-beans-per-time",
   // authMiddleware,
   createSeatBesideHostHandler
+);
+router.post(
+  "/book-hot-seat",
+  // authMiddleware,
+  bookHotSeatHandler
+);
+router.put(
+  "/clear-hot-seat",
+  // authMiddleware,
+  clearHotSeatHandler
 );
 
 router.get("/beans-per-time",

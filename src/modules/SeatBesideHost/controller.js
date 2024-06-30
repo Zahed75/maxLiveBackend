@@ -1,8 +1,11 @@
 const { asyncHandler } = require("../../utility/common");
-const { createSeatBesideHostService,getAllSeatBesideHostService,updateSeatBesideHostService } = require("./service");
-
-
-
+const {
+  createSeatBesideHostService,
+  getAllSeatBesideHostService,
+  updateSeatBesideHostService,
+  bookHotSeatService,
+  clearHotSeatService,
+} = require("./service");
 
 const createSeatBesideHostHandler = asyncHandler(async (req, res) => {
   const result = await createSeatBesideHostService(req.body);
@@ -28,9 +31,26 @@ const updateSeatBesideHostHandler = asyncHandler(async (req, res) => {
   });
 });
 
+const bookHotSeatHandler = asyncHandler(async (req, res) => {
+  const result = await bookHotSeatService(req.body);
+  res.status(result.status).json({
+    message: result.message,
+    result,
+  });
+});
+
+const clearHotSeatHandler = asyncHandler(async (req, res) => {
+  const result = await clearHotSeatService(req.body);
+  res.status(result.status).json({
+    message: result.message,
+    result,
+  });
+});
 
 module.exports = {
-    createSeatBesideHostHandler,
-    getAllSeatBesideHostHandler,
-    updateSeatBesideHostHandler
-}
+  createSeatBesideHostHandler,
+  getAllSeatBesideHostHandler,
+  updateSeatBesideHostHandler,
+  bookHotSeatHandler,
+  clearHotSeatHandler
+};

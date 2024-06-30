@@ -14,6 +14,17 @@ const firebase = {
     } catch (error) {
       throw new Error('User not found');
     }
+  },
+  getRoomById: async (roomId) => {
+    try {
+      const roomDoc = await admin.firestore().collection('live_rooms').doc(roomId).get();
+      if (!roomDoc.exists) {
+        throw new Error('Room not found');
+      }
+      return { id: roomDoc.id, ...roomDoc.data() };
+    } catch (error) {
+      throw new Error('Error retrieving room');
+    }
   }
 };
 
