@@ -61,11 +61,12 @@ const sendBeansToHostHandler = asyncHandler(async (req, res) => {
 })
 
 const hostSalaryHandler = asyncHandler(async (req, res) => {
-  const result = await hostService.hostSalaryService();
-
+  const {agencyId} = req.query
+  console.log(agencyId)
+  const result = await hostService.hostSalaryService(agencyId);
   res.status(200).json({
     message: "Host salary retrieved successfully",
-    result
+    salaries: result
   })
 
 })

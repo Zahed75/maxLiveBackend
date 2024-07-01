@@ -91,11 +91,23 @@ const getDurationFromTime = (time, timeType) => {
 
   return `${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
+
+function parseDurationToMs(durationString) {
+  const [hoursStr, minutesStr, secondsStr] = durationString.split(':');
+  const [seconds, milliseconds] = secondsStr.split('.');
+  const hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10);
+  const secondsNum = parseInt(seconds, 10);
+  const millisecondsNum = parseInt(milliseconds || '0', 10);
+  const totalMilliseconds = (hours * 3600000) + (minutes * 60000) + (secondsNum * 1000) + millisecondsNum;
+  return totalMilliseconds;
+}
 module.exports = {
   generateOTP,
   asyncHandler,
   convertTo4Digit,
   generateHostId,
   getDurationFromTime,
-  UserSkinsSchema
+  UserSkinsSchema,
+  parseDurationToMs
 };

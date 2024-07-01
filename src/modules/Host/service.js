@@ -1,12 +1,13 @@
 const User = require("../User/model");
 const Host = require("../Host/model");
 const Agency = require("../Agency/model");
-const { generateHostId } = require("../../utility/common");
+const { generateHostId, parseDurationToMs } = require("../../utility/common");
 const { NotFound, BadRequest, Unauthorized } = require("../../utility/errors");
 
 const generateMaxId = require("../../utility/maxId");
 const firebase = require("../../utility/firebaseConfig");
 const LiveRoom = require("../LiveRoom/model");
+const dayjs = require("dayjs");
 
 const applyToBeHostService = async (
   userId,
@@ -60,63 +61,67 @@ const deleteHostService = async (id) => {
   return hostUsers;
 };
 
-const hostSalaryService = async () => {
-  const startOfMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  );
-  const endOfMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 1,
-    0,
-    23,
-    59,
-    59,
-    999
-  );
-
-  const rooms = await LiveRoom.find({
-    ended_at: {
-      $gte: startOfMonth,
-      $lte: endOfMonth,
-    },
-  });
-
-  const hosts = await Host.find();
+const hostSalaryService = async (agencyId) => {
+  // 0.000075 = 7.5$ on 1lac diamonds
+  // 0.00007 = 7$ on 1lac diamonds
+  // 0.00003 = 3$ on 1lac diamonds
+  const hosts = await Host.find({ agencyId });
   const salaries = [];
-  hosts.forEach(async (host) => {
+  let totalHostSalary = 0;
+  let totalHostReward = 0;
+  for (const host of hosts) {
+    const isTenDaysCompletedByHost = !dayjs(host.createdAt).isAfter(dayjs().subtract(10, 'day'));
     const liveRoomByHost = await LiveRoom.find({ host_id: host._id });
     const totalDiamondsReward = liveRoomByHost.reduce(
       (sum, item) => sum + item.diamondsReward,
       0
     );
+    const totalLiveCompleteDuration = liveRoomByHost.reduce(
+      (sum, item) => sum + parseDurationToMs(item.duration),
+      0
+    );
+
     let salary;
+
     if (totalDiamondsReward > host.monthlyTarget) {
       if (host.hostType === "VD") {
-        salary =
-          host.monthlyTarget * 0.00007 +
-          host.monthlyTarget * 0.00003 +
-          ((totalDiamondsReward - host.monthlyTarget) * 0.00007 +
-            (totalDiamondsReward - host.monthlyTarget) * 0.00003) *
-            0.5;
+        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
+          salary = host.monthlyTarget * 0.000075 + (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
+        } else {
+          salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003 + ((totalDiamondsReward - host.monthlyTarget) * 0.00007 + (totalDiamondsReward - host.monthlyTarget) * 0.00003) * 0.5;
+        }
       } else {
-        salary =
-          host.monthlyTarget * 0.000075 +
-          (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
+        salary = host.monthlyTarget * 0.000075 + (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
       }
     } else {
       if (host.hostType === "VD") {
-        salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003;
+        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
+          salary = host.monthlyTarget * 0.000075;
+        } else {
+          salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003;
+        }
       } else {
-        salary = host.monthlyTarget * 0.000075 
+        salary = host.monthlyTarget * 0.000075;
       }
     }
 
-    console.log(salary);
-  });
+    const hostSalary = {
+      ...host.toObject(), // Convert Mongoose document to plain object
+      salary: Math.round(salary),
+      rooms: liveRoomByHost,
+      totalDiamondsReward,
+      totalLiveCompleteDuration
+    };
 
-  return rooms;
+    salaries.push(hostSalary);
+    totalHostSalary += Math.round(salary)
+    totalHostReward += totalDiamondsReward
+  }
+  return {
+    hosts: salaries,
+    totalHostSalary,
+    totalHostReward
+  };
 };
 
 const sendBeansToHostService = async (payload) => {
