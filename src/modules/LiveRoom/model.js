@@ -19,6 +19,11 @@ const liveRoomSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    diamondsReward: {
+      type: Number,
+      required: true,
+      default: 0
+    }
   },
   {
     versionKey: false,

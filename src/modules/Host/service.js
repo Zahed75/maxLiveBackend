@@ -5,6 +5,7 @@ const { generateHostId } = require("../../utility/common");
 const { NotFound,BadRequest,Unauthorized } = require("../../utility/errors");
 
 const generateMaxId = require('../../utility/maxId'); 
+const firebase = require("../../utility/firebaseConfig");
 
 
 const applyToBeHostService = async (
@@ -65,6 +66,43 @@ const deleteHostService = async (id)=>{
   return hostUsers;
 
 }
+const sendBeansToHostService = async (payload)=>{
+  const {hostId, beans, userId, roomId} = payload
+  const host = await Host.findById(hostId);
+  const user = await User.findById(userId)
+  const room = await firebase.getRoomById(roomId);
+  const roomRef = firebase.admin
+  .firestore()
+  .collection("live_rooms")
+  .doc(roomId);
+
+  if(!host){
+    throw new NotFound("Host not found")
+  }
+  if(!user){
+    throw new NotFound("User not found")
+  }
+  if(!room){
+    throw new NotFound("Room not found")
+  }
+  if(user.beans < beans){
+    throw new Error("Insufficient beans")
+  }
+  if(0 > beans){
+    throw new Error("Beans must be a positive number")
+  }
+  if(!room.diamondsReward){
+    room.diamondsReward = 0
+  }
+  const updatedRoom = {
+    ...room,
+    diamondsReward: room.diamondsReward + beans
+  };
+  user.beans -= beans;
+  user.save()
+  await roomRef.set(updatedRoom, { merge: true });
+  return room;
+}
 
 
 
@@ -72,6 +110,6 @@ const deleteHostService = async (id)=>{
 module.exports = {
 
    applyToBeHostService,
-   deleteHostService
-
+   deleteHostService,
+   sendBeansToHostService
 };

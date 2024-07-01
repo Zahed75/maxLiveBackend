@@ -449,8 +449,8 @@ const acceptExchangeRequest = async (hostId) => {
       throw new NotFound("Host not found");
     }
     host.exchangeRequest = false;
-    host.beans += host.exchangeRequestDiamonds;
-    host.totalExchanged += host.exchangeRequestDiamonds
+    host.beans += (host.exchangeRequestDiamonds * 0.4);
+    host.totalExchanged += host.exchangeRequestDiamonds 
     host.diamonds -= host.exchangeRequestDiamonds
     host.exchangeRequestDiamonds = 0;
     // Save the host

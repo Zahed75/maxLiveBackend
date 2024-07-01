@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.post(
   "/save-live-room",
-  handleValidation((body) => liveRoomValidationSchema.validate(body)),
-  liveRoomControllers.createLiveRoomHandler
+  // handleValidation((body) => liveRoomValidationSchema.validate(body)),
+  liveRoomControllers.saveLiveRoomHandler
 );
 
 
