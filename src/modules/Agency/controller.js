@@ -304,6 +304,11 @@ const countryAgencyTargetGraphHandler = asyncHandler(async (req, res) => {
 
   res.status(response.status).json({ message: response.message, result: response.countryTargets });
 });
+const getAgenciesSalary = asyncHandler(async (req, res) => {
+  const response = await agencyService.getAgenciesSalaryService();
+
+  res.status(response.status).json({ message: response.message, result: response });
+});
 
 
 
@@ -330,6 +335,10 @@ router.patch('/transferHost', transferHostToAgencyHandler);
 router.post('/createExchangeRequest', createExchangeRequestHandler);
 router.post('/acceptExchangeRequest', acceptExchangeRequestHandler)
 router.post('/declineExchangeRequest', declineExchangeRequestHandler)
+router.get('/getAgenciesSalary', getAgenciesSalary)
+
+
+// take it in last
 router.get('/:id', getHostbyIdHandler);
 
 module.exports = router;

@@ -2,12 +2,14 @@ const Agency = require("../Agency/model");
 const User = require("../User/model");
 const Host = require("../Host/model");
 const { NotFound, BadRequest } = require("../../utility/errors");
-const { asyncHandler } = require("../../utility/common");
+const { asyncHandler, parseDurationToMs } = require("../../utility/common");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const generateMaxId = require('../../utility/maxId');
 const UserModel = require("../User/model");
+const dayjs = require("dayjs");
+const LiveRoom = require("../LiveRoom/model");
 
 
 
@@ -197,7 +199,7 @@ const signinAgencyService = async (email, password) => {
 // updateAgency
 
 const updateAgencyById = async (id, value, profilePicturePath) => {
-  if(profilePicturePath){
+  if (profilePicturePath) {
     value.profilePicture = profilePicturePath
   }
   const agencyList = await Agency.findByIdAndUpdate({ _id: id }, value, {
@@ -450,7 +452,7 @@ const acceptExchangeRequest = async (hostId) => {
     }
     host.exchangeRequest = false;
     host.beans += (host.exchangeRequestDiamonds * 0.4);
-    host.totalExchanged += host.exchangeRequestDiamonds 
+    host.totalExchanged += host.exchangeRequestDiamonds
     host.diamonds -= host.exchangeRequestDiamonds
     host.exchangeRequestDiamonds = 0;
     // Save the host
@@ -505,6 +507,121 @@ const countryAgencyTargetGraphService = async () => {
     throw error;
   }
 };
+const getAgenciesSalaryService = async () => {
+  try {
+    const agencies = await Agency.find();
+
+    const agencyIds = agencies.map(agency => agency.agencyId);
+    const hosts = await Host.find({ agencyId: { $in: agencyIds } });
+    
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    const hostIds = hosts.map(host => host._id);
+    const liveRooms = await LiveRoom.find({
+      host_id: { $in: hostIds },
+      ended_at: { $gte: firstDayOfMonth, $lte: lastDayOfMonth }
+    });
+
+    const hostLiveRooms = liveRooms.reduce((acc, room) => {
+      if (!acc[room.host_id]) {
+        acc[room.host_id] = [];
+      }
+      acc[room.host_id].push(room);
+      return acc;
+    }, {});
+
+    const agencyHosts = hosts.reduce((acc, host) => {
+      if (!acc[host.agencyId]) {
+        acc[host.agencyId] = [];
+      }
+      acc[host.agencyId].push(host);
+      return acc;
+    }, {});
+
+    const agencySalaries = [];
+    let totalAgencySalary = 0;
+    let totalAgencyDiamondsReward = 0;
+
+    const calculateSalary = (host, totalDiamondsReward, totalLiveCompleteDuration, isTenDaysCompletedByHost) => {
+      let salary;
+      if (totalDiamondsReward > host.monthlyTarget) {
+        if (host.hostType === "VD") {
+          if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { // 60000000ms = 20 hours
+            salary = host.monthlyTarget * 0.000075 + (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
+          } else {
+            salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003 + ((totalDiamondsReward - host.monthlyTarget) * 0.00007 + (totalDiamondsReward - host.monthlyTarget) * 0.00003) * 0.5;
+          }
+        } else {
+          salary = host.monthlyTarget * 0.000075 + (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
+        }
+      } else {
+        if (host.hostType === "VD") {
+          if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { // 60000000ms = 20 hours
+            salary = totalDiamondsReward * 0.000075;
+          } else {
+            salary = totalDiamondsReward * 0.00007 + totalDiamondsReward * 0.00003;
+          }
+        } else {
+          salary = totalDiamondsReward * 0.000075;
+        }
+      }
+      return salary;
+    };
+
+    for (const agency of agencies) {
+      const hosts = agencyHosts[agency.agencyId] || [];
+      const salaries = [];
+      let totalHostSalary = 0;
+      let totalHostReward = 0;
+
+      for (const host of hosts) {
+        const isTenDaysCompletedByHost = !dayjs(host.createdAt).isAfter(dayjs().subtract(10, 'day'));
+        const liveRoomByHost = hostLiveRooms[host._id] || [];
+
+        const totalDiamondsReward = liveRoomByHost.reduce((sum, item) => sum + item.diamondsReward, 0);
+        const totalLiveCompleteDuration = liveRoomByHost.reduce((sum, item) => sum + parseDurationToMs(item.duration), 0);
+
+        const salary = calculateSalary(host, totalDiamondsReward, totalLiveCompleteDuration, isTenDaysCompletedByHost);
+
+        const hostSalary = {
+          ...host.toObject(),
+          salary: Math.round(salary),
+          rooms: liveRoomByHost,
+          totalLiveCompleteDuration
+        };
+        salaries.push(hostSalary);
+        totalHostSalary += Math.round(salary);
+        totalHostReward += totalDiamondsReward;
+      }
+
+      const agencySalary = {
+        ...agency.toObject(),
+        salary: totalHostSalary * 0.15,
+        totalHostReward
+      };
+
+      agencySalaries.push(agencySalary);
+      totalAgencySalary += totalHostSalary * 0.15;
+      totalAgencyDiamondsReward += totalHostReward;
+    }
+
+    return { 
+      status: 200, 
+      message: 'Agencies salary fetched successfully', 
+      result: {
+        salaries: agencySalaries,
+        totalAgencySalary,
+        totalAgencyDiamondsReward
+      } 
+    };
+  } catch (error) {
+    console.error("Error fetching agencies salary", error);
+    throw error;
+  }
+};
+
 
 
 
@@ -526,5 +643,6 @@ module.exports = {
   createExchangeRequest,
   acceptExchangeRequest,
   declineExchangeRequest,
-  countryAgencyTargetGraphService
+  countryAgencyTargetGraphService,
+  getAgenciesSalaryService
 };

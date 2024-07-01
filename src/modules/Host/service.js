@@ -66,12 +66,21 @@ const hostSalaryService = async (agencyId) => {
   // 0.00007 = 7$ on 1lac diamonds
   // 0.00003 = 3$ on 1lac diamonds
   const hosts = await Host.find({ agencyId });
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   const salaries = [];
   let totalHostSalary = 0;
   let totalHostReward = 0;
   for (const host of hosts) {
     const isTenDaysCompletedByHost = !dayjs(host.createdAt).isAfter(dayjs().subtract(10, 'day'));
-    const liveRoomByHost = await LiveRoom.find({ host_id: host._id });
+    const liveRoomByHost = await LiveRoom.find({
+      host_id: host._id,
+      ended_at: {
+        $gte: firstDayOfMonth,
+        $lte: lastDayOfMonth
+      }
+    });
     const totalDiamondsReward = liveRoomByHost.reduce(
       (sum, item) => sum + item.diamondsReward,
       0
@@ -82,7 +91,6 @@ const hostSalaryService = async (agencyId) => {
     );
 
     let salary;
-
     if (totalDiamondsReward > host.monthlyTarget) {
       if (host.hostType === "VD") {
         if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
@@ -96,23 +104,21 @@ const hostSalaryService = async (agencyId) => {
     } else {
       if (host.hostType === "VD") {
         if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
-          salary = host.monthlyTarget * 0.000075;
+          salary = totalDiamondsReward * 0.000075;
         } else {
-          salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003;
+          salary = totalDiamondsReward * 0.00007 + totalDiamondsReward * 0.00003;
         }
       } else {
-        salary = host.monthlyTarget * 0.000075;
+        salary = totalDiamondsReward * 0.000075;
       }
     }
 
     const hostSalary = {
-      ...host.toObject(), // Convert Mongoose document to plain object
+      ...host.toObject(), 
       salary: Math.round(salary),
       rooms: liveRoomByHost,
-      totalDiamondsReward,
       totalLiveCompleteDuration
     };
-
     salaries.push(hostSalary);
     totalHostSalary += Math.round(salary)
     totalHostReward += totalDiamondsReward
