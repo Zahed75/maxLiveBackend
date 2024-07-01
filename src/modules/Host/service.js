@@ -69,31 +69,30 @@ const hostSalaryService = async (agencyId) => {
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  const hostIds = hosts.map(host => host._id);
+  const liveRooms = await LiveRoom.find({
+    host_id: { $in: hostIds },
+    ended_at: { $gte: firstDayOfMonth, $lte: lastDayOfMonth }
+  });
+
+  const hostLiveRooms = liveRooms.reduce((acc, room) => {
+    if (!acc[room.host_id]) {
+      acc[room.host_id] = [];
+    }
+    acc[room.host_id].push(room);
+    return acc;
+  }, {});
+
   const salaries = [];
   let totalHostSalary = 0;
   let totalHostReward = 0;
-  for (const host of hosts) {
-    const isTenDaysCompletedByHost = !dayjs(host.createdAt).isAfter(dayjs().subtract(10, 'day'));
-    const liveRoomByHost = await LiveRoom.find({
-      host_id: host._id,
-      ended_at: {
-        $gte: firstDayOfMonth,
-        $lte: lastDayOfMonth
-      }
-    });
-    const totalDiamondsReward = liveRoomByHost.reduce(
-      (sum, item) => sum + item.diamondsReward,
-      0
-    );
-    const totalLiveCompleteDuration = liveRoomByHost.reduce(
-      (sum, item) => sum + parseDurationToMs(item.duration),
-      0
-    );
 
+  const calculateSalary = (host, totalDiamondsReward, totalLiveCompleteDuration, isTenDaysCompletedByHost) => {
     let salary;
     if (totalDiamondsReward > host.monthlyTarget) {
       if (host.hostType === "VD") {
-        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
+        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { // 60000000ms = 20 hours
           salary = host.monthlyTarget * 0.000075 + (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
         } else {
           salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003 + ((totalDiamondsReward - host.monthlyTarget) * 0.00007 + (totalDiamondsReward - host.monthlyTarget) * 0.00003) * 0.5;
@@ -103,7 +102,7 @@ const hostSalaryService = async (agencyId) => {
       }
     } else {
       if (host.hostType === "VD") {
-        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { //60000000ms = 20 hours
+        if (totalLiveCompleteDuration < 60000000 || !isTenDaysCompletedByHost) { // 60000000ms = 20 hours
           salary = totalDiamondsReward * 0.000075;
         } else {
           salary = totalDiamondsReward * 0.00007 + totalDiamondsReward * 0.00003;
@@ -112,23 +111,36 @@ const hostSalaryService = async (agencyId) => {
         salary = totalDiamondsReward * 0.000075;
       }
     }
+    return salary;
+  };
+
+  for (const host of hosts) {
+    const isTenDaysCompletedByHost = !dayjs(host.createdAt).isAfter(dayjs().subtract(10, 'day'));
+    const liveRoomByHost = hostLiveRooms[host._id] || [];
+
+    const totalDiamondsReward = liveRoomByHost.reduce((sum, item) => sum + item.diamondsReward, 0);
+    const totalLiveCompleteDuration = liveRoomByHost.reduce((sum, item) => sum + parseDurationToMs(item.duration), 0);
+
+    const salary = calculateSalary(host, totalDiamondsReward, totalLiveCompleteDuration, isTenDaysCompletedByHost);
 
     const hostSalary = {
-      ...host.toObject(), 
+      ...host.toObject(),
       salary: Math.round(salary),
       rooms: liveRoomByHost,
       totalLiveCompleteDuration
     };
     salaries.push(hostSalary);
-    totalHostSalary += Math.round(salary)
-    totalHostReward += totalDiamondsReward
+    totalHostSalary += Math.round(salary);
+    totalHostReward += totalDiamondsReward;
   }
+
   return {
     hosts: salaries,
     totalHostSalary,
     totalHostReward
   };
 };
+
 
 const sendBeansToHostService = async (payload) => {
   const { hostId, beans, userId, roomId } = payload;
