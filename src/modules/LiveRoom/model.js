@@ -6,6 +6,10 @@ const liveRoomSchema = new mongoose.Schema(
         type : Date,
         required: true
     },
+    duration:{
+      type : String,
+      required: true
+    },
     ended_at:{
         type : Date,
         default: Date.now()

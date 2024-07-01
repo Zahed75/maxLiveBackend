@@ -1,12 +1,12 @@
 const User = require("../User/model");
-const Host = require('../Host/model');
+const Host = require("../Host/model");
 const Agency = require("../Agency/model");
 const { generateHostId } = require("../../utility/common");
-const { NotFound,BadRequest,Unauthorized } = require("../../utility/errors");
+const { NotFound, BadRequest, Unauthorized } = require("../../utility/errors");
 
-const generateMaxId = require('../../utility/maxId'); 
+const generateMaxId = require("../../utility/maxId");
 const firebase = require("../../utility/firebaseConfig");
-
+const LiveRoom = require("../LiveRoom/model");
 
 const applyToBeHostService = async (
   userId,
@@ -39,8 +39,7 @@ const applyToBeHostService = async (
     user.isVerified = user.isVerified;
     user.isApproved = user.isApproved;
     user.profilePicture = user.profilePicture;
-    maxId, 
-    user.nidFront = nidFrontPath;
+    maxId, (user.nidFront = nidFrontPath);
     user.nidBack = nidBackPath;
     await user.save();
 
@@ -51,65 +50,116 @@ const applyToBeHostService = async (
   }
 };
 
-
-
-
-
 // delete Host service
 
-const deleteHostService = async (id)=>{
-  
-  const hostUsers = Host.findByIdAndDelete({_id:id});
-  if(!hostUsers){
-    throw new NotFound("Host not found")
+const deleteHostService = async (id) => {
+  const hostUsers = Host.findByIdAndDelete({ _id: id });
+  if (!hostUsers) {
+    throw new NotFound("Host not found");
   }
   return hostUsers;
+};
 
-}
-const sendBeansToHostService = async (payload)=>{
-  const {hostId, beans, userId, roomId} = payload
+const hostSalaryService = async () => {
+  const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1
+  );
+  const endOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  );
+
+  const rooms = await LiveRoom.find({
+    ended_at: {
+      $gte: startOfMonth,
+      $lte: endOfMonth,
+    },
+  });
+
+  const hosts = await Host.find();
+  const salaries = [];
+  hosts.forEach(async (host) => {
+    const liveRoomByHost = await LiveRoom.find({ host_id: host._id });
+    const totalDiamondsReward = liveRoomByHost.reduce(
+      (sum, item) => sum + item.diamondsReward,
+      0
+    );
+    let salary;
+    if (totalDiamondsReward > host.monthlyTarget) {
+      if (host.hostType === "VD") {
+        salary =
+          host.monthlyTarget * 0.00007 +
+          host.monthlyTarget * 0.00003 +
+          ((totalDiamondsReward - host.monthlyTarget) * 0.00007 +
+            (totalDiamondsReward - host.monthlyTarget) * 0.00003) *
+            0.5;
+      } else {
+        salary =
+          host.monthlyTarget * 0.000075 +
+          (totalDiamondsReward - host.monthlyTarget) * 0.000075 * 0.5;
+      }
+    } else {
+      if (host.hostType === "VD") {
+        salary = host.monthlyTarget * 0.00007 + host.monthlyTarget * 0.00003;
+      } else {
+        salary = host.monthlyTarget * 0.000075 
+      }
+    }
+
+    console.log(salary);
+  });
+
+  return rooms;
+};
+
+const sendBeansToHostService = async (payload) => {
+  const { hostId, beans, userId, roomId } = payload;
   const host = await Host.findById(hostId);
-  const user = await User.findById(userId)
+  const user = await User.findById(userId);
   const room = await firebase.getRoomById(roomId);
   const roomRef = firebase.admin
-  .firestore()
-  .collection("live_rooms")
-  .doc(roomId);
+    .firestore()
+    .collection("live_rooms")
+    .doc(roomId);
 
-  if(!host){
-    throw new NotFound("Host not found")
+  if (!host) {
+    throw new NotFound("Host not found");
   }
-  if(!user){
-    throw new NotFound("User not found")
+  if (!user) {
+    throw new NotFound("User not found");
   }
-  if(!room){
-    throw new NotFound("Room not found")
+  if (!room) {
+    throw new NotFound("Room not found");
   }
-  if(user.beans < beans){
-    throw new Error("Insufficient beans")
+  if (user.beans < beans) {
+    throw new Error("Insufficient beans");
   }
-  if(0 > beans){
-    throw new Error("Beans must be a positive number")
+  if (0 > beans) {
+    throw new Error("Beans must be a positive number");
   }
-  if(!room.diamondsReward){
-    room.diamondsReward = 0
+  if (!room.diamondsReward) {
+    room.diamondsReward = 0;
   }
   const updatedRoom = {
     ...room,
-    diamondsReward: room.diamondsReward + beans
+    diamondsReward: room.diamondsReward + beans,
   };
   user.beans -= beans;
-  user.save()
+  user.save();
   await roomRef.set(updatedRoom, { merge: true });
   return room;
-}
-
-
-
+};
 
 module.exports = {
-
-   applyToBeHostService,
-   deleteHostService,
-   sendBeansToHostService
+  applyToBeHostService,
+  deleteHostService,
+  sendBeansToHostService,
+  hostSalaryService,
 };

@@ -60,6 +60,16 @@ const sendBeansToHostHandler = asyncHandler(async (req, res) => {
 
 })
 
+const hostSalaryHandler = asyncHandler(async (req, res) => {
+  const result = await hostService.hostSalaryService();
+
+  res.status(200).json({
+    message: "Host salary retrieved successfully",
+    result
+  })
+
+})
+
 
 
 
@@ -70,6 +80,7 @@ router.post("/applytoBeHost/:userId/:agencyId/:hostId", multerMiddleware.upload.
 ]), applyToBeHostHandler);
 router.post("/sendBeansToHost", sendBeansToHostHandler)
 router.delete('/:id', deleteHostHandler)
+router.get('/salary', hostSalaryHandler)
 
 
 

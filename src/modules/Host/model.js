@@ -28,6 +28,10 @@ const hostSchema = new mongoose.Schema(
     userName: {
       type: String,
     },
+    monthlyTarget: {
+      type: Number,
+      default: 0
+    },
     birthdate: {
       type: String,
     },
